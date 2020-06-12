@@ -530,6 +530,6 @@ namespace Nullspace
             }
         }
 
-        protected uint TimerId { get; set; }
+        protected int TimerId { get; set; }
     }
 }
