@@ -13,14 +13,12 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.4.8f1</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -235,13 +233,97 @@
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/kay/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>Assets/Plugins/System.Drawing.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Algorithm\2DConvexPolygonDeompose.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DEarClipping.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DHMWaypoint.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DImageSkeleton.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DJarvisConvex.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DPolygonScanning.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DRectPartion.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DVoronoiGraph.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\2DVoronoiGraphFast.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\3DQuickHull.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\AStar.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\Dijkstra.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\DijkstraTest.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\FPGrowth.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\GroupClosest.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\GroupHash.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\KMeansPlus.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\Utils\AlgorithmFileUtils.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\Utils\GeoAlgorithmUtils.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\Utils\MeshBorderFind.cs" />
+    <Compile Include="Assets\Scripts\Algorithm\Utils\MeshVertexMerge.cs" />
+    <Compile Include="Assets\Scripts\BehaviourTree\BehaviourTree.cs" />
+    <Compile Include="Assets\Scripts\BehaviourTree\BTActionNode.cs" />
+    <Compile Include="Assets\Scripts\BehaviourTree\BTCompositeNode.cs" />
+    <Compile Include="Assets\Scripts\BehaviourTree\BTConditionNode.cs" />
+    <Compile Include="Assets\Scripts\BehaviourTree\BTDecoratorNode.cs" />
+    <Compile Include="Assets\Scripts\BehaviourTree\BTTimerTask.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\BVHTree.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\BVHTree2D.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\BVHTree3D.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoAABB.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoBSpline.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoCircle.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoLine.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoMesh.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeometricObject.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoPlane.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoPointsArray.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoPolygon.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoRay.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoSegment.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoSphere.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Geometric\GeoTriangle.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Object\BVHAABB2Object.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Object\BVHAABB3Object.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Object\BVHBaseObject.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Object\BVHSegment2Object.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Object\BVHTriangle2Object.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Object\BVHTriangle3Object.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoAABBUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoCircleUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoLineUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoPlaneUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoPolygonUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoRayUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoSegmentUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoTangentUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoTriangleUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\GeoUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\Matrix2x2.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\MatrixUtils.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\Vector2i.cs" />
     <Compile Include="Assets\Scripts\Config\LoggerConfig.cs" />
     <Compile Include="Assets\Scripts\Config\NetworkConfig.cs" />
     <Compile Include="Assets\Scripts\Config\XmlDataConfig.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\EventDispatcher.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\EventException.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateCondition.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateConditionType.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateController.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateEntity.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateParameterDataType.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateParameterValue.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\IAgent.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\IState.cs" />
     <Compile Include="Assets\Scripts\Movable\MovableObject.cs" />
     <Compile Include="Assets\Scripts\Movable\MovableObjectTest.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkClient.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCommand.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCppClient.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkHeadFormat.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkMessage.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkPacket.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkSynClient.cs" />
+    <Compile Include="Assets\Scripts\Network\Test\NetCommand.cs" />
+    <Compile Include="Assets\Scripts\Network\Test\TestNetwork.cs" />
     <Compile Include="Assets\Scripts\NullspaceRoot.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\ResourceCacheBehaviour.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\ResourceCacheBindParent.cs" />
