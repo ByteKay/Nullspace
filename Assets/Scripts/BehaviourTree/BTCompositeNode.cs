@@ -139,8 +139,8 @@ namespace Nullspace
             BTNodeState NodeStatus();
         }
 
-        List<Coroutine> mCoroutines = new List<Coroutine>();
-        MonoBehaviour behaviour;
+        private List<Coroutine> mCoroutines = new List<Coroutine>();
+        private MonoBehaviour behaviour;
         public override BTNodeState Process(Object obj)
         {
             if (mNodeState == BTNodeState.Ready || mNodeState == BTNodeState.Success)

@@ -5,11 +5,11 @@ namespace Nullspace
 {
     public class BTTimerTask
     {
-        long mCurrentTicks;
-        long mInterval;
-        long mNextTicks;
-        Callback<Object> mCallback = null;
-        bool isStop;
+        private long mCurrentTicks;
+        private long mInterval;
+        private long mNextTicks;
+        private Callback<Object> mCallback = null;
+        private bool isStop;
         public BTTimerTask(float interval, Action<Object> action)
         {
             if (action != null)
@@ -39,7 +39,7 @@ namespace Nullspace
             return false;
         }
 
-        void Start()
+        private void Start()
         {
             if (isStop)
             {

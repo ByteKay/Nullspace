@@ -43,8 +43,8 @@ namespace Nullspace
     // 计数器
     public class BTCounterLimitNode : BTDecoratorNode
     {
-        int mRunningLimitCount;
-        int mRunningCount = 0;
+        private int mRunningLimitCount;
+        private int mRunningCount = 0;
         public BTCounterLimitNode(int limit) : base()
         {
             mRunningLimitCount = limit;
@@ -72,7 +72,7 @@ namespace Nullspace
     // 运行时间内
     public class BTTimerLimitNode : BTDecoratorNode
     {
-        BTTimerTask mTimerTask;
+        private BTTimerTask mTimerTask;
         public BTTimerLimitNode(float interval) : base()
         {
             mTimerTask = new BTTimerTask(interval, null);
@@ -100,7 +100,7 @@ namespace Nullspace
     // 定时器
     public class BTTimerNode : BTDecoratorNode
     {
-        BTTimerTask mTimerTask;
+        private BTTimerTask mTimerTask;
         public BTTimerNode(float interval) : base()
         {
             mTimerTask = new BTTimerTask(interval, null);
@@ -120,7 +120,7 @@ namespace Nullspace
     // 直接装饰器 定时器
     public class BTTSimpleTimerNode : BehaviourTreeNode
     {
-        BTTimerTask mTimerTask;
+        private BTTimerTask mTimerTask;
         public BTTSimpleTimerNode(float interval, Action<Object> action) : base()
         {
             mTimerTask = new BTTimerTask(interval, action);
