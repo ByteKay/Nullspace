@@ -292,7 +292,7 @@ namespace Nullspace
                         }
                     }
                 }
-                TimerPriorityQueue<NodeType, NodeType, float> minHeap = new TimerPriorityQueue<NodeType, NodeType, float>();
+                PriorityQueue<NodeType, NodeType, float> minHeap = new PriorityQueue<NodeType, NodeType, float>();
                 foreach (var open in openSet)
                 {
                     minHeap.Enqueue(open.Key, open.Key, open.Value);

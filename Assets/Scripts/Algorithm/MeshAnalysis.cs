@@ -174,7 +174,7 @@ namespace Nullspace
         public MeshAnalysis(List<List<Vector3>> triangles)
         {
             List<Vector3> temp = new List<Vector3>();
-            CommonUtils.FlatList(triangles, ref temp);
+            GeoAlgorithmUtils.FlatList(triangles, ref temp);
             MeshAnalysis1(temp);
         }
 

@@ -58,7 +58,7 @@ namespace Nullspace
         private ushort mGridXMod;
         private ushort mGridXLog2;
         private PathNode[] mGridNode = null;
-        private TimerPriorityQueue<ushort, ushort, float> mOpenTable;
+        private PriorityQueue<ushort, ushort, float> mOpenTable;
         private List<PathNodeResult> mResultPath = new List<PathNodeResult>();
         private int mOpenStatusValue = 0;
         private int mCloseStatusValue = 1;
@@ -130,7 +130,7 @@ namespace Nullspace
             mGridXMod = (ushort)(mGridX - 1);
             mGridXLog2 = (ushort)Math.Log(mGridX, 2);
             mGridNode = new PathNode[mGridX * mGridY];
-            mOpenTable = new TimerPriorityQueue<ushort, ushort, float>();
+            mOpenTable = new PriorityQueue<ushort, ushort, float>();
             mMultiple = 1.0f / mGridX;
         }
 

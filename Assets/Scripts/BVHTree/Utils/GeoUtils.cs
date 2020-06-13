@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,13 +6,112 @@ namespace Nullspace
 {
     public class GeoUtils
     {
-        public static Vector3 ToVector2(Vector2 v)
+        public static float PRECISION = 1e-5f;
+        public static Vector3 ToVector3(Vector2 v)
         {
             return new Vector3(v.x, v.y, 0.0f);
         }
         public static Vector2 ToVector2(Vector3 v)
         {
-            return new Vector2(v.x, v.z);
+            return new Vector2(v.x, v.y);
+        }
+
+        public static GeoAABB3 GetAABB(List<Vector3> points)
+        {
+            GeoAABB3 aabb = new GeoAABB3();
+            if (points.Count > 0)
+            {
+                aabb.mMin = points[0];
+                aabb.mMax = points[0];
+                for (int i = 1; i < points.Count; ++i)
+                {
+                    aabb.mMax = Vector3.Max(aabb.mMax, points[i]);
+                    aabb.mMin = Vector3.Min(aabb.mMin, points[i]);
+                }
+            }
+            return aabb;
+        }
+
+        public static List<List<Vector2>> CircleSplit(List<List<int>> circles, List<Vector2> points)
+        {
+            List<List<Vector2>> results = new List<List<Vector2>>();
+            foreach (List<int> temp in circles)
+            {
+                if (temp.Count < 2)
+                {
+                    continue;
+                }
+                // to do
+            }
+            return results;
+        }
+
+        public static Vector2 Center(List<Vector2> src)
+        {
+            Vector2 temp = Vector2.zero;
+            if (src.Count > 0)
+            {
+                foreach (Vector2 v in src)
+                {
+                    temp += v;
+                }
+                temp = temp * 1.0f / src.Count;
+            }
+            return temp;
+        }
+        public static List<Vector2> TranslateAndScale(List<Vector2> src, Vector2 pivot, float scale)
+        {
+            List<Vector2> temp = new List<Vector2>();
+            foreach (Vector2 v in src)
+            {
+                temp.Add((v - pivot) * scale);
+            }
+            return temp;
+        }
+
+        public static List<Vector2> TranslateAndScale(List<Vector2> src, float scale)
+        {
+            Vector2 center = Center(src);
+            List<Vector2> temp = new List<Vector2>();
+            foreach (Vector2 v in src)
+            {
+                temp.Add((v - center) * scale);
+            }
+            return temp;
+        }
+
+        public static List<int> VertexIndexList(List<Vector2> points, int round = 2)
+        {
+            List<int> temp = new List<int>();
+            Dictionary<string, int> indexMap = new Dictionary<string, int>();
+            int index = 0;
+            for (int i = 0; i < points.Count; ++i)
+            {
+                string key = string.Format("{0}_{1}", Math.Round(points[i][0], round), Math.Round(points[i][1], round));
+                if (!indexMap.ContainsKey(key))
+                {
+                    indexMap.Add(key, index);
+                    index++;
+                }
+                temp.Add(indexMap[key]);
+            }
+            return temp;
+        }
+        public static List<Vector2> VertexMergeList(List<Vector2> points, int round = 2)
+        {
+            List<Vector2> temp = new List<Vector2>();
+            HashSet<string> indexMap = new HashSet<string>();
+            Vector2 last = new Vector2(float.MaxValue, float.MaxValue);
+            for (int i = 0; i < points.Count; ++i)
+            {
+                Vector2 tempV = new Vector2((float)Math.Round(points[i][0], round), (float)Math.Round(points[i][1], round));
+                if (tempV != last)
+                {
+                    last = tempV;
+                    temp.Add(tempV);
+                }
+            }
+            return temp;
         }
         public static GeoAABB2 GetAABB(List<Vector2> points)
         {
@@ -24,11 +123,62 @@ namespace Nullspace
                 for (int i = 1; i < points.Count; ++i)
                 {
                     aabb.mMax = Vector2.Max(aabb.mMax, points[i]);
-                    aabb.mMin = Vector2.Max(aabb.mMin, points[i]);
+                    aabb.mMin = Vector2.Min(aabb.mMin, points[i]);
                 }
+                aabb.mSize = aabb.mMax - aabb.mMin;
             }
             return aabb;
         }
+
+        public static void MeshVertexPrimitiveType1(List<Vector3> points, ref List<Vector3> vertes, ref List<int> indices)
+        {
+            vertes.Clear();
+            indices.Clear();
+            int count = points.Count;
+            Dictionary<string, int> cache = new Dictionary<string, int>();
+            int index = 0;
+            for (int i = 0; i < count; ++i)
+            {
+                string format = string.Format("{0}_{1}_{2}", Math.Round(points[i][0], 4), Math.Round(points[i][1], 4), Math.Round(points[i][2], 4));
+                if (cache.ContainsKey(format))
+                {
+                    indices.Add(cache[format]);
+                }
+                else
+                {
+                    cache.Add(format, index);
+                    vertes.Add(points[i]);
+                    indices.Add(index);
+                    index++;
+                }
+            }
+            cache.Clear();
+        }
+
+        public static void MeshVertexPrimitiveType(List<Vector3> points, ref List<Vector3> vertes, ref List<int> indices)
+        {
+            vertes.Clear();
+            indices.Clear();
+            int count = points.Count / 3;
+            for (int i = 0; i < count; ++i)
+            {
+                for (int j = i * 3; j < i * 3 + 3; ++j)
+                {
+                    Vector3 vj = points[j];
+                    int idx = vertes.FindIndex((v) => { return v == vj; });
+                    if (idx == -1)
+                    {
+                        indices.Add(vertes.Count);
+                        vertes.Add(vj);
+                    }
+                    else
+                    {
+                        indices.Add(idx);
+                    }
+                }
+            }
+        }
+
         public static void MeshVertexPrimitiveType(List<Vector2> points, ref List<Vector2> vertes, ref List<int> indices)
         {
             vertes.Clear();
@@ -85,7 +235,22 @@ namespace Nullspace
                 triangles.Add(tri);
             }
         }
-
+        public static List<Vector3> CalculateCircle3(float angle, float r, float y, Vector2 center)
+        {
+            List<Vector3> cir = new List<Vector3>();
+            Matrix2x2 mat2 = MatrixUtils.CreateMatrix2D(angle, center);
+            mat2.Scale = Vector2.one * r;
+            Vector2 start = new Vector2(0, 1);
+            int count = (int)(360.0f / angle);
+            for (int i = 0; i < count; ++i)
+            {
+                Vector2 next = mat2.Rotate(start);
+                start = next.normalized;
+                next = start * r + center;
+                cir.Add(new Vector3(next[0], y, next[1]));
+            }
+            return cir;
+        }
         public static List<Vector2> CalculateCircle(float angle, float r, Vector2 center)
         {
             List<Vector2> cir = new List<Vector2>();
@@ -104,7 +269,7 @@ namespace Nullspace
 
         public static void MeshTrianlgeToList(List<Vector2> vertes, ref List<List<Vector2>> triangles)
         {
-            int count = vertes.Count / 3; 
+            int count = vertes.Count / 3;
             for (int i = 0; i < count; ++i)
             {
                 List<Vector2> tri = new List<Vector2>();
@@ -114,14 +279,7 @@ namespace Nullspace
                 triangles.Add(tri);
             }
         }
-        public static void FlatList<T>(List<List<T>> vertes, ref List<T> points)
-        {
-            points.Clear();
-            foreach (List<T> lst in vertes)
-            {
-                points.AddRange(lst);
-            }
-        }
+
 
         public static void FlatList(List<List<Vector2>> vertes, ref List<Vector2> points)
         {
@@ -131,8 +289,33 @@ namespace Nullspace
                 points.AddRange(lst);
             }
         }
+        public static void MergePointByDirection1(List<Vector2> convex)
+        {
+            int size = convex.Count;
+            Vector2 pi;
+            Vector2 ni;
+            List<int> needRemove = new List<int>();
+            for (int i = 0; i < size; ++i)
+            {
+                int n = (i + 1) % size;
+                int p = (i - 1 + size) % size;
+                pi = convex[i] - convex[p];
+                ni = convex[i] - convex[n];
+                pi.Normalize();
+                ni.Normalize();
+                float dot = Vector2.Dot(pi, ni);
+                if (dot < -0.995f)
+                {
+                    needRemove.Add(i);
+                }
+            }
+            for (int i = needRemove.Count - 1; i >= 0; --i)
+            {
+                convex.RemoveAt(needRemove[i]);
+            }
+        }
 
-        public static void MergePoint(List<Vector2> convex)
+        public static void MergePointByDirection(List<Vector2> convex)
         {
             int size = convex.Count;
             Vector2 pi;
@@ -194,13 +377,13 @@ namespace Nullspace
             Vector3 cd = line4 - line3;
             Vector3 ac = line3 - line1;
             float f1ab = Vector3.Dot(ab, ab);// ab.x * ab.x + ab.y * ab.y + ab.z * ab.z;
-            float f1cd = Vector3.Dot(cd, cd); ;//cd.x * cd.x + cd.y * cd.y + cd.z * cd.z;
+            float f1cd = Vector3.Dot(cd, cd); //cd.x * cd.x + cd.y * cd.y + cd.z * cd.z;
             float f2 = Vector3.Dot(ab, cd);//ab.x * cd.x + ab.y * cd.y + ab.z * cd.z;
             float f3ab = Vector3.Dot(ab, ac); // ab.x * ac.x + ab.y * ac.y + ab.z * ac.z;
             float f3cd = Vector3.Dot(cd, ac);// cd.x * ac.x + cd.y * ac.y + cd.z * ac.z;
 
             float det = (-f1ab * f1cd) + f2 * f2;
-            if (det > -1e-5f && det < 1e-5f) // 平行 共线
+            if (det > -GeoUtils.PRECISION && det < GeoUtils.PRECISION) // 平行 共线
             {
                 closest1 = new Vector3();
                 closest2 = new Vector3();
@@ -227,7 +410,7 @@ namespace Nullspace
             float f3cd = Vector3.Dot(cd, ac);// cd.x * ac.x + cd.y * ac.y + cd.z * ac.z;
 
             float det = (-f1ab * f1cd) + f2 * f2;
-            if (det > -1e-5f && det < 1e-5f) // 平行 共线
+            if (det > -GeoUtils.PRECISION && det < GeoUtils.PRECISION) // 平行 共线
             {
                 closest1 = new Vector3();
                 closest2 = new Vector3();
@@ -266,7 +449,7 @@ namespace Nullspace
             float f3cd = Vector3.Dot(cd, ac);// cd.x * ac.x + cd.y * ac.y + cd.z * ac.z;
 
             float det = (-f1ab * f1cd) + f2 * f2;
-            if (det > -1e-5f && det < 1e-5f) // 平行 共线
+            if (det > -GeoUtils.PRECISION && det < GeoUtils.PRECISION) // 平行 共线
             {
                 closest1 = new Vector3();
                 closest2 = new Vector3();
@@ -311,7 +494,7 @@ namespace Nullspace
             float f3cd = Vector3.Dot(cd, ac);// cd.x * ac.x + cd.y * ac.y + cd.z * ac.z;
 
             float det = (-f1ab * f1cd) + f2 * f2;
-            if (det > -1e-5f && det < 1e-5f) // 平行 共线
+            if (det > -GeoUtils.PRECISION && det < GeoUtils.PRECISION) // 平行 共线
             {
                 closest1 = new Vector3();
                 closest2 = new Vector3();
@@ -343,7 +526,7 @@ namespace Nullspace
             float f3cd = Vector3.Dot(cd, ac);// cd.x * ac.x + cd.y * ac.y + cd.z * ac.z;
 
             float det = (-f1ab * f1cd) + f2 * f2;
-            if (det > -1e-5f && det < 1e-5f) // 平行 共线
+            if (det > -GeoUtils.PRECISION && det < GeoUtils.PRECISION) // 平行 共线
             {
                 closest1 = new Vector3();
                 closest2 = new Vector3();
@@ -384,7 +567,7 @@ namespace Nullspace
             float f3cd = Vector3.Dot(cd, ac);// cd.x * ac.x + cd.y * ac.y + cd.z * ac.z;
 
             float det = (-f1ab * f1cd) + f2 * f2;
-            if (det > -1e-5f && det < 1e-5f) // 平行 共线
+            if (det > -GeoUtils.PRECISION && det < GeoUtils.PRECISION) // 平行 共线
             {
                 closest1 = new Vector3();
                 closest2 = new Vector3();

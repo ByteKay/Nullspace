@@ -11,9 +11,6 @@ namespace Nullspace
 
     public class ClosestUnion
     {
-
-        private Dictionary<int, List<int>> mGroups;
-        private List<int> mIndexTable;
         public ClosestUnion()
         {
             mGroups = new Dictionary<int, List<int>>();
@@ -42,25 +39,25 @@ namespace Nullspace
         public void Unite(int i, int j)
         {
             int ii = Find(i);
-		    int jj = Find(j);
-		    if (ii != jj)
-		    {
-			    mIndexTable[ii] = jj;
-		    }
+            int jj = Find(j);
+            if (ii != jj)
+            {
+                mIndexTable[ii] = jj;
+            }
         }
 
         public void Group()
         {
             int size = mIndexTable.Count;
-		    for (int i = 0; i < size; ++i)
-		    {
-			    int groupId = Find(i);
-			    if (!mGroups.ContainsKey(groupId))
-			    {
-				    mGroups.Add(groupId, new List<int>());
-			    }
-			    mGroups[groupId].Add(i);
-		    }
+            for (int i = 0; i < size; ++i)
+            {
+                int groupId = Find(i);
+                if (!mGroups.ContainsKey(groupId))
+                {
+                    mGroups.Add(groupId, new List<int>());
+                }
+                mGroups[groupId].Add(i);
+            }
         }
 
         public Dictionary<int, List<int>> GetResult()
@@ -68,13 +65,13 @@ namespace Nullspace
             return mGroups;
         }
 
+        private Dictionary<int, List<int>> mGroups;
+        private List<int> mIndexTable;
     }
 
     // 可以认为是  基于密度的聚类
     public class GroupClosest<T> where T : ClosestObject
     {
-        private ClosestUnion mUnion;
-        private List<T> mObjects;
         class ClosestPair
         {
             public int mI;
@@ -95,6 +92,10 @@ namespace Nullspace
         {
             mUnion = new ClosestUnion();
             mObjects = t;
+        }
+        public void AddRange(List<T> t)
+        {
+            mObjects.AddRange(t);
         }
 
         public void Add(T t)
@@ -143,6 +144,8 @@ namespace Nullspace
             }
         }
 
+        private ClosestUnion mUnion;
+        private List<T> mObjects;
     }
 
 

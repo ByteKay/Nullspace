@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
 namespace Nullspace
 {
     public class QHullEdgeBounding
@@ -32,7 +32,7 @@ namespace Nullspace
 
         public void Push(GeoSegment3 edge)
         {
-            int index = mEdgeStack.FindIndex(delegate(GeoSegment3 p) { return p.Equal(edge); });
+            int index = mEdgeStack.FindIndex(delegate (GeoSegment3 p) { return p.Equal(edge); });
             if (index == -1)
                 mEdgeStack.Add(edge);
             else
@@ -44,7 +44,7 @@ namespace Nullspace
     {
         public GeoPlane mPlane;
         public Vector3[] mVertexPoints;
-        
+
         public QHullTrianglePlane(Vector3 a, Vector3 b, Vector3 c)
         {
             Vector3 normal = Vector3.Cross(b - a, c - a);
@@ -109,9 +109,9 @@ namespace Nullspace
         {
             mPointsList = new List<Vector3>();
             mTrianglePlane = new QHullTrianglePlane(a, b, c);
-		    mFathestPoint = Vector3.zero;
-		    mFathestDistance = -1e20f;
-		    mIsDelete = false;
+            mFathestPoint = Vector3.zero;
+            mFathestDistance = -1e20f;
+            mIsDelete = false;
         }
 
         public bool AddPoint(Vector3 p)
@@ -144,6 +144,11 @@ namespace Nullspace
 
     public class QuickHull
     {
+        public static List<Vector3> BuildHull(List<Vector3> points)
+        {
+            return BuildHull(new GeoPointsArray3(points));
+        }
+
         public static List<Vector3> BuildHull(GeoPointsArray3 points)
         {
             QuickHull qHull = new QuickHull(points);
@@ -156,7 +161,7 @@ namespace Nullspace
         List<QHullTrianglePlanePoints> mTrianglePlanePoints;
         public QuickHull(GeoPointsArray3 points)
         {
-            mPoints = points;    
+            mPoints = points;
             mPoints.Distinct();
             mVertexCount = mPoints.Size();
             mTrianglePlanePoints = new List<QHullTrianglePlanePoints>();
@@ -175,16 +180,16 @@ namespace Nullspace
         private void CleanTrianglePlaneList()
         {
             int size = mTrianglePlanePoints.Count;
-		    List<QHullTrianglePlanePoints> trianglePlanePoints = new List<QHullTrianglePlanePoints>();
-		    // save the index
-		    for (int i = 0; i < size; ++i)
-		    {
-			    if (!mTrianglePlanePoints[i].mIsDelete)
-			    {
-				    trianglePlanePoints.Add(mTrianglePlanePoints[i]);
-			    }
-		    }
-		    mTrianglePlanePoints = trianglePlanePoints;
+            List<QHullTrianglePlanePoints> trianglePlanePoints = new List<QHullTrianglePlanePoints>();
+            // save the index
+            for (int i = 0; i < size; ++i)
+            {
+                if (!mTrianglePlanePoints[i].mIsDelete)
+                {
+                    trianglePlanePoints.Add(mTrianglePlanePoints[i]);
+                }
+            }
+            mTrianglePlanePoints = trianglePlanePoints;
         }
 
         public List<Vector3> GetTriangles()
@@ -203,13 +208,13 @@ namespace Nullspace
         {
             int triangleCount = mTrianglePlanePoints.Count;
             List<Vector3> vertes = new List<Vector3>();
-            List<int> indices = new List<int>();           
-		    for (int i = 0; i < triangleCount; ++i)
-		    {
-			    QHullTrianglePlane plane = mTrianglePlanePoints[i].mTrianglePlane;
+            List<int> indices = new List<int>();
+            for (int i = 0; i < triangleCount; ++i)
+            {
+                QHullTrianglePlane plane = mTrianglePlanePoints[i].mTrianglePlane;
                 for (int j = 0; j < 3; ++j)
                 {
-                    int index = vertes.FindIndex(delegate(Vector3 v) { return v == plane.mVertexPoints[j]; });
+                    int index = vertes.FindIndex(delegate (Vector3 v) { return v == plane.mVertexPoints[j]; });
                     if (index == -1)
                     {
                         indices.Add(vertes.Count);
@@ -220,7 +225,7 @@ namespace Nullspace
                         indices.Add(index);
                     }
                 }
-		    }
+            }
         }
 
         private void Build()
@@ -238,62 +243,62 @@ namespace Nullspace
             mTrianglePlanePoints.Add(facePositive);
             mTrianglePlanePoints.Add(faceNegative);
             // travel
-		    int step = 0;
-		    while (step < mTrianglePlanePoints.Count)
-		    {
-			    QHullTrianglePlanePoints trianglePlanePointsLoop1 = mTrianglePlanePoints[step++];
+            int step = 0;
+            while (step < mTrianglePlanePoints.Count)
+            {
+                QHullTrianglePlanePoints trianglePlanePointsLoop1 = mTrianglePlanePoints[step++];
                 if (trianglePlanePointsLoop1.mIsDelete || trianglePlanePointsLoop1.IsEmpty())
-			    {
-				    continue;
-			    }
-			    fathestPoint = trianglePlanePointsLoop1.mFathestPoint;
-			    int size = mTrianglePlanePoints.Count;
-			    QHullEdgeBounding edgeStack = new QHullEdgeBounding();
-			    List<Vector3> tempPointsList = new List<Vector3>();
-			    for (int i = 0; i < size; ++i)
-			    {
-				    QHullTrianglePlanePoints trianglePlanePointsLoop2 = mTrianglePlanePoints[i];
-				    if (!trianglePlanePointsLoop2.mIsDelete && trianglePlanePointsLoop2.Inside(fathestPoint))
-				    {
-					    trianglePlanePointsLoop2.mIsDelete = true;
-					    // save the face edges
-					    Vector3[] planePoints = trianglePlanePointsLoop2.mTrianglePlane.mVertexPoints;
-					    edgeStack.Push(planePoints[0], planePoints[1]);
-					    edgeStack.Push(planePoints[1], planePoints[2]);
-					    edgeStack.Push(planePoints[2], planePoints[0]);
-					    // save the face retaining points
-					    if (!trianglePlanePointsLoop2.IsEmpty())
-					    {
-						    int tempSize = trianglePlanePointsLoop2.mPointsList.Count;
-						    for (int j = 0; j < tempSize; ++j)
-						    {
-							    tempPointsList.Add(trianglePlanePointsLoop2.mPointsList[j]);
-						    }
-						    trianglePlanePointsLoop2.mPointsList.Clear();
-					    }
-				    }
-			    }
-			    while (!edgeStack.IsEmpty())
-			    {
-				    GeoSegment3 edge = edgeStack.Pop();
-				    QHullTrianglePlanePoints newTrianglePlanePs = new QHullTrianglePlanePoints(edge.mP1, edge.mP2, fathestPoint);
-				    List<Vector3> tempPointsList2 = new List<Vector3>();
-				    for (int k = 0; k < tempPointsList.Count; ++k)
-				    {
-					    Vector3 point = tempPointsList[k];
-					    if (!newTrianglePlanePs.AddPoint(point))
-					    {
-						    tempPointsList2.Add(point);
-					    }
-				    }
-				    // add the new trianglePlane
-				    mTrianglePlanePoints.Add(newTrianglePlanePs);
-				    // reset, save points
-				    tempPointsList = tempPointsList2;
-			    }
-			    // clear the points
-			    tempPointsList.Clear();
-		    }
+                {
+                    continue;
+                }
+                fathestPoint = trianglePlanePointsLoop1.mFathestPoint;
+                int size = mTrianglePlanePoints.Count;
+                QHullEdgeBounding edgeStack = new QHullEdgeBounding();
+                List<Vector3> tempPointsList = new List<Vector3>();
+                for (int i = 0; i < size; ++i)
+                {
+                    QHullTrianglePlanePoints trianglePlanePointsLoop2 = mTrianglePlanePoints[i];
+                    if (!trianglePlanePointsLoop2.mIsDelete && trianglePlanePointsLoop2.Inside(fathestPoint))
+                    {
+                        trianglePlanePointsLoop2.mIsDelete = true;
+                        // save the face edges
+                        Vector3[] planePoints = trianglePlanePointsLoop2.mTrianglePlane.mVertexPoints;
+                        edgeStack.Push(planePoints[0], planePoints[1]);
+                        edgeStack.Push(planePoints[1], planePoints[2]);
+                        edgeStack.Push(planePoints[2], planePoints[0]);
+                        // save the face retaining points
+                        if (!trianglePlanePointsLoop2.IsEmpty())
+                        {
+                            int tempSize = trianglePlanePointsLoop2.mPointsList.Count;
+                            for (int j = 0; j < tempSize; ++j)
+                            {
+                                tempPointsList.Add(trianglePlanePointsLoop2.mPointsList[j]);
+                            }
+                            trianglePlanePointsLoop2.mPointsList.Clear();
+                        }
+                    }
+                }
+                while (!edgeStack.IsEmpty())
+                {
+                    GeoSegment3 edge = edgeStack.Pop();
+                    QHullTrianglePlanePoints newTrianglePlanePs = new QHullTrianglePlanePoints(edge.mP1, edge.mP2, fathestPoint);
+                    List<Vector3> tempPointsList2 = new List<Vector3>();
+                    for (int k = 0; k < tempPointsList.Count; ++k)
+                    {
+                        Vector3 point = tempPointsList[k];
+                        if (!newTrianglePlanePs.AddPoint(point))
+                        {
+                            tempPointsList2.Add(point);
+                        }
+                    }
+                    // add the new trianglePlane
+                    mTrianglePlanePoints.Add(newTrianglePlanePs);
+                    // reset, save points
+                    tempPointsList = tempPointsList2;
+                }
+                // clear the points
+                tempPointsList.Clear();
+            }
         }
 
         private void FindOnce(out Vector3 min, out Vector3 max, out Vector3 fathestPoint)

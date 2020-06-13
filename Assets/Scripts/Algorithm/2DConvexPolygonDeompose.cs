@@ -116,7 +116,7 @@ namespace Nullspace
         private static List<List<int>> HMDecompose(List<Vector2> vertes, List<int> indices)
         {
             List<HalfEdge> edges = BuilderEdge(indices);
-            TimerPriorityQueue<int, HalfEdge, float> remoableEdge = new TimerPriorityQueue<int, HalfEdge, float>();
+            PriorityQueue<int, HalfEdge, float> remoableEdge = new PriorityQueue<int, HalfEdge, float>();
             GetRemovableEdgeQueue(vertes, edges, ref remoableEdge);
             HashSet<EdgeID> st = DeleteEdges(remoableEdge, vertes);
             return ExtractPolygonList(edges, st);
@@ -156,7 +156,7 @@ namespace Nullspace
 	        return resultList;
         }
 
-        private static HashSet<EdgeID> DeleteEdges(TimerPriorityQueue<int, HalfEdge, float> priorityQueue, List<Vector2> vertes)
+        private static HashSet<EdgeID> DeleteEdges(PriorityQueue<int, HalfEdge, float> priorityQueue, List<Vector2> vertes)
         {
             HashSet<EdgeID> deletedEdgeSet = new HashSet<EdgeID>();
 	        while (priorityQueue.Size > 0)
@@ -176,7 +176,7 @@ namespace Nullspace
             }
             return e;
         }
-        private static void UpdateEdge(HalfEdge edgeToRemove, TimerPriorityQueue<int, HalfEdge, float> priorityQueue, HashSet<EdgeID> deletedEdgeSet, List<Vector2> pointList)
+        private static void UpdateEdge(HalfEdge edgeToRemove, PriorityQueue<int, HalfEdge, float> priorityQueue, HashSet<EdgeID> deletedEdgeSet, List<Vector2> pointList)
         {
             HalfEdge left = GetUndeletedLeft(edgeToRemove, deletedEdgeSet);
             HalfEdge right = GetUndeletedRight(edgeToRemove, deletedEdgeSet);
@@ -262,7 +262,7 @@ namespace Nullspace
 	        }
 	        return halfEdgeList;
         }
-        private static void GetRemovableEdgeQueue(List<Vector2> vertes, List<HalfEdge> edges, ref TimerPriorityQueue<int, HalfEdge, float> remoableEdge)
+        private static void GetRemovableEdgeQueue(List<Vector2> vertes, List<HalfEdge> edges, ref PriorityQueue<int, HalfEdge, float> remoableEdge)
         {
             HashSet<EdgeID> deleteSet = new HashSet<EdgeID>();
             foreach (HalfEdge edge in edges)
