@@ -161,5 +161,37 @@ namespace Nullspace
                 return false;
             return true;
         }
+
+        public static List<T> RandomShuffle<T>(List<T> source)
+        {
+            int[] shuffle = RandomShuffle(source.Count);
+            List<T> res = new List<T>();
+            foreach (int idx in shuffle)
+            {
+                res.Add(source[idx]);
+            }
+            return res;
+        }
+
+        public static int[] RandomShuffle(int indexCount)
+        {
+            int[] res = new int[indexCount];
+            for (int i = 0; i < indexCount; ++i)
+            {
+                res[i] = i;
+            }
+            for (int i = 0; i < indexCount; ++i)
+            {
+                int j = GetRandomInt(0, indexCount);
+                while (j == i)
+                {
+                    j = GetRandomInt(0, indexCount);
+                }
+                int temp = res[i];
+                res[i] = res[j];
+                res[j] = temp;
+            }
+            return res;
+        }
     }
 }

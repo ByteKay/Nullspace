@@ -28,13 +28,13 @@ namespace Nullspace
     {
         private int mNextTimerId;
         private int mCurrentTick;
-        private TimerPriorityQueue<int, TimerTask, int> mPriorityQueue;
+        private PriorityQueue<int, TimerTask, int> mPriorityQueue;
         private Stopwatch mStopWatch;
         private readonly object mQueueLock = new object();
 
         private void Awake()
         {
-            mPriorityQueue = new TimerPriorityQueue<int, TimerTask, int>();
+            mPriorityQueue = new PriorityQueue<int, TimerTask, int>();
             mStopWatch = new Stopwatch();
             mCurrentTick = 0;
             mNextTimerId = 0;

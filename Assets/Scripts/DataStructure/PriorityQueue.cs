@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace Nullspace
 {
-    public sealed class TimerPriorityQueueEventArgs<T> : EventArgs // where T : class
+    public sealed class PriorityQueueEventArgs<T> : EventArgs // where T : class
     {
-        public TimerPriorityQueueEventArgs(T oldFirstElement, T newFirstElement)
+        public PriorityQueueEventArgs(T oldFirstElement, T newFirstElement)
         {
             OldFirstElement = oldFirstElement;
             NewFirstElement = newFirstElement;
@@ -17,14 +17,14 @@ namespace Nullspace
     }
 
     [Serializable]
-    public class TimerPriorityQueue<K, V, P> // where V : class
+    public class PriorityQueue<K, V, P> // where V : class
     {
         private List<HeapNode<K, V, P>> mPriorityHeap;
         private HeapNode<K, V, P> mPlaceHolder;
         private Comparer<P> mPriorityComparer;
         public int Size;
         // public event EventHandler<KeyedPriorityQueueEventArgs<V>> mFirstElementChanged;
-        public TimerPriorityQueue()
+        public PriorityQueue()
         {
             mPriorityHeap = new List<HeapNode<K, V, P>>();
             mPriorityComparer = Comparer<P>.Default;
@@ -32,7 +32,7 @@ namespace Nullspace
             mPriorityHeap.Add(new HeapNode<K, V, P>());
         }
 
-        public TimerPriorityQueue(Comparer<P> compair)
+        public PriorityQueue(Comparer<P> compair)
         {
             mPriorityHeap = new List<HeapNode<K, V, P>>();
             mPriorityComparer = compair;
