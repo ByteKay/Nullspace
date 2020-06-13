@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 namespace Nullspace
@@ -17,6 +18,23 @@ namespace Nullspace
             mMin = min;
             mMax = max;
             mSize = mMax - mMin;
+        }
+
+        public Vector2 Size
+        {
+            get
+            {
+                if (mSize == Vector2.zero)
+                {
+                    mSize = mMax - mMin;
+                }
+                return mSize;
+            }
+        }
+
+        public Vector2 Center()
+        {
+            return (mMax + mMin) * 0.5f;
         }
 
         public float Area()

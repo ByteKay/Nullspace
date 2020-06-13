@@ -90,6 +90,12 @@ namespace Nullspace
             mIsIntersect = false;
             mLength = 0.0f;
         }
+
+        public void Clear()
+        {
+            mIsIntersect = false;
+            mLength = 0.0f;
+        }
     }
 
     // 相交有多个点  直线与三角形相交两个点

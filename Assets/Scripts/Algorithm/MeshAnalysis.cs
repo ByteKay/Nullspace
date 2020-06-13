@@ -429,7 +429,6 @@ namespace Nullspace
                     int index3 = GetVertexIndex(p3);
                     if (index3 != -1)
                     {
-                        Vector2i temp = new Vector2i(index1, index2);
                         result = mMeshAnalysis.mFaces.FindIndex((MeshFace f) => { return f.IsEqual(index1, index2, index3); });
                     }
                 }

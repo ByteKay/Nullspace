@@ -66,7 +66,6 @@ namespace Nullspace
     public class EarPolygon
     {
         private LinkedList<EarPoint> mHead;
-        private EarPolygon mParent;
         private int mNumberOfPoints;
         private List<EarPolygon> mChildren;
         private float mArea; // 带符号
@@ -76,7 +75,6 @@ namespace Nullspace
             mChildren = new List<EarPolygon>();
             mResults = new List<List<Vector2>>();
             mHead = new LinkedList<EarPoint>();
-            mParent = null;
             mNumberOfPoints = 0;
         }
         public EarPolygon(EarPolygon parent)
@@ -84,7 +82,6 @@ namespace Nullspace
             mChildren = new List<EarPolygon>();
             mResults = new List<List<Vector2>>();
             mHead = new LinkedList<EarPoint>();
-            mParent = parent;
             parent.AddChild(this);
             mNumberOfPoints = 0;
         }
@@ -244,10 +241,8 @@ namespace Nullspace
         private static bool RecordEars(EarPolygon poly)
 	    {
             LinkedListNode<EarPoint> active = poly.Get();
-		    int NumPoints = poly.NumPoints() - 2;
 		    while (poly.NumPoints() >= 3)
 		    {
-			    int num = poly.NumPoints();
                 int idx = active.Value.mIndex;
                 do
 			    {

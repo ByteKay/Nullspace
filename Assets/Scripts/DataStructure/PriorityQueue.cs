@@ -50,7 +50,7 @@ namespace Nullspace
         public V Dequeue()
         {
             V local = (Size < 1) ? default(V) : DequeueImpl();
-            V newHead = (Size < 1) ? default(V) : mPriorityHeap[1].Value;
+            // V newHead = (Size < 1) ? default(V) : mPriorityHeap[1].Value;
             // this.RaiseHeadChangedEvent(default(V), newHead);
             return local;
         }
@@ -66,7 +66,7 @@ namespace Nullspace
 
         public void Enqueue(K key, V value, P priority)
         {
-            V local = (Size > 0) ? this.mPriorityHeap[1].Value : default(V);
+            // V local = (Size > 0) ? this.mPriorityHeap[1].Value : default(V);
             int num = ++Size;
             int num2 = num >> 1;
             if (num == mPriorityHeap.Count)
@@ -80,7 +80,7 @@ namespace Nullspace
                 num2 = num >> 1;
             }
             mPriorityHeap[num] = new HeapNode<K, V, P>(key, value, priority);
-            V newHead = mPriorityHeap[1].Value;
+            // V newHead = mPriorityHeap[1].Value;
             //if (!newHead.Equals(local))
             //{
             //    this.RaiseHeadChangedEvent(local, newHead);
@@ -170,7 +170,7 @@ namespace Nullspace
         {
             if (Size >= 1)
             {
-                V oldHead = mPriorityHeap[1].Value;
+                // V oldHead = mPriorityHeap[1].Value;
                 for (int i = 1; i <= Size; i++)
                 {
                     if (mPriorityHeap[i].Key.Equals(key))

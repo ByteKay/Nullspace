@@ -30,7 +30,7 @@ namespace Nullspace
             mNormal = Vector3.Cross(mAxisX, mAxisZ);
             mNormal.Normalize();
             mPoint = p1;
-            float mD = -Vector3.Dot(mNormal, p1);
+            mD = -Vector3.Dot(mNormal, p1);
             mAxisX = Vector3.Cross(mAxisZ, mNormal);
             mAxisX.Normalize();
             Quaternion q = Quaternion.FromToRotation(Vector3.up, mNormal);

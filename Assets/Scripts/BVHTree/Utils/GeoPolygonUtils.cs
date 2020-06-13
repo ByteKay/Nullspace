@@ -102,6 +102,10 @@ namespace Nullspace
         {
             return (p2[0] - p1[0]) * (p[1] - p1[1]) - (p[0] - p1[0]) * (p2[1] - p1[1]);
         }
+        public static bool IsConvexAngle(Vector2 p1, Vector2 p2, Vector2 p)
+        {
+            return CounterClockwiseGL0(p1, p2, p) >= 0;
+        }
 
         public static bool IsConvex(Vector2 p1, Vector2 p2, Vector2 p)
         {

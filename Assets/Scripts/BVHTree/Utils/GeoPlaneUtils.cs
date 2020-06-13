@@ -363,7 +363,7 @@ namespace Nullspace
             foreach (Vector3 p in ps)
             {
                 Vector3 p1 = plane.TransformToLocal(p);
-                tmp.Add(new Vector2(p.x, p.z));
+                tmp.Add(new Vector2(p1.x, p1.z));
             }
             return tmp;
         }

@@ -76,7 +76,6 @@ namespace Nullspace
         {
             if (GeoCircleUtils.IsInCircle(center, r, seg1) && GeoCircleUtils.IsInCircle(center, r, seg2)) // 都在外面，不一定
                 return false;
-            bool isinsect = GeoLineUtils.IsLineInsectCircle2(seg1, seg2, center, r, ref insect);
             List<Vector3> array = insect.mHitGlobalPoint.mPointArray;
             List<int> removeIndex = new List<int>();
             for (int i = 0; i < array.Count; ++i)
@@ -263,7 +262,7 @@ namespace Nullspace
 
             Vector3 d31 = Vector3.Cross(d, v3v1);
             float d31v2v1 = Vector3.Dot(d31, v2v1);
-            float tmp = 1.0f / d31v2v1;
+            // float tmp = 1.0f / d31v2v1;
             float t = Vector3.Dot(Vector3.Cross(line1p1, v2v1), v3v1);
             float u = Vector3.Dot(Vector3.Cross(d, v3v1), line1p1);
             float v = Vector3.Dot(Vector3.Cross(line1p1, v2v1), d);

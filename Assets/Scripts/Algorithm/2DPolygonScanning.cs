@@ -43,7 +43,6 @@ namespace Nullspace
             {
                 convex.Add(convexSrc[i] * scale);
             }
-            List<Vector2i> temp = new List<Vector2i>();
             List<Vector2i> newV = convex.Select(t =>
             {
                 return new Vector2i((int)(t[0] + 0.5f), (int)(t[1] + 0.5f));
@@ -379,7 +378,6 @@ namespace Nullspace
             {
                 convex.Add(convexSrc[i] * scale);
             }
-            List<Vector2i> temp = new List<Vector2i>();
             List<Vector2i> newV = convex.Select(t =>
                 {
                     return new Vector2i((int)(t[0] + 0.5f), (int)(t[1] + 0.5f));

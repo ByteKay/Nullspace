@@ -44,8 +44,6 @@ namespace Nullspace
                 rect : p(x, y) = p1 + u * d1 + v * d2 (0 < u < 1, 0 < v < 1)
              *  (p - center).magnitude = r
              */
-            Vector2 d1 = new Vector2(max[0] - min[0], 0);
-            Vector2 d2 = new Vector2(0, max[1] - min[1]);
 
             // float x = min[0] + u * d1[0];
             // float y = min[1] + v * d2[1];
@@ -456,7 +454,6 @@ namespace Nullspace
                 float y = diff[1];
                 float z = diff[2];
 
-                Vector3 v0 = min;
                 Vector3 v1 = new Vector3(max[0], min[1], min[2]);
                 Vector3 v2 = new Vector3(max[0], max[1], min[2]);
                 Vector3 v3 = new Vector3(min[0], max[1], min[2]);

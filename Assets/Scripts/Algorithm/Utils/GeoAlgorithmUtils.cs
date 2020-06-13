@@ -169,7 +169,6 @@ namespace Nullspace
             List<Vector2> temp = new List<Vector2>();
             List<Vector2> result = new List<Vector2>();
             temp.AddRange(polygonPoints);
-            List<Vector2> kb = new List<Vector2>();
             int count = polygonPoints.Count;
             for (int i = 0; i < temp.Count;)
             {

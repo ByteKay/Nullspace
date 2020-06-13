@@ -28,7 +28,7 @@ namespace Nullspace
         public int mFaceIndex;
         public int mOtherVertex;
         public Vector2i mEdgeVertexIndex;
-        Vector2i mSharedTriangles;
+        private Vector2i mSharedTriangles;
         public SharedEdge(int index, int i, int j, int other)
         {
             mEdgeVertexIndex = Vector2i.GetVector2i(i, j);

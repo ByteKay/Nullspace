@@ -202,9 +202,9 @@ namespace Nullspace
                     return false;
                 }
             }
-            Vector3 d31 = Vector3.Cross(d, v3v1);
-            float d31v2v1 = Vector3.Dot(d31, v2v1);
-            float tmp = 1.0f / d31v2v1;
+            //Vector3 d31 = Vector3.Cross(d, v3v1);
+            //float d31v2v1 = Vector3.Dot(d31, v2v1);
+
             float t = Vector3.Dot(Vector3.Cross(line1p1, v2v1), v3v1);
             float u = Vector3.Dot(Vector3.Cross(d, v3v1), line1p1);
             float v = Vector3.Dot(Vector3.Cross(line1p1, v2v1), d);

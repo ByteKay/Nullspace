@@ -245,7 +245,6 @@ namespace Nullspace
         {
 	        SetMinSupport(mMinSupport, transitions.Size());
 	        FPNodeHeadTable table = BuildHeaderTable(transitions);
-	        FPTreeNode root = BuildFPTree(transitions, table);
 	        if (transitions.Depth > mMaxDepth)
 		        return;
 	        int size = table.Size();

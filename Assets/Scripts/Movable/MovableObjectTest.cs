@@ -31,9 +31,9 @@ public class MovableObjectTest : MonoBehaviour
         Vector3 min1 = new Vector3(667, 0, -375);
         Vector3 max1 = new Vector3(-667, 0, 375);
 
-        Vector3 refPos = pos;
-        Vector3 refDir = dir;
-        Vector3 nextPos = pos;
+        //Vector3 refPos = pos;
+        //Vector3 refDir = dir;
+        //Vector3 nextPos = pos;
         Debug.DrawLine(min, min1, Color.red, 1000000);
         Debug.DrawLine(min1, max, Color.red, 1000000);
         Debug.DrawLine(max, max1, Color.red, 1000000);

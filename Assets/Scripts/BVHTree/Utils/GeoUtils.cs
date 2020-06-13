@@ -100,7 +100,7 @@ namespace Nullspace
         public static List<Vector2> VertexMergeList(List<Vector2> points, int round = 2)
         {
             List<Vector2> temp = new List<Vector2>();
-            HashSet<string> indexMap = new HashSet<string>();
+            // HashSet<string> indexMap = new HashSet<string>();
             Vector2 last = new Vector2(float.MaxValue, float.MaxValue);
             for (int i = 0; i < points.Count; ++i)
             {

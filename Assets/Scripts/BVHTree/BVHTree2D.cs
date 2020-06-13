@@ -45,8 +45,7 @@ namespace Nullspace
             todo[stackptr].mLength = -9999999.0f;
             while (stackptr >= 0)
             {
-                int ni = todo[stackptr].mIndex;
-                float near = todo[stackptr].mLength;
+                int ni = todo[stackptr].mIndex; 
                 stackptr--;
                 BVHFlatNode2 node = mFlatTreeList[ni];
                 // 对叶节点做相交测试
@@ -199,7 +198,7 @@ namespace Nullspace
             }
         }
 
-        private void Build()
+        public void Build()
         {
             mNumNodes = mNumLeafs = 0;
             int stackptr = 0;
