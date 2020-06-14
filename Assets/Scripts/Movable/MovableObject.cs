@@ -81,7 +81,6 @@ namespace Nullspace
         /// <summary>
         /// 设置 默认朝向交点 为 对象目标
         /// </summary>
-        /// <param name="fish"></param>
         public void SetTarget()
         {
             TargetType = TargetType.NONE;
@@ -106,13 +105,11 @@ namespace Nullspace
         /// <summary>
         /// 设置移动物体为对象目标
         /// </summary>
-        /// <param name="fish"></param>
         public void SetTarget(MovableObject follow)
         {
             TargetFollow = follow;
             TargetType = TargetType.MOVABLE;
             IsCheckReached = true;
-            DebugUtils.Info("RFBullet", "fish target");
         }
 
         /// <summary>

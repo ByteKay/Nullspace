@@ -4,10 +4,10 @@ namespace Nullspace
 {
     public class XmlDataConfig
     {
-        public string Fish { get; set; }
-        public string FishResourceInfo { get; set; }
-        public string FishAction { get; set; }
-        public string FishResource { get; set; }
+        public string Name { get; set; }
+        public string ResourceInfo { get; set; }
+        public string ActionName { get; set; }
+        public string Resource { get; set; }
         public string Path { get; set; }
         public string PathTrigger { get; set; }
         public string ClusterResource { get; set; }

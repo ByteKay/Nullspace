@@ -8,7 +8,7 @@ namespace Nullspace
 {
     public enum ResourceCacheMask
     {
-        Fishing = 1,
+        Testing = 1,
     }
 
 
