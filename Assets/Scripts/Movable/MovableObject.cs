@@ -104,7 +104,7 @@ namespace Nullspace
         }
 
         /// <summary>
-        /// 设置鱼为对象目标
+        /// 设置移动物体为对象目标
         /// </summary>
         /// <param name="fish"></param>
         public void SetTarget(MovableObject follow)
@@ -214,7 +214,7 @@ namespace Nullspace
         /// 朝目标移动
         /// </summary>
         private Vector3 TargetPos;  // 目标为点
-        private MovableObject TargetFollow;// 目标为鱼
+        private MovableObject TargetFollow;// 目标为移动物体
 
         /// <summary>
         /// 目标类别
