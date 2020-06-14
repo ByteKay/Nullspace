@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Fishing
+﻿
+namespace Nullspace
 {
     public abstract class TimeBuff : Buff
     {
