@@ -108,8 +108,6 @@ namespace Nullspace
                 float near = todo[stackptr].mLength;
                 stackptr--;
                 BVHFlatNode2 node = mFlatTreeList[ni];
-                if (near > intersection.mLength)
-                    continue;
                 // 对叶节点做相交测试
                 if (node.mRightOffset == 0)
                 {
