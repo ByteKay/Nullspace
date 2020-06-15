@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Demo.unity
+- path: Assets/PhysXDemo/CollisionDemo.unity
   isLoaded: 1
   isActive: 1
