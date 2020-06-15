@@ -21,7 +21,7 @@ namespace Nullspace
         {
             mActivedTouchQueue = new LinkedList<TouchQueue>();
             mGestureListeners = new List<GestureListener>();
-            mGestureRecognizer = new BaseGestureRecognizer();
+            mGestureRecognizer = BaseGestureRecognizer.Create(BaseGestureRecognizer.NAME_ID);
             mTimer = new Stopwatch();
             mTimer.Reset();
             mMaxTouchQueueCount = maxCount;
@@ -30,7 +30,9 @@ namespace Nullspace
             {
                 mTouchQueues.Add(new TouchQueue(i));
             }
+            mTimer.Start();
         }
+
 
         public void Clear()
         {
@@ -49,7 +51,7 @@ namespace Nullspace
             mTouchQueues[touchIndex].AddTouch(x, y, mTimer.ElapsedMilliseconds);
             if (mGestureRecognizer != null)
             {
-                mGestureRecognizer.TryAddTouchQueueChanging(mTouchQueues[touchIndex], 1, mTimer.ElapsedMilliseconds);
+                mGestureRecognizer.TryAddTouchQueueChanging(mTouchQueues[touchIndex], TouchQueueChangingMode.TQC_PRESS, mTimer.ElapsedMilliseconds);
             }
         }
 
@@ -62,7 +64,7 @@ namespace Nullspace
             mTouchQueues[touchIndex].TouchMove(x, y, mTimer.ElapsedMilliseconds);
             if (mGestureRecognizer != null)
             {
-                mGestureRecognizer.TryAddTouchQueueChanging(mTouchQueues[touchIndex], 2, mTimer.ElapsedMilliseconds);
+                mGestureRecognizer.TryAddTouchQueueChanging(mTouchQueues[touchIndex], TouchQueueChangingMode.TQC_MOVE, mTimer.ElapsedMilliseconds);
             }
         }
 
@@ -75,7 +77,7 @@ namespace Nullspace
             mTouchQueues[touchIndex].ReleaseTouch(x, y, mTimer.ElapsedMilliseconds);
             if (mGestureRecognizer != null)
             {
-                mGestureRecognizer.TryAddTouchQueueChanging(mTouchQueues[touchIndex], 3, mTimer.ElapsedMilliseconds);
+                mGestureRecognizer.TryAddTouchQueueChanging(mTouchQueues[touchIndex], TouchQueueChangingMode.TQC_RELEASE, mTimer.ElapsedMilliseconds);
             }
         }
 
@@ -87,7 +89,7 @@ namespace Nullspace
             }
             mGestureRecognizer.Update(mTimer.ElapsedMilliseconds);
             BaseGestureEvent gestureEvent = mGestureRecognizer.GetCurrentGestureEvent();
-            if (gestureEvent != null)
+            if (gestureEvent == null)
             {
                 return;
             }

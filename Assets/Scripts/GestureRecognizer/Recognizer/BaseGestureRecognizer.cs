@@ -5,6 +5,14 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    public enum TouchQueueChangingMode
+    {
+        TQC_NONE = 0,
+        TQC_PRESS = 1,
+        TQC_MOVE = 2,
+        TQC_RELEASE = 3,
+    }
+
     public class BaseGestureRecognizer
     {
         private static uint _MAX_INTERVAL_OF_DOUBLE_CLICK_ = 300;
@@ -24,15 +32,7 @@ namespace Nullspace
         private static int _lastMultiTouchMoveX = 0;
         private static int _lastMultiTouchMoveY = 0;
 
-        private static string NAME_ID = "BaseGestureRecognizer";
-
-        enum TouchQueueChangingMode
-        {
-            TQC_NONE = 0,
-            TQC_PRESS = 1,
-            TQC_MOVE = 2,
-            TQC_RELEASE = 3,
-        }
+        public static string NAME_ID = "BaseGestureRecognizer";
 
         protected string mId;
         protected BaseGestureEvent mCurrentGestureEvent;
@@ -86,7 +86,63 @@ namespace Nullspace
 
         public virtual void Update(long currentTime)
         {
-
+            int count = mChangedTouchQueues.Count;
+            if (GetActiveTouchQueueCount() > 1)
+            {
+                OnMultiTouch(currentTime);
+            }
+            else
+            {
+                if (_inMultiTouchMove)
+                {
+                    mCurrentGestureEvent = new GestureEndMoveEvent(_lastMultiTouchMoveX, _lastMultiTouchMoveY, currentTime, 2);
+                    _lastMultiTouchMoveX = _lastMultiTouchMoveY = 0;
+                    _inMultiTouchMove = false;
+                }
+                int idx = 0;
+                while (mChangedTouchQueues.Count > 0 && (idx < count))
+                {
+                    TouchQueueInfomation info = mChangedTouchQueues.First.Value;
+                    mChangedTouchQueues.RemoveFirst();
+                    idx++;
+                    int x = 0;
+                    int y = 0;
+                    info.touchQueue.GetTrackStartingPosition(ref x, ref y);
+                    switch (info.curState)
+                    {
+                        case TouchState.STATE_TAP:
+                            OnTapState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_SWIPE:
+                            OnSwipeState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_MOVE:
+                            OnMoveState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_LONG_TAP:
+                            OnLongTapState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_DOUBLE_TAP:
+                            OnDoubleTapState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_DRAG:
+                            OnDragState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_DRAG_MOVE:
+                            OnDragMoveState(ref info, currentTime);
+                            break;
+                        case TouchState.STATE_MULTI:
+                            info.touchQueue.ForceReleaseTouch();
+                            break;
+                        case TouchState.STATE_NONE:
+                            info.touchQueue.ForceReleaseTouch();
+                            break;
+                        default:
+                            info.touchQueue.ForceReleaseTouch();
+                            break;
+                    }
+                }
+            }
         }
 
 
@@ -104,6 +160,8 @@ namespace Nullspace
             int height = Screen.height;
             mMaxSteadyMoveDistanceY = (int)(_MAX_DISTANCE_RATIO_FOR_STEADY * height + 0.5f);
             mMinSpeedForSwipe = Mathf.Sqrt(((width * width) + (height * height))) / _MAX_SWIPE_DURATION_FOR_WHOLE_SCREEN;
+            mChangedTouchQueues = new LinkedList<TouchQueueInfomation>();
+            ResetCurrentGesture();
         }
 
         protected TouchQueueInfomation FindQueueInfomation(TouchQueue queue)
@@ -132,12 +190,12 @@ namespace Nullspace
             }
         }
 
-        public bool TryAddTouchQueueChanging(TouchQueue queue, int changingMode, long time)
+        public bool TryAddTouchQueueChanging(TouchQueue queue, TouchQueueChangingMode changingMode, long time)
         {
             TouchQueueInfomation info = FindQueueInfomation(queue);
             if (info.IsEmpty())
             {
-                if (changingMode == (int)TouchQueueChangingMode.TQC_PRESS)
+                if (changingMode == TouchQueueChangingMode.TQC_PRESS)
                 {
                     TouchQueueInfomation tqcInfo = new TouchQueueInfomation(queue, changingMode, time);
                     mChangedTouchQueues.AddLast(tqcInfo);
@@ -147,9 +205,9 @@ namespace Nullspace
             }
             else
             {
-                if (changingMode == (int)TouchQueueChangingMode.TQC_RELEASE)
+                if (changingMode == TouchQueueChangingMode.TQC_RELEASE)
                 {
-                    Debug.Assert((info.lastChangingMode == (int)TouchQueueChangingMode.TQC_PRESS) || (info.lastChangingMode == (int)TouchQueueChangingMode.TQC_MOVE));
+                    Debug.Assert((info.lastChangingMode == TouchQueueChangingMode.TQC_PRESS) || (info.lastChangingMode == TouchQueueChangingMode.TQC_MOVE));
                     info.releaseTime = time;
                     info.repeatTimes++;
                 }
@@ -174,7 +232,7 @@ namespace Nullspace
             return val;
         }
 
-        protected virtual void OnTapState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnTapState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -239,7 +297,7 @@ namespace Nullspace
             }
         }
 
-        protected virtual void OnSwipeState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnSwipeState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -269,7 +327,7 @@ namespace Nullspace
                 mChangedTouchQueues.AddLast(info);
             }
         }
-        protected virtual void OnLongTapState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnLongTapState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -284,7 +342,7 @@ namespace Nullspace
             }
         }
 
-        protected virtual void OnDoubleTapState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnDoubleTapState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -313,7 +371,7 @@ namespace Nullspace
             }
         }
 
-        protected virtual void OnMoveState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnMoveState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -329,7 +387,7 @@ namespace Nullspace
             }
         }
 
-        protected virtual void OnDragState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnDragState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -362,7 +420,7 @@ namespace Nullspace
             }
 
         }
-        protected virtual void OnDragMoveState(ref TouchQueueInfomation info, uint time)
+        protected virtual void OnDragMoveState(ref TouchQueueInfomation info, long time)
         {
             int x = 0;
             int y = 0;
@@ -378,7 +436,7 @@ namespace Nullspace
             }
         }
 
-        protected virtual void OnMultiTouch(uint time)
+        protected virtual void OnMultiTouch(long time)
         {
             LinkedList<TouchQueue> temp = new LinkedList<TouchQueue>();
             int count = mChangedTouchQueues.Count;
@@ -413,7 +471,7 @@ namespace Nullspace
                 }
                 if ((len1 < _MAX_DISTANCE_RATIO_FOR_STEADY) || (len2 < _MAX_DISTANCE_RATIO_FOR_STEADY))
                 {
-                    //roc todo, buggy here
+                    // todo, buggy here
                     mCurrentGestureEvent = new GestureRotateEvent((int)p1.x, (int)p1.y, time, 2, 1.0f);
                 }
                 else

@@ -3,7 +3,7 @@ namespace Nullspace
 {
     public class BaseGestureEvent
     {
-        protected byte mEventType;
+        protected GestureEventType mEventType;
         protected int mEventX;
         protected int mEventY;
         protected int mTouchCount;
@@ -32,7 +32,7 @@ namespace Nullspace
             mIntParameter = 0;
         }
 
-        public byte GetEventType() { return mEventType; }
+        public GestureEventType GetEventType() { return mEventType; }
         public int GetEventX() { return mEventX; }
         public int GetEventY() { return mEventY; }
         public void GetEventCoordinate(ref int x, ref int y) { x = mEventX; y = mEventY; }

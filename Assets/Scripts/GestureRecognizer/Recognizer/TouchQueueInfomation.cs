@@ -5,7 +5,7 @@ namespace Nullspace
     {
         public TouchQueue touchQueue;
         public long releaseTime;
-        public int lastChangingMode;
+        public TouchQueueChangingMode lastChangingMode;
         public int repeatTimes;
 
         public TouchState curState;
@@ -13,12 +13,12 @@ namespace Nullspace
         {
             touchQueue = null;
             releaseTime = 0;
-            lastChangingMode = 0;
+            lastChangingMode = TouchQueueChangingMode.TQC_NONE;
             repeatTimes = 0;
             curState = TouchState.STATE_NONE;
         }
 
-        public TouchQueueInfomation(TouchQueue queue, int changingMode, long time)
+        public TouchQueueInfomation(TouchQueue queue, TouchQueueChangingMode changingMode, long time)
         {
             curState = TouchState.STATE_NONE;
             touchQueue = queue;
@@ -31,6 +31,6 @@ namespace Nullspace
             }
         }
 
-        public bool IsEmpty() { return touchQueue != null && releaseTime > 0; }
+        public bool IsEmpty() { return touchQueue == null || releaseTime == 0; }
     }
 }

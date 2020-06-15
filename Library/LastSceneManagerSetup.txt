@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/BVHDemo/BvhDemo.unity
+- path: Assets/TouchInput/TouchInput.unity
   isLoaded: 1
   isActive: 1
