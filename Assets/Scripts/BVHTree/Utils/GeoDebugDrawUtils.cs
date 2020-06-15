@@ -12,6 +12,11 @@ namespace Nullspace
             Debug.DrawLine(p1, p2, clr);
         }
 
+        public static void DrawLine(Vector3 p1, Vector3 p2, Color clr)
+        {
+            Debug.DrawLine(p1, p2, clr);
+        }
+
         public static void DrawPoints(List<Vector2> points, Color clr)
         {
             for (int i = 0; i < points.Count; ++i)

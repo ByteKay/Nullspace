@@ -113,7 +113,7 @@ namespace Nullspace
         public uint mLeafCount;
         public uint mRightOffset;
     }
-    class BVHTraversal
+    public class BVHTraversal
     {
         public int mIndex;
         public float mLength;
@@ -124,13 +124,13 @@ namespace Nullspace
             mLength = len;
         }
     }
-    class BVHBuildEntry
+    public class BVHBuildEntry
     {
         public uint mParent;
         public uint mStart;
         public uint mEnd;
     }
 
-    
+
 
 }

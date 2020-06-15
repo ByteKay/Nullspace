@@ -13,12 +13,14 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.4.8f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -235,6 +237,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\BVHDemo\BVH.cs" />
+    <Compile Include="Assets\BVHDemo\BVHAabbObject.cs" />
+    <Compile Include="Assets\BVHDemo\BVHBox.cs" />
+    <Compile Include="Assets\BVHDemo\BVHIntersectionInfo.cs" />
+    <Compile Include="Assets\BVHDemo\BVHObject.cs" />
+    <Compile Include="Assets\BVHDemo\BVHRay.cs" />
+    <Compile Include="Assets\BVHDemo\BVHSphereObject.cs" />
+    <Compile Include="Assets\BVHDemo\BVHTriangleObject.cs" />
+    <Compile Include="Assets\BVHDemo\RayTracerTest.cs" />
     <Compile Include="Assets\PhysXDemo\BallMaker.cs" />
     <Compile Include="Assets\PhysXDemo\StickMaker.cs" />
     <Compile Include="Assets\PhysXDemo\StickOnCollision.cs" />
