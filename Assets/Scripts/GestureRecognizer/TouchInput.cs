@@ -8,43 +8,58 @@ namespace Nullspace
     public class TouchInput : MonoBehaviour, GestureListener
     {
         private TouchManager TouchManager { get; set; }
-        private bool MouseDownFlag = false;
+        private GestureEventType GestureType { get; set; }
+
         private void Awake()
         {
             TouchManager = new TouchManager(2);
             TouchManager.RegisterGestureListener(this);
             Input.simulateMouseWithTouches = true;
+            GestureType = GestureEventType.GESTURE_UNKNOWN;
         }
 
         public void Update()
+        {
+            HandleInputTouch();
+            HandleMouchTouch();
+            TouchManager.Update();
+        }
+
+        private void HandleInputTouch()
         {
             // Handle native touch events
             foreach (Touch touch in Input.touches)
             {
                 HandleTouch(touch.fingerId, touch.position, touch.phase);
             }
+        }
 
+        private void HandleMouchTouch()
+        {
             // Simulate touch events from mouse events
             if (Input.touchCount == 0)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Debug.Log("1");
                     HandleTouch(0, Input.mousePosition, TouchPhase.Began);
                 }
                 if (Input.GetMouseButton(0))
                 {
-                    Debug.Log("2");
                     HandleTouch(0, Input.mousePosition, TouchPhase.Moved);
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    Debug.Log("3");
                     HandleTouch(0, Input.mousePosition, TouchPhase.Ended);
                 }
             }
 
-            TouchManager.Update();
+        }
+
+        public void OnGUI()
+        {
+            GUI.skin.label.fontSize = 32;
+            GUI.skin.label.onNormal.textColor = Color.red;
+            GUILayout.Label(EnumUtils.EnumToString(GestureType), GUILayout.Height(50), GUILayout.Width(800));
         }
 
         private void HandleTouch(int touchFingerId, Vector3 position, TouchPhase touchPhase)
@@ -79,6 +94,7 @@ namespace Nullspace
 
         public void GestureEvent(BaseGestureEvent gestureEvent)
         {
+            GestureType = gestureEvent.GetEventType();
             switch (gestureEvent.GetEventType())
             {
                 case GestureEventType.GESTURE_TAP:

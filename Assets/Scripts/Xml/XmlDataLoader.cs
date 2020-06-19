@@ -177,11 +177,7 @@ namespace Nullspace
 
         private void UnloadAB()
         {
-#if UNITY_EDITOR && !EDITOR_AB
 
-#else
-            HLGameRoot.ResourceManager.UnloadAssetBundle(RFXmlFile.Group, RFXmlFile.Path, true);
-#endif
         }
 
         private bool LoadData(string timeStamps, List<Type> gameDataType)
@@ -276,13 +272,6 @@ namespace Nullspace
             }
             fileName = string.Format("{0}/{1}/{2}", Application.dataPath, "Path", fileName);
             content = XmlFileUtils.LoadText(fileName);
-#else
-            TextAsset asset = HLGameRoot.ResourceManager.LoadAssetSync(RFXmlFile.Group, RFXmlFile.Path, fileName, typeof(TextAsset)) as TextAsset;
-            if (asset != null)
-            {
-                content = asset.text;
-                Resources.UnloadAsset(asset);
-            }
 #endif
             return content;
         }
