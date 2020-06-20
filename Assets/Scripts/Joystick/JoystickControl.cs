@@ -61,6 +61,11 @@ namespace Nullspace
             ResetJoystick();
         }
 
+        private void Update()
+        {
+            mValueChanged.Invoke(InnerTransform.localPosition / MaxRadius);
+        }
+
         public void AddListener(JoystickListenerType type, UnityAction<Vector2> call)
         {
             switch (type)
@@ -118,7 +123,8 @@ namespace Nullspace
                 localPosition.y = direction.y;
             }
             InnerTransform.localPosition = localPosition;
-            mValueChanged.Invoke(localPosition / MaxRadius);
+            // 这里存在 如果不拖动，则不会持续。 放在Update处理比较好
+            
         }
 
     }
