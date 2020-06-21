@@ -221,6 +221,9 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>C:/Unity201848/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>Assets/Plugins/x86_64/System.Drawing.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Analytics">
       <HintPath>C:/Users/kayoyang/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.13/UnityEngine.Analytics.dll</HintPath>
     </Reference>
@@ -229,9 +232,6 @@
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/kayoyang/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <HintPath>Assets/Plugins/x86_64/System.Drawing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +244,7 @@
     <Compile Include="Assets\BVHDemo\BVHSphereObject.cs" />
     <Compile Include="Assets\BVHDemo\BVHTriangleObject.cs" />
     <Compile Include="Assets\BVHDemo\RayTracerTest.cs" />
+    <Compile Include="Assets\CameraFollowDemo\ThirdPersonCharacter.cs" />
     <Compile Include="Assets\JoystickDemo\JoystickTarget.cs" />
     <Compile Include="Assets\PhysXDemo\BallMaker.cs" />
     <Compile Include="Assets\PhysXDemo\StickMaker.cs" />
