@@ -158,22 +158,22 @@ namespace Nullspace
     {
         public static float Height = 97000f;
         /// <summary>
-        /// 子弹速度
+        /// 速度
         /// </summary>
         public float Speed { get; set; }
 
         /// <summary>
-        /// 子弹位置，实时变化
+        /// 位置，实时变化
         /// </summary>
         public Vector3 Pos { get { Vector3 pos = transform.position; pos.y = 0; return pos; } set { value.y = Height; transform.position = value; } }
 
         /// <summary>
-        /// 子弹朝向，实时变化
+        /// 朝向，实时变化
         /// </summary>
         public Vector3 Direction { get { return transform.forward; } set { value.y = 0; transform.forward = value.normalized; } }
 
         /// <summary>
-        /// 子弹碰撞范围:平方
+        /// 碰撞范围:平方
         /// </summary>
         public float SquareDistanceThreshold { get; set; }
 
@@ -203,11 +203,6 @@ namespace Nullspace
         public bool IsLuaCollideCheck { get; set; }
 
         /// <summary>
-        /// 子弹过滤字段
-        /// </summary>
-        public int BulletFilter { get; set; }
-
-        /// <summary>
         /// 朝目标移动
         /// </summary>
         private Vector3 TargetPos;  // 目标为点
@@ -219,17 +214,17 @@ namespace Nullspace
         private TargetType TargetType;
 
         /// <summary>
-        /// 子弹是否激活状态
+        /// 是否激活状态
         /// </summary>
         private bool IsPlaying { get; set; }
 
         /// <summary>
-        /// 子弹飞行范围：略大一点
+        /// 飞行范围：略大一点
         /// </summary>
         private Bounds BigBound = new Bounds();
 
         /// <summary>
-        /// 子弹飞行范围：正常大小
+        /// 飞行范围：正常大小
         /// </summary>
         private Bounds NormalBound = new Bounds();
 
@@ -283,7 +278,7 @@ namespace Nullspace
         }
 
         /// <summary>
-        /// 设置子弹 飞行属性
+        /// 设置 飞行属性
         /// </summary>
         /// <param name="speed"></param>
         /// <param name="pos"></param>
@@ -298,12 +293,11 @@ namespace Nullspace
             Pos = pos;
             Speed = speed;
             Direction = dir;
-            BulletFilter = bulletFilter;
             SquareDistanceThreshold = squreDistanceThreshold;
         }
 
         /// <summary>
-        /// 控制子弹开始执行
+        /// 控制开始执行
         /// </summary>
         /// <param name="forceUpdate"></param>
         public void BulletFly(bool forceUpdate, bool freezeMove, bool freezeRotate, bool freezeCollide, bool checkReached, bool luaCollideCheck)
@@ -342,7 +336,7 @@ namespace Nullspace
         }
 
         /// <summary>
-        /// 子弹有效设置
+        /// 有效设置
         /// </summary>
         public void Stop()
         {
@@ -350,7 +344,7 @@ namespace Nullspace
         }
 
         /// <summary>
-        /// 更新子弹
+        /// 更新
         /// </summary>
         public void Update()
         {

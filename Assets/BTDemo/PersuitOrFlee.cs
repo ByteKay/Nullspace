@@ -102,6 +102,7 @@ namespace Nullspace
             return 0;
         }
 
+        // 还存在一点Bug
         public void Flee()
         {
             Vector3 dir = Direction();
