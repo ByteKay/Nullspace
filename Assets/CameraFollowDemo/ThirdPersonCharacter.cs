@@ -12,16 +12,19 @@ namespace Nullspace
 
         private Animator Animator { get; set; }
 
+        private Vector3 MoveUpNormal { get; set; }
         private float TurnAmount;
         private float ForwardAmount;
         private bool IsCrouching;
         private bool IsGrounded;
+        private Transform CameraTransform;
 
         private void Awake()
         {
             Animator = GetComponent<Animator>();
             IsCrouching = false;
             IsGrounded = true;
+            MoveUpNormal = Vector3.up;
         }
 
         private void Start()
@@ -29,6 +32,10 @@ namespace Nullspace
             JoystickCtl.AddListener(JoystickListenerType.PRESS, JoystickPress);
             JoystickCtl.AddListener(JoystickListenerType.VALUE_CHANGED, JoystickDrag);
             JoystickCtl.AddListener(JoystickListenerType.RELEASE, JoystickRelease);
+            if (Camera.main != null)
+            {
+                CameraTransform = Camera.main.transform;
+            }
         }
 
         private void JoystickPress(Vector2 touchPos)
@@ -49,6 +56,12 @@ namespace Nullspace
             if (touchPos.sqrMagnitude > 0)
             {
                 Vector3 direction = new Vector3(touchPos.x, 0, touchPos.y);
+                if (CameraTransform)
+                {
+                    Vector3 forward = Vector3.Scale(CameraTransform.forward, new Vector3(1, 0, 1)).normalized;
+                    direction = direction.x * CameraTransform.right + direction.z * forward;
+                }
+                direction.Normalize();
                 transform.forward = direction;
                 Move(direction, false, false);
             }
@@ -61,8 +74,9 @@ namespace Nullspace
             {
                 move.Normalize();
             }
+            // MoveUpNormal 可能会改变，当角色在斜坡上移动
+            move = Vector3.ProjectOnPlane(move, MoveUpNormal);
             move = transform.InverseTransformDirection(move);
-            move = Vector3.ProjectOnPlane(move, Vector3.up);
             TurnAmount = move.x;
             ForwardAmount = move.z;
             UpdateAnimator(move);

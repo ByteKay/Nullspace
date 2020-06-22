@@ -54,6 +54,7 @@ namespace Nullspace
         {
             FingerId = FINGER_NOT_VALID;
             InnerTransform.localPosition = Vector3.zero;
+            IsDraging = false;
         }
 
         private void OnDisable()
@@ -88,9 +89,11 @@ namespace Nullspace
             {
                 return;
             }
+            IsDraging = true;
             FingerId = eventData.pointerId;
             InitializedPos = eventData.position;
             mPressEvent.Invoke(eventData.position);
+            EnumEventDispatcher.TriggerEvent(EnumEventType.JoystickPress, eventData.position);
         }
 
         public override void OnPointerUp(PointerEventData eventData)
@@ -99,8 +102,10 @@ namespace Nullspace
             {
                 return;
             }
+            
             ResetJoystick();
             mReleaseEvent.Invoke(eventData.position);
+            EnumEventDispatcher.TriggerEvent(EnumEventType.JoystickRelease, eventData.position);
         }
 
         public override void OnDrag(PointerEventData eventData)
