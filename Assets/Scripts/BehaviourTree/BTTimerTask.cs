@@ -1,20 +1,19 @@
 ﻿using System;
-using Object = System.Object;
 
 namespace Nullspace
 {
-    public class BTTimerTask
+    public class BTTimerTask<T>
     {
         private long mCurrentTicks;
         private long mInterval;
         private long mNextTicks;
-        private Callback<Object> mCallback = null;
+        private Callback<T> mCallback = null;
         private bool isStop;
-        public BTTimerTask(float interval, Action<Object> action)
+        public BTTimerTask(float interval, Action<T> action)
         {
             if (action != null)
             {
-                mCallback = new Callback<object>();
+                mCallback = new Callback<T>();
                 mCallback.Handler = action;
             }
             mCurrentTicks = System.DateTime.Now.Ticks;
@@ -23,7 +22,7 @@ namespace Nullspace
             isStop = true;
         }
 
-        public bool Process(Object obj)
+        public bool Process(T obj)
         {
             Start();
             if (System.DateTime.Now.Ticks > mNextTicks)

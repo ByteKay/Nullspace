@@ -3,9 +3,9 @@ using System;
 
 namespace Nullspace
 {
-    public class BTActionNode : BehaviourTreeNode
+    public class BTActionNode<T> : BehaviourTreeNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             return BTNodeState.Ready;
         }

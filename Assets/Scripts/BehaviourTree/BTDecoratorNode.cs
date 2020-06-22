@@ -2,22 +2,22 @@
 using System;
 namespace Nullspace
 {
-    public class BTDecoratorNode : BehaviourTreeNode
+    public class BTDecoratorNode<T> : BehaviourTreeNode<T>
     {
-        protected BehaviourTreeNode mChild = null;
-        public override BTNodeState Process(Object obj)
+        protected BehaviourTreeNode<T> mChild = null;
+        public override BTNodeState Process(T obj)
         {
             return BTNodeState.Ready;
         }
-        public void Proxy(BehaviourTreeNode child)
+        public void Proxy(BehaviourTreeNode<T> child)
         {
             mChild = child;
         }
     }
     // 直到 success
-    public class BTUntilSuccessNode : BTDecoratorNode
+    public class BTUntilSuccessNode<T> : BTDecoratorNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             if (mChild.Process(obj) == BTNodeState.Success)
             {
@@ -28,9 +28,9 @@ namespace Nullspace
     }
 
     // 直到 fail
-    public class BTUtilFailureNode : BTDecoratorNode
+    public class BTUtilFailureNode<T> : BTDecoratorNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             if (mChild.Process(obj) == BTNodeState.Failure)
             {
@@ -41,7 +41,7 @@ namespace Nullspace
     }
 
     // 计数器
-    public class BTCounterLimitNode : BTDecoratorNode
+    public class BTCounterLimitNode<T> : BTDecoratorNode<T>
     {
         private int mRunningLimitCount;
         private int mRunningCount = 0;
@@ -49,7 +49,7 @@ namespace Nullspace
         {
             mRunningLimitCount = limit;
         }
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             mNodeState = mChild.Process(obj);
             if (mNodeState == BTNodeState.Running)
@@ -70,15 +70,15 @@ namespace Nullspace
     }
 
     // 运行时间内
-    public class BTTimerLimitNode : BTDecoratorNode
+    public class BTTimerLimitNode<T> : BTDecoratorNode<T>
     {
-        private BTTimerTask mTimerTask;
+        private BTTimerTask<T> mTimerTask;
         public BTTimerLimitNode(float interval) : base()
         {
-            mTimerTask = new BTTimerTask(interval, null);
+            mTimerTask = new BTTimerTask<T>(interval, null);
         }
 
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             mNodeState = mChild.Process(obj);
             if (mNodeState == BTNodeState.Running)
@@ -98,15 +98,15 @@ namespace Nullspace
     }
 
     // 定时器
-    public class BTTimerNode : BTDecoratorNode
+    public class BTTimerNode<T> : BTDecoratorNode<T>
     {
-        private BTTimerTask mTimerTask;
+        private BTTimerTask<T> mTimerTask;
         public BTTimerNode(float interval) : base()
         {
-            mTimerTask = new BTTimerTask(interval, null);
+            mTimerTask = new BTTimerTask<T>(interval, null);
         }
 
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             bool flag = mTimerTask.Process(obj);
             if (flag)
@@ -118,15 +118,15 @@ namespace Nullspace
     }
 
     // 直接装饰器 定时器
-    public class BTTSimpleTimerNode : BehaviourTreeNode
+    public class BTTSimpleTimerNode<T> : BehaviourTreeNode<T>
     {
-        private BTTimerTask mTimerTask;
-        public BTTSimpleTimerNode(float interval, Action<Object> action) : base()
+        private BTTimerTask<T> mTimerTask;
+        public BTTSimpleTimerNode(float interval, Action<T> action) : base()
         {
-            mTimerTask = new BTTimerTask(interval, action);
+            mTimerTask = new BTTimerTask<T>(interval, action);
         }
 
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             bool flag = mTimerTask.Process(obj);
             if (flag)
@@ -138,9 +138,9 @@ namespace Nullspace
     }
 
     // 取非
-    public class BTInvertNode : BTDecoratorNode
+    public class BTInvertNode<T> : BTDecoratorNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             mNodeState = mChild.Process(obj);
             if (mNodeState == BTNodeState.Failure)

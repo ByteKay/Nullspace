@@ -1,6 +1,4 @@
 ﻿
-using Object = System.Object;
-
 namespace Nullspace
 {
     public enum BTNodeState
@@ -12,9 +10,9 @@ namespace Nullspace
         Error
     }
 
-    public abstract class BehaviourTreeNode
+    public abstract class BehaviourTreeNode<T>
     {
-        protected BehaviourTreeNode mRunningNode;
+        protected BehaviourTreeNode<T> mRunningNode;
         protected BTNodeState mNodeState;
         public string Name { get; set; }
 
@@ -24,12 +22,12 @@ namespace Nullspace
             mNodeState = BTNodeState.Ready;
         }
 
-        public virtual void Enter(Object obj)
+        public virtual void Enter(T obj)
         {
 
         }
 
-        public virtual BTNodeState Run(Object obj)
+        public virtual BTNodeState Run(T obj)
         {
             Enter(obj);
             mNodeState = Process(obj);
@@ -37,28 +35,30 @@ namespace Nullspace
             return mNodeState;
         }
 
-        public virtual void Leave(Object obj)
+        public virtual void Leave(T obj)
         {
-            DebugUtils.Info("Leave", "{0} {1}", Name, mNodeState);
+            DebugUtils.Info("Leave", string.Format("{0} {1}", Name, mNodeState));
         }
 
-        public abstract BTNodeState Process(Object obj);
+        public abstract BTNodeState Process(T obj);
     }
 
-    public class BehaviorTreeRoot : BehaviourTreeNode
+    public class BehaviorTreeRoot<T> : BehaviourTreeNode<T>
     {
-        public BehaviourTreeNode Root { get; set; }
+        public BehaviourTreeNode<T> Root { get; set; }
         public BehaviorTreeRoot()
         {
-
+            Name = "root";
+            Root = null;
         }
 
-        public BehaviorTreeRoot(BehaviourTreeNode root)
+        public BehaviorTreeRoot(BehaviourTreeNode<T> root)
         {
             Root = root;
+            Name = "root";
         }
 
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             mNodeState = Root.Run(obj);
             return mNodeState;

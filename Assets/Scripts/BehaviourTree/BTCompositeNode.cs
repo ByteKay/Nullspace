@@ -7,28 +7,28 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class BTCompositeNode : BehaviourTreeNode
+    public class BTCompositeNode<T> : BehaviourTreeNode<T>
     {
-        protected List<BehaviourTreeNode> mChildren;
+        protected List<BehaviourTreeNode<T>> mChildren;
         public BTCompositeNode() : base()
         {
-            mChildren = new List<BehaviourTreeNode>();
+            mChildren = new List<BehaviourTreeNode<T>>();
         }
 
-        public void AddChild(BehaviourTreeNode node)
+        public void AddChild(BehaviourTreeNode<T> node)
         {
             mChildren.Add(node);
         }
 
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             return BTNodeState.Ready;
         }
     }
 
-    public class BTSelectorNode : BTCompositeNode
+    public class BTSelectorNode<T> : BTCompositeNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             int index = 0;
             if (mNodeState == BTNodeState.Running && mRunningNode != null)
@@ -58,9 +58,9 @@ namespace Nullspace
         }
     }
 
-    public class BTSequenceNode : BTCompositeNode
+    public class BTSequenceNode<T> : BTCompositeNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
             int index = 0;
             if (mNodeState == BTNodeState.Running && mRunningNode != null)
@@ -90,11 +90,11 @@ namespace Nullspace
         }
     }
 
-    public class BTRandomSelectorNode : BTCompositeNode
+    public class BTRandomSelectorNode<T> : BTCompositeNode<T>
     {
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
-            int[] seq = RandomShuffle(mChildren.Count);
+            int[] seq = RandomUtils.RandomShuffle(mChildren.Count);
             foreach (int index in seq)
             {
                 if (mChildren[index].Run(obj) == BTNodeState.Success)
@@ -105,32 +105,12 @@ namespace Nullspace
             return BTNodeState.Failure;
         }
 
-        private int[] RandomShuffle(int indexCount)
-        {
-            int[] res = new int[indexCount];
-            for (int i = 0; i < indexCount; ++i)
-            {
-                res[i] = i;
-            }
-            for (int i = 0; i < indexCount; ++i)
-            {
-                int j = UnityEngine.Random.Range(0, indexCount);
-                while (j == i)
-                {
-                    j = UnityEngine.Random.Range(0, indexCount);
-                }
-                int temp = res[i];
-                res[i] = res[j];
-                res[j] = temp;
-            }
-            return res;
-        }
     }
 
     // 并行，与 Sequence 不同，节点同时运行
     //  &&  || 操作
     // 只是优化 可使用 协程 StartCor
-    public abstract class BTParallelNode : BTCompositeNode
+    public abstract class BTParallelNode<T> : BTCompositeNode<T>
     {
         // 并行节点除了继承 BehaviourTreeNode 外，还需要实现 BTParallelFunc
         public interface IBTParallelFunc
@@ -141,32 +121,33 @@ namespace Nullspace
 
         private List<Coroutine> mCoroutines = new List<Coroutine>();
         private MonoBehaviour behaviour;
-        public override BTNodeState Process(Object obj)
+        public override BTNodeState Process(T obj)
         {
-            if (mNodeState == BTNodeState.Ready || mNodeState == BTNodeState.Success)
-            {
-                if (!(obj is MonoBehaviour))
-                {
-                    throw new Exception("exception: " + "obj should extends MonoBehaviour");
-                }
-                behaviour = (MonoBehaviour)obj;
-                foreach (BehaviourTreeNode node in mChildren)
-                {
-                    if (typeof(IBTParallelFunc).IsAssignableFrom(node.GetType()))
-                    {
-                        mCoroutines.Add(behaviour.StartCoroutine(((IBTParallelFunc)node).RunCode()));
-                    }
-                    else
-                    {
-                        throw new Exception("exception: " + node.GetType().Name + " should implements IBTParallelFunc");
-                    }
-                }
-                mNodeState = BTNodeState.Running;
-            }
-            else if (mNodeState == BTNodeState.Running)
-            {
-                mNodeState = Handle();
-            }
+            // todo by kay
+            //if (mNodeState == BTNodeState.Ready || mNodeState == BTNodeState.Success)
+            //{
+            //    if (!(obj is MonoBehaviour))
+            //    {
+            //        throw new Exception("exception: " + "obj should extends MonoBehaviour");
+            //    }
+            //    behaviour = (MonoBehaviour)obj;
+            //    foreach (BehaviourTreeNode node in mChildren)
+            //    {
+            //        if (typeof(IBTParallelFunc).IsAssignableFrom(node.GetType()))
+            //        {
+            //            mCoroutines.Add(behaviour.StartCoroutine(((IBTParallelFunc)node).RunCode()));
+            //        }
+            //        else
+            //        {
+            //            throw new Exception("exception: " + node.GetType().Name + " should implements IBTParallelFunc");
+            //        }
+            //    }
+            //    mNodeState = BTNodeState.Running;
+            //}
+            //else if (mNodeState == BTNodeState.Running)
+            //{
+            //    mNodeState = Handle();
+            //}
             return mNodeState;
         }
 
@@ -184,13 +165,13 @@ namespace Nullspace
         }
     }
 
-    public class BTAndParaNode : BTParallelNode
+    public class BTAndParaNode<T> : BTParallelNode<T>
     {
         protected override BTNodeState Handle()
         {
             BTNodeState result = BTNodeState.Running;
             int count = 0;
-            foreach (BehaviourTreeNode node in mChildren)
+            foreach (BehaviourTreeNode<T> node in mChildren)
             {
                 if (((IBTParallelFunc)node).NodeStatus() == BTNodeState.Failure)
                 {
@@ -214,13 +195,13 @@ namespace Nullspace
         }
     }
 
-    public class BTOrParaNode : BTParallelNode
+    public class BTOrParaNode<T> : BTParallelNode<T>
     {
         protected override BTNodeState Handle()
         {
             BTNodeState result = BTNodeState.Running;
             int count = 0;
-            foreach (BehaviourTreeNode node in mChildren)
+            foreach (BehaviourTreeNode<T> node in mChildren)
             {
                 if (((IBTParallelFunc)node).NodeStatus() == BTNodeState.Success)
                 {
