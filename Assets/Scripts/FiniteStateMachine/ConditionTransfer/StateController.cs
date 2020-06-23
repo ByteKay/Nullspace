@@ -6,9 +6,9 @@ namespace Nullspace
     public class StateController<T>
     {
         private Dictionary<string, StateControllerParameter> mParameters;
-        private StateEntity<T> mEntryState;
-        private StateEntity<T> mExitState;
-        private StateEntity<T> mAnyStates;
+        //private StateEntity<T> mEntryState;
+        //private StateEntity<T> mExitState;
+        //private StateEntity<T> mAnyStates;
         private List<StateEntity<T>> mStateSet;
 
         public StateController()
@@ -19,6 +19,8 @@ namespace Nullspace
 
         public StateEntity<T> Current { get; set; }
 
+        public T State { get { return Current.StateType; } }
+
         /// <summary>
         /// 添加一个新状态
         /// </summary>
@@ -26,13 +28,20 @@ namespace Nullspace
         /// <returns></returns>
         public StateEntity<T> AddState(T stateType)
         {
-            int index = mStateSet.FindIndex((item) => { return stateType.Equals(item.StateType); });
-            StateEntity<T> entity = null;
-            if (index < 0)
+            StateEntity<T> entity = GetEntity(stateType);
+            if (entity == null)
             {
                 entity = new StateEntity<T>(stateType, this);
+                mStateSet.Add(entity);
             }
-            else
+            return entity;
+        }
+
+        private StateEntity<T> GetEntity(T stateType)
+        {
+            int index = mStateSet.FindIndex((item) => { return stateType.Equals(item.StateType); });
+            StateEntity<T> entity = null;
+            if (index >= 0)
             {
                 entity = mStateSet[index];
             }
@@ -44,7 +53,7 @@ namespace Nullspace
             if (mParameters.ContainsKey(paraName))
             {
                 StateParameterDataType type = StateParameterDataType.TRIGGER;
-                Type vType = typeof(U);
+                Type vType = value.GetType();
                 if (vType == typeof(int))
                 {
                     type = StateParameterDataType.INT;
@@ -76,9 +85,17 @@ namespace Nullspace
                 if (isDirty)
                 {
                     Assert(!nextTransfer.Equals(Current.StateType), "wrong changed state");
-                    // todo
+                    ChangeStatus(nextTransfer);
                 }
             }
+        }
+
+        private void ChangeStatus(T nextState)
+        {
+            StateEntity<T> nextEntity = GetEntity(nextState);
+            Current.Exit();
+            nextEntity.Enter();
+            nextEntity.Process();
         }
 
         /// <summary>
@@ -119,7 +136,8 @@ namespace Nullspace
                     return param.Value.Equals(condition.Value);
                 case StateParameterDataType.FLOAT:
                 case StateParameterDataType.INT: // int 也当作 浮点比较
-                    return CheckFloat((float)condition.Value, (float)param.Value, condition.CompareType);
+                    // 当前值 param.Value 与 目标值 condition.Value 比较
+                    return CheckFloat((float)param.Value, (float)condition.Value, condition.CompareType);
             }
             return true;
         }

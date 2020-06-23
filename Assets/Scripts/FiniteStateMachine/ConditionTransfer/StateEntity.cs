@@ -5,11 +5,12 @@ using System.Text;
 
 namespace Nullspace
 {
-    public class StateEntity<T> : IState
+    public class StateEntity<T> : IState<T>
     {
         private List<T> mNextStates;
         private List<StateConditions> mNextConditions;
         private StateController<T> mOwnerCtl;
+
         public StateEntity(T stateType, StateController<T> ctl)
         {
             StateType = stateType;
@@ -23,10 +24,7 @@ namespace Nullspace
 
         public StateEntity<T> AsCurrent()
         {
-            if (mOwnerCtl.Current == null)
-            {
-                mOwnerCtl.Current = this;
-            }
+            mOwnerCtl.Current = this;
             return this;
         }
 
@@ -35,7 +33,7 @@ namespace Nullspace
         /// </summary>
         /// <param name="nextStateType">下一个状态类别</param>
         /// <returns>状态转移条件</returns>
-        public StateConditions AddTransfer(T nextStateType)
+        public override StateConditions AddTransfer(T nextStateType)
         {
             StateConditions conditions = null;
             int index = mNextStates.FindIndex((item) => { return item.Equals(nextStateType); });
@@ -82,11 +80,11 @@ namespace Nullspace
             return false;
         }
 
-        public void Exit()
+        public override void Enter()
         {
-            // todo
-            // 检测条件，是否转移到下一个状态
-
+            AsCurrent();
+            base.Enter();
         }
+
     }
 }

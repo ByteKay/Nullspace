@@ -35,7 +35,10 @@ namespace Nullspace
         {
             foreach (StateCondition condition in mConditions)
             {
-                controller.CheckCondition(condition);
+                if (!controller.CheckCondition(condition))
+                {
+                    return false;
+                }
             }
             return true;
         }

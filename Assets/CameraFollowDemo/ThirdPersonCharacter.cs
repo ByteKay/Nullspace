@@ -48,7 +48,7 @@ namespace Nullspace
             Animator.SetFloat("Forward", 0);
             Animator.SetFloat("Turn", 0);
             // Move(Vector3.zero, false, false);
-            DebugUtils.Info("Move", "JoystickRelease");
+            // DebugUtils.Info("Move", "JoystickRelease");
         }
 
         private void JoystickDrag(Vector2 touchPos)
@@ -80,7 +80,7 @@ namespace Nullspace
             TurnAmount = move.x;
             ForwardAmount = move.z;
             UpdateAnimator(move);
-            DebugUtils.Info("Move", string.Format("{0} {1}", TurnAmount, ForwardAmount));
+            // DebugUtils.Info("Move", string.Format("{0} {1}", TurnAmount, ForwardAmount));
         }
 
         private void UpdateAnimator(Vector3 move)
