@@ -50,9 +50,9 @@ namespace Nullspace
         }
 #endif
 
-        public bool InitAndLoad(string flag)
+        public bool InitAndLoad(string nameSpace, string flag)
         {
-            Init("Nullspace");
+            Init(nameSpace);
             UnityEngine.Profiling.Profiler.BeginSample("InitAndLoad");
             bool ret = LoadData(flag);
             UnityEngine.Profiling.Profiler.EndSample();
@@ -270,7 +270,7 @@ namespace Nullspace
             {
                 fileName = fileName + XmlData.mXmlSuffix;
             }
-            fileName = string.Format("{0}/{1}/{2}", Application.dataPath, "Path", fileName);
+            fileName = string.Format("{0}/{1}/{2}", Application.dataPath, "XmlData", fileName);
             content = XmlFileUtils.LoadText(fileName);
 #endif
             return content;
