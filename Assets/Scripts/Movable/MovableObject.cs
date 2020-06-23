@@ -151,7 +151,7 @@ namespace Nullspace
 
     public partial class MovableObject : MonoBehaviour
     {
-        public static float Height = 97000f;
+        public static float Height = 0;
         /// <summary>
         /// 速度
         /// </summary>
@@ -236,6 +236,19 @@ namespace Nullspace
             BigBound.max = max + new Vector3(1, 0, 1);
             NormalBound.min = min;
             NormalBound.max = max;
+
+#if UNITY_EDITOR
+            Vector3 mmin = min;
+            Vector3 mmax = max;
+            mmin.y = 0;
+            mmax.y = 0;
+            Vector3 mmin1 = new Vector3(mmax.x, 0, mmin.z);
+            Vector3 mmax1 = new Vector3(mmin.x, 0, mmax.z);
+            Debug.DrawLine(mmin, mmin1, Color.black, 1000000);
+            Debug.DrawLine(mmin1, mmax, Color.black, 1000000);
+            Debug.DrawLine(mmax, mmax1, Color.black, 1000000);
+            Debug.DrawLine(mmax1, mmin, Color.black, 1000000);
+#endif
         }
 
         /// <summary>
@@ -254,8 +267,8 @@ namespace Nullspace
                 if (main != null)
                 {
                     // 转换
-                    Vector3 min = main.ScreenToWorldPoint(new Vector3(minX, minY, 0));
-                    Vector3 max = main.ScreenToWorldPoint(new Vector3(maxX, maxY, 0));
+                    Vector3 min = main.ScreenToWorldPoint(new Vector3(minX, minY, main.farClipPlane));
+                    Vector3 max = main.ScreenToWorldPoint(new Vector3(maxX, maxY, main.farClipPlane));
                     SetBoundWorld(min, max);
                 }
                 else
