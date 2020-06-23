@@ -33,6 +33,7 @@ namespace Nullspace
             return Time.realtimeSinceStartup - ReleasedTimePoint >= life;
         }
     }
+
     public class ObjectPool
     {
         private static List<uint> ExpiredKeys = new List<uint>();
@@ -163,6 +164,7 @@ namespace Nullspace
         public static ObjectCacheBase Acquire(Type type)
         {
             Debug.Assert(type.IsSubclassOf(typeof(ObjectCacheBase)), "wrong type");
+            Debug.Assert(type.GetConstructor(null) != null, "no default constructor");
             if (!Pools.ContainsKey(type))
             {
                 Pools.Add(type, new ObjectPool(type));
