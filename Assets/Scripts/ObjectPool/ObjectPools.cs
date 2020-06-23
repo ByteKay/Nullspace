@@ -9,14 +9,16 @@ namespace Nullspace
         private static uint CurrentSize = 0;
         private static uint NextKey { get { return CurrentSize++; } }
 
-        public uint Key;
         private float ReleasedTimePoint;
+        
         public ObjectCacheBase()
         {
             Key = NextKey;
             ReleasedTimePoint = Time.realtimeSinceStartup;
             Initialize();
         }
+
+        public uint Key { get; set; }
 
         protected virtual void Initialize()
         {
