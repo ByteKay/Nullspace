@@ -39,7 +39,7 @@ namespace Nullspace
             }
         }
 
-        public void OnDestroy()
+        protected virtual void OnDestroy()
         {
             applicationIsQuitting = true;
         }

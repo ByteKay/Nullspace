@@ -10,6 +10,12 @@ namespace Nullspace
             // 2. LoggerConfig
             // 3. NetworkConfig
             // 4. TimerTaskQueue
+            // 5. ObjectPools
+        }
+
+        protected override void OnDestroy()
+        {
+            
         }
     }
 }

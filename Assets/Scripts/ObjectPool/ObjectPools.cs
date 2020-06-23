@@ -155,14 +155,14 @@ namespace Nullspace
     {
         private static Dictionary<Type, ObjectPool> Pools;
         private static List<Type> ClearEmptyPools;
+        private static int CheckTimerId;
         static ObjectPools()
         {
             Pools = new Dictionary<Type, ObjectPool>();
             ClearEmptyPools = new List<Type>();
-            TimerTaskQueue.Instance.AddTimer(2000, 2000, CheckLifeExpired);
+            CheckTimerId = TimerTaskQueue.Instance.AddTimer(2000, 2000, CheckLifeExpired);
         }
-
-
+        
         public static ObjectCacheBase Acquire(Type type)
         {
             Debug.Assert(type.IsSubclassOf(typeof(ObjectCacheBase)), "wrong type");
@@ -188,12 +188,13 @@ namespace Nullspace
             }
         }
 
-        public static void Clear()
+        public static void Quit()
         {
             foreach (ObjectPool pool in Pools.Values)
             {
                 pool.Clear();
             }
+            TimerTaskQueue.Instance.DelTimer(CheckTimerId);
         }
 
         private static void CheckLifeExpired()
