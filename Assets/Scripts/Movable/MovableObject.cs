@@ -19,7 +19,6 @@ namespace Nullspace
         /// </summary>
         public void OnReachBorder()
         {
-            // HLDebug.Info("RFEntityBullet", "OnReachBorder");
             IsCheckReached = false;
             OnBorderRevert();
         }
@@ -42,7 +41,6 @@ namespace Nullspace
         /// </summary>
         public void OnReachTarget()
         {
-            // HLDebug.Info("RFEntityBullet", "OnReachTarget");
             IsCheckReached = false;
             // todo
         }
@@ -52,7 +50,6 @@ namespace Nullspace
         /// </summary>
         public void HandleInvalid()
         {
-            // HLDebug.Info("RFEntityBullet", "HandleInvalid");
             IsCheckReached = false;
             // todo
         }
@@ -72,8 +69,7 @@ namespace Nullspace
 
     /// <summary>
     /// 目标对象处理。
-    /// 这里冗余在一起，方便后面不重复 new 。而 RFEntityBullet 会缓存
-    /// 也就是 这些数据 会随着 RFEntityBullet 而 缓存
+    /// 这里冗余在一起，方便后面不重复 new 。而 会缓存
     /// </summary>
     public partial class MovableObject
     {
@@ -99,7 +95,6 @@ namespace Nullspace
             TargetPos = targetPos;
             IsCheckReached = true;
             TargetType = TargetType.POINT;
-            DebugUtils.Info("RFBullet", "point target");
         }
 
         /// <summary>
@@ -288,7 +283,7 @@ namespace Nullspace
         /// <param name="maxX"></param>
         /// <param name="maxY"></param>
         /// <param name="squreDistanceThreshold"></param>
-        public void SetInfo(float speed, Vector3 pos, Vector3 dir, int bulletFilter, float squreDistanceThreshold = 400.0f)
+        public void SetInfo(float speed, Vector3 pos, Vector3 dir, float squreDistanceThreshold = 400.0f)
         {
             Pos = pos;
             Speed = speed;
@@ -300,7 +295,7 @@ namespace Nullspace
         /// 控制开始执行
         /// </summary>
         /// <param name="forceUpdate"></param>
-        public void BulletFly(bool forceUpdate, bool freezeMove, bool freezeRotate, bool freezeCollide, bool checkReached, bool luaCollideCheck)
+        public void Move(bool forceUpdate, bool freezeMove, bool freezeRotate, bool freezeCollide, bool checkReached, bool luaCollideCheck)
         {
             IsPlaying = true;
             FreezeMove = freezeMove;

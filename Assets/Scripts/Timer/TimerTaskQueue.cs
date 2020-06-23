@@ -24,6 +24,10 @@ namespace Nullspace
         }
     }
 
+    /// <summary>
+    /// interval == 0, 表示非 loop
+    /// interval > 0, 表示 以 interval 循环
+    /// </summary>
     public class TimerTaskQueue : Singleton<TimerTaskQueue>
     {
         private int mNextTimerId;

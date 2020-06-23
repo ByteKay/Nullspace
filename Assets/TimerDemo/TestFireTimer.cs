@@ -15,6 +15,18 @@ namespace Nullspace
         private void TestAutoTimer()
         {
             timer = new AutoCountTimer();
+            timer.Awake();
+        }
+
+        private void OnDestroy()
+        {
+            TimerTaskQueue.Instance.Reset();
+            timer.Control(ProcessState.STOP);
+        }
+
+        private void Update()
+        {
+            TimerTaskQueue.Instance.Tick();
         }
 
         private void OnGUI()

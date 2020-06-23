@@ -200,7 +200,7 @@ namespace Nullspace
         public virtual void AddTarget(TargetType msg)
         {
             // 如果生产时，处于cd期间并且控制为忽略，则不添加处理
-            if (!isActive || (ignoreWhenCD && IsInCD()))
+            if (ignoreWhenCD && IsInCD())
             {
                 Debug.Log("AutoCountTimer refuse ");
                 return;
@@ -238,7 +238,7 @@ namespace Nullspace
         /// <summary>
         /// 初始化数据
         /// </summary>
-        protected virtual void Awake()
+        public virtual void Awake()
         {
             mTargetMessages = new LinkedList<TargetType>();
             mStateMessages = new LinkedList<ProcessParam>();
@@ -327,7 +327,7 @@ namespace Nullspace
 
             if (bWrongState)
             {
-                Debug.LogError("wrong state" + state);
+                DebugUtils.Error("wrong state", state);
             }
         }
 
@@ -468,7 +468,7 @@ namespace Nullspace
             }
             if (retCode != 0)
             {
-                Debug.Log(string.Format("(TotalValue, CurValue) = ({1}, {2})", TotalValue, CurValue));
+                DebugUtils.Info("Process", string.Format("(TotalValue, CurValue) = ({1}, {2})", TotalValue, CurValue));
                 return;
             }
             PostFire();
@@ -490,7 +490,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    Debug.Log(string.Format("Finished: (TotalValue, CurValue) = ({1}, {2})", TotalValue, CurValue));
+                    DebugUtils.Info("CheckFinished", string.Format("Finished: (TotalValue, CurValue) = ({1}, {2})", TotalValue, CurValue));
                 }
             }
         }
@@ -507,7 +507,7 @@ namespace Nullspace
             mCurrentProcessParam = process;
             if (on)
             {
-                TimerId = TimerTaskQueue.Instance.AddTimer(0, (int)process.timeValue * 1000, HandleStateOff);
+                TimerId = TimerTaskQueue.Instance.AddTimer((int)process.timeValue * 1000, 0, HandleStateOff);
             }
         }
 

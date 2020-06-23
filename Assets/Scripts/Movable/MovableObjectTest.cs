@@ -56,11 +56,11 @@ public class MovableObjectTest : MonoBehaviour
 
         Vector3 dir = new Vector3(Random.Range(1, 10), 0, Random.Range(1, 10));
         dir.Normalize();
-        movable.SetInfo(200, new Vector3(Random.Range(-1000, 1000), 0, Random.Range(-1000, 1000)), dir, -1, 400);
+        movable.SetInfo(200, new Vector3(Random.Range(-1000, 1000), 0, Random.Range(-1000, 1000)), dir, 400);
         movable.SetBoundInfo(-667, -375, 667, 375, true);
         // bullet.SetTarget(new Vector3(100, 0, 100));
         movable.SetTarget(target);
         // bullet.SetTarget();
-        movable.BulletFly(true, false, false, true, true, false);
+        movable.Move(true, false, false, true, true, false);
     }
 }
