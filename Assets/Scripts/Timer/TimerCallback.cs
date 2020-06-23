@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Nullspace
 {
-    public abstract class TimerCallback
+    public abstract class TimerCallback : ObjectCacheBase
     {
         public abstract Delegate Handler
         {

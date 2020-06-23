@@ -5,9 +5,9 @@ namespace Nullspace
 {
     public class TimerTask
     {
-        public TimerTask(TimerCallback callback)
+        public TimerTask()
         {
-            Callback = callback;
+            
         }
 
         public int TimerId { get; set; }
@@ -161,7 +161,8 @@ namespace Nullspace
 
         private TimerTask GetTimerData(TimerCallback callback, int start, int interval)
         {
-            TimerTask task = new TimerTask(callback);
+            TimerTask task = new TimerTask();
+            task.Callback = callback;
             task.Interval = interval;
             task.TimerId = NextTimerId;
             task.NextTick = mCurrentTick + 1 + start;
