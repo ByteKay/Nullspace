@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 namespace Nullspace
 {
     public class ObjectCacheBase
@@ -14,7 +16,6 @@ namespace Nullspace
         public ObjectCacheBase()
         {
             Key = NextKey;
-            ReleasedTimePoint = Time.realtimeSinceStartup;
             Initialize();
         }
 
@@ -22,9 +23,10 @@ namespace Nullspace
 
         protected virtual void Initialize()
         {
-            // todo
+            ReleasedTimePoint = Time.realtimeSinceStartup;
         }
 
+        // 这个只能通过 ObjectPools.Instance.Release --> ObjectPool.Release -> Release 过来
         public virtual void Release()
         {
             ReleasedTimePoint = Time.realtimeSinceStartup;
@@ -46,7 +48,7 @@ namespace Nullspace
 
         public Type Type { get; set; }
         // 默认5分钟
-        public ObjectPool(Type type, int lifeTimeSecond = 300)
+        public ObjectPool(Type type, int lifeTimeSecond = 20)
         {
             Type = type;
             LifeTimeSecond = lifeTimeSecond;
@@ -147,35 +149,42 @@ namespace Nullspace
 
         public bool IsEmpty()
         {
-            return CircleCaches.Count == 0;
+            return Count == 0;
         }
+
+        public int Count { get { return CircleCaches.Count; } }
     }
 
-    public class ObjectPools
+    [Serializable]
+    public class ObjectPools : Singleton<ObjectPools>
     {
-        private static Dictionary<Type, ObjectPool> Pools;
-        private static List<Type> ClearEmptyPools;
-        private static int CheckTimerId;
-        static ObjectPools()
+        private Dictionary<Type, ObjectPool> Pools;
+        private List<Type> ClearEmptyPools;
+        private int CheckTimerId;
+        private void Awake()
         {
             Pools = new Dictionary<Type, ObjectPool>();
             ClearEmptyPools = new List<Type>();
             CheckTimerId = TimerTaskQueue.Instance.AddTimer(2000, 2000, CheckLifeExpired);
         }
-        
-        public static ObjectCacheBase Acquire(Type type)
+
+        public T Acquire<T>() where T : ObjectCacheBase
         {
-            Debug.Assert(type.IsSubclassOf(typeof(ObjectCacheBase)), "wrong type");
-            Debug.Assert(type.GetConstructor(null) != null, "no default constructor");
+            Type type = typeof(T);
+            Debug.Assert(type.GetConstructor(Type.EmptyTypes) != null, "no default constructor");
             if (!Pools.ContainsKey(type))
             {
                 Pools.Add(type, new ObjectPool(type));
             }
-            return Pools[type].Acquire();
+            return Pools[type].Acquire() as T;
         }
 
-        public static void Release(ObjectCacheBase obj)
+        public void Release(ObjectCacheBase obj)
         {
+            if (obj == null)
+            {
+                return; 
+            }
             Type type = obj.GetType();
             Debug.Assert(type.IsSubclassOf(typeof(ObjectCacheBase)), "wrong type");
             if (Pools.ContainsKey(type))
@@ -188,17 +197,19 @@ namespace Nullspace
             }
         }
 
-        public static void Quit()
+        protected override void OnDestroy()
         {
             foreach (ObjectPool pool in Pools.Values)
             {
                 pool.Clear();
             }
             TimerTaskQueue.Instance.DelTimer(CheckTimerId);
+            base.OnDestroy();
         }
 
-        private static void CheckLifeExpired()
+        private void CheckLifeExpired()
         {
+            DebugUtils.Info("ObjectPools", "CheckLifeExpired");
             ClearEmptyPools.Clear();
             foreach (ObjectPool pool in Pools.Values)
             {
@@ -216,6 +227,19 @@ namespace Nullspace
                 }
             }
         }
+
+#if UNITY_EDITOR
+        public void InspectorShow()
+        {
+            foreach (ObjectPool pool in Pools.Values)
+            {
+                EditorGUILayout.BeginVertical(GUI.skin.GetStyle("Window"));
+                GUILayout.Label(pool.Type.Name + " " + pool.Count);
+                EditorGUILayout.EndVertical();
+                GUILayout.Space(16);
+            }
+        }
+#endif
 
     }
 

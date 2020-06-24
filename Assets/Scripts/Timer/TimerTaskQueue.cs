@@ -3,13 +3,8 @@ using System.Diagnostics;
 
 namespace Nullspace
 {
-    public class TimerTask
+    public class TimerTask : ObjectCacheBase
     {
-        public TimerTask()
-        {
-            
-        }
-
         public int TimerId { get; set; }
 
         public int Interval { get; set; }
@@ -21,6 +16,13 @@ namespace Nullspace
         public void DoAction()
         {
             Callback.Run();
+        }
+
+        public override void Release()
+        {
+            ObjectPools.Instance.Release(Callback);
+            Callback = null;
+            base.Release();
         }
     }
 
@@ -46,7 +48,7 @@ namespace Nullspace
 
         public int AddTimer(int start, int interval, Action handler)
         {
-            Callback callback = new Callback();
+            Callback callback = ObjectPools.Instance.Acquire<Callback>();
             callback.Handler = handler;
             var p = GetTimerData(callback, start, interval);
             return AddTimer(p);
@@ -54,7 +56,7 @@ namespace Nullspace
 
         public int AddTimer<T>(int start, int interval, Action<T> handler, T arg1)
         {
-            Callback<T> callback = new Callback<T>();
+            Callback<T> callback = ObjectPools.Instance.Acquire<Callback<T>>();
             callback.Arg1 = arg1;
             callback.Handler = handler;
             TimerTask p = GetTimerData(callback, start, interval);
@@ -63,7 +65,7 @@ namespace Nullspace
 
         public int AddTimer<T, U>(int start, int interval, Action<T, U> handler, T arg1, U arg2)
         {
-            Callback<T, U> callback = new Callback<T, U>();
+            Callback<T, U> callback = ObjectPools.Instance.Acquire<Callback<T, U>>();
             callback.Arg1 = arg1;
             callback.Arg2 = arg2;
             callback.Handler = handler;
@@ -73,7 +75,7 @@ namespace Nullspace
 
         public int AddTimer<T, U, V>(int start, int interval, Action<T, U, V> handler, T arg1, U arg2, V arg3)
         {
-            Callback<T, U, V> callback = new Callback<T, U, V>();
+            Callback<T, U, V> callback = ObjectPools.Instance.Acquire<Callback<T, U, V>>();
             callback.Arg1 = arg1;
             callback.Arg2 = arg2;
             callback.Arg3 = arg3;
@@ -83,7 +85,7 @@ namespace Nullspace
         }
         public int AddTimer<T, U, V, W>(int start, int interval, Action<T, U, V> handler, T arg1, U arg2, V arg3, W arg4)
         {
-            Callback<T, U, V, W> callback = new Callback<T, U, V, W>();
+            Callback<T, U, V, W> callback = ObjectPools.Instance.Acquire<Callback<T, U, V, W>>();
             callback.Arg1 = arg1;
             callback.Arg2 = arg2;
             callback.Arg3 = arg3;
@@ -94,9 +96,14 @@ namespace Nullspace
         }
         public void DelTimer(int timerId)
         {
+            TimerTask p = null;
             lock (mQueueLock)
             {
-                mPriorityQueue.Remove(timerId);
+                p = mPriorityQueue.Remove(timerId);
+            }
+            if (p != null)
+            {
+                ObjectPools.Instance.Release(p);
             }
         }
 
@@ -132,6 +139,7 @@ namespace Nullspace
                 else
                 {
                     p.DoAction();
+                    ObjectPools.Instance.Release(p);
                 }
             }
         }
@@ -145,7 +153,8 @@ namespace Nullspace
             {
                 while (mPriorityQueue.Size != 0)
                 {
-                    mPriorityQueue.Dequeue();
+                    TimerTask p = mPriorityQueue.Dequeue();
+                    ObjectPools.Instance.Release(p);
                 }
             }
         }
@@ -161,7 +170,7 @@ namespace Nullspace
 
         private TimerTask GetTimerData(TimerCallback callback, int start, int interval)
         {
-            TimerTask task = new TimerTask();
+            TimerTask task = ObjectPools.Instance.Acquire<TimerTask>();
             task.Callback = callback;
             task.Interval = interval;
             task.TimerId = NextTimerId;

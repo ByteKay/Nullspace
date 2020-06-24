@@ -20,7 +20,6 @@ namespace Nullspace
     public class Callback : TimerCallback
     {
         private Action mAction;
-
         public override Delegate Handler
         {
             get { return mAction; }
@@ -36,13 +35,7 @@ namespace Nullspace
     public class Callback<T> : TimerCallback
     {
         private Action<T> mAction;
-        private T mArg1;
-
-        public T Arg1
-        {
-            get { return mArg1; }
-            set { mArg1 = value; }
-        }
+        public T Arg1 { get; set; }
         public override Delegate Handler
         {
             get { return mAction; }
@@ -51,27 +44,16 @@ namespace Nullspace
 
         public override void Run()
         {
-            mAction(mArg1);
+            mAction(Arg1);
         }
     }
 
     public class Callback<T, U> : TimerCallback
     {
         private Action<T, U> mAction;
-        private T mArg1;
-        private U mArg2;
+        public T Arg1 { get; set; }
 
-        public T Arg1
-        {
-            get { return mArg1; }
-            set { mArg1 = value; }
-        }
-
-        public U Arg2
-        {
-            get { return mArg2; }
-            set { mArg2 = value; }
-        }
+        public U Arg2 { get; set; }
         public override Delegate Handler
         {
             get { return mAction; }
@@ -80,34 +62,18 @@ namespace Nullspace
 
         public override void Run()
         {
-            mAction(mArg1, mArg2);
+            mAction(Arg1, Arg2);
         }
     }
 
     public class Callback<T, U, V> : TimerCallback
     {
         private Action<T, U, V> mAction;
-        private T mArg1;
-        private U mArg2;
-        private V mArg3;
+        public T Arg1 { get; set; }
 
-        public T Arg1
-        {
-            get { return mArg1; }
-            set { mArg1 = value; }
-        }
+        public U Arg2 { get; set; }
 
-        public U Arg2
-        {
-            get { return mArg2; }
-            set { mArg2 = value; }
-        }
-
-        public V Arg3
-        {
-            get { return mArg3; }
-            set { mArg3 = value; }
-        }
+        public V Arg3 { get; set; }
 
         public override Delegate Handler
         {
@@ -117,39 +83,16 @@ namespace Nullspace
 
         public override void Run()
         {
-            mAction(mArg1, mArg2, mArg3);
+            mAction(Arg1, Arg2, Arg3);
         }
     }
     public class Callback<T, U, V, W> : TimerCallback
     {
         private Action<T, U, V, W> mAction;
-        private T mArg1;
-        private U mArg2;
-        private V mArg3;
-        private W mArg4;
-
-        public T Arg1
-        {
-            get { return mArg1; }
-            set { mArg1 = value; }
-        }
-
-        public U Arg2
-        {
-            get { return mArg2; }
-            set { mArg2 = value; }
-        }
-
-        public V Arg3
-        {
-            get { return mArg3; }
-            set { mArg3 = value; }
-        }
-        public W Arg4
-        {
-            get { return mArg4; }
-            set { mArg4 = value; }
-        }
+        public T Arg1 { get; set; }
+        public U Arg2 { get; set; }
+        public V Arg3 { get; set; }
+        public W Arg4 { get; set; }
         public override Delegate Handler
         {
             get { return mAction; }
@@ -158,7 +101,7 @@ namespace Nullspace
 
         public override void Run()
         {
-            mAction(mArg1, mArg2, mArg3, mArg4);
+            mAction(Arg1, Arg2, Arg3, Arg4);
         }
     }
 }
