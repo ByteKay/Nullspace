@@ -8,7 +8,6 @@ namespace Nullspace
 {
     public class ResourceCachePools
     {
-        public static string SUFFIX_FLAG = "19500";
         private static List<int> CACHE = new List<int>();
         private Dictionary<int, ResourceCachePool> mPools;
         private Dictionary<int, ResourceCacheEntity> mAcquiredItems;
