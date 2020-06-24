@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Scripts/KDTree.meta
+guid: e6bc32ac8a296b24d81e5a59df962392
+=======
+guid: 777dc4ec54682d34e90dccae15cab780
+>>>>>>> fc98cc1e3d63f6b009ad2b71e9e402877b2abd3b:Assets/Scripts/OcclusionCulling.meta
+folderAsset: yes
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
