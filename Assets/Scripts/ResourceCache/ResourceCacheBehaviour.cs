@@ -18,8 +18,22 @@ namespace Nullspace
 
         public void AddCallback(TimerCallback task)
         {
-            Callback.Add(task);
+            if (task != null)
+            {
+                Callback.Add(task);
+            }
         }
+
+        public void InvokeCallback()
+        {
+            foreach (var callback in Callback)
+            {
+                callback.Run();
+                ObjectPools.Instance.Release(callback);
+            }
+            Callback.Clear();
+        }
+
     }
 
     public partial class ResourceCacheBehaviour
@@ -130,11 +144,7 @@ namespace Nullspace
 
         public virtual void PostCallback()
         {
-            foreach (var callback in Param.Callback)
-            {
-                callback.Run();
-            }
-            Param.Callback.Clear();
+            Param.InvokeCallback();
         }
 
         public void Process(ResourceCacheBehaviourParam param)
