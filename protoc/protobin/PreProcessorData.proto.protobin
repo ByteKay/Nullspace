@@ -1,0 +1,61 @@
+
+õ
+PreProcessorData.protoconstructor_data"-
+
+CDVector3f	
+x (	
+y (	
+z (""
+
+CDVector2i	
+x (	
+y ("A
+CDVertexList1
+mVertexList (2.constructor_data.CDVector3f"!
+CDIndexList
+
+mIndexList ("I
+CDRegionInnerBorder2
+mInnerIndex (2.constructor_data.CDIndexList"I
+CDRegionOuterBorder2
+mOuterIndex (2.constructor_data.CDIndexList"G
+CDRegionHullBorder1
+
+mHullIndex (2.constructor_data.CDIndexList"W
+CDRegionExternalHalfBorder9
+mEaternalHalfIndex (2.constructor_data.CDIndexList"O
+CDRegionExternalBorder5
+mExternalIndex (2.constructor_data.CDIndexList">
+
+CDFreeMesh0
+	mFreeMesh (2.constructor_data.CDIndexList">
+
+CDWallMesh0
+	mWallMesh (2.constructor_data.CDIndexList"@
+CDInnerMesh1
+
+mInnerMesh (2.constructor_data.CDIndexList"N
+CDExternalHalfMesh8
+mExternalHalfMesh (2.constructor_data.CDIndexList"F
+CDExternalMesh4
+mExternalMesh (2.constructor_data.CDIndexList"A
+CDSkeletonPath/
+	mSkeleton (2.constructor_data.CDVector2i"å
+AllInOne
+mName (	3
+mVertexList (2.constructor_data.CDVertexList3
+	mSkeleton (2 .constructor_data.CDSkeletonPath?
+mInnerBorderList (2%.constructor_data.CDRegionInnerBorder9
+mHullBorder (2$.constructor_data.CDRegionHullBorder;
+mOuterBorder (2%.constructor_data.CDRegionOuterBorderA
+mExternalBorder (2(.constructor_data.CDRegionExternalBorder/
+	mFreeMesh (2.constructor_data.CDFreeMesh/
+	mWallMesh	 (2.constructor_data.CDWallMesh1
+
+mInnerMesh
+ (2.constructor_data.CDInnerMesh?
+mExternalHalfMesh (2$.constructor_data.CDExternalHalfMesh7
+mExternalMesh (2 .constructor_data.CDExternalMeshI
+mExternalHalfBorder (2,.constructor_data.CDRegionExternalHalfBorder
+
+mY (BH

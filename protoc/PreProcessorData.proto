@@ -1,0 +1,98 @@
+option optimize_for = LITE_RUNTIME;
+package constructor_data;
+message CDVector3f 
+{
+	optional float x = 1;
+	optional float y = 2;
+	optional float z = 3;
+}
+
+message CDVector2i
+{
+	optional int32 x = 1;
+	optional int32 y = 2;
+}
+
+message CDVertexList
+{
+	repeated CDVector3f mVertexList = 1;
+}
+
+message CDIndexList
+{
+	repeated int32 mIndexList = 1;
+}
+
+message CDRegionInnerBorder
+{
+	repeated CDIndexList mInnerIndex = 1;
+}
+
+message CDRegionOuterBorder
+{
+	optional CDIndexList mOuterIndex = 1;
+}
+
+message CDRegionHullBorder
+{
+	optional CDIndexList mHullIndex = 1;
+}
+
+message CDRegionExternalHalfBorder
+{
+	optional CDIndexList mEaternalHalfIndex = 1;
+}
+
+message CDRegionExternalBorder
+{
+	optional CDIndexList mExternalIndex = 1;
+}
+
+message CDFreeMesh
+{
+	optional CDIndexList mFreeMesh = 1;
+}
+
+message CDWallMesh
+{
+	optional CDIndexList mWallMesh = 1;
+}
+
+message CDInnerMesh
+{
+	optional CDIndexList mInnerMesh = 1;
+}
+
+message CDExternalHalfMesh
+{
+	optional CDIndexList mExternalHalfMesh = 1;
+}
+
+message CDExternalMesh
+{
+	optional CDIndexList mExternalMesh = 1;
+}
+
+message CDSkeletonPath
+{
+	repeated CDVector2i mSkeleton = 1;
+}
+
+message AllInOne
+{
+	optional string mName = 1;
+	optional CDVertexList mVertexList = 2;
+	optional CDSkeletonPath mSkeleton = 3;
+	optional CDRegionInnerBorder mInnerBorderList = 4;
+	optional CDRegionHullBorder mHullBorder = 5;
+	optional CDRegionOuterBorder mOuterBorder = 6;
+	optional CDRegionExternalBorder mExternalBorder = 7;
+	optional CDFreeMesh mFreeMesh = 8;
+	optional CDWallMesh mWallMesh = 9;
+	optional CDInnerMesh mInnerMesh = 10;
+	optional CDExternalHalfMesh mExternalHalfMesh = 11;
+	optional CDExternalMesh mExternalMesh = 12;
+	optional CDRegionExternalHalfBorder mExternalHalfBorder = 13;
+	optional float mY = 14;
+}
+
