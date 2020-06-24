@@ -9,16 +9,17 @@ namespace Nullspace
     public class ResourceCachePools
     {
         private static List<int> CACHE = new List<int>();
-
+        public static string SUFFIX_FLAG = "19500";
         private Dictionary<int, ResourceCachePool> mPools;
         private Dictionary<int, ResourceCacheEntity> mAcquiredItems;
-        public DeviceLevel DeviceLevel { get; set; }
+
+        public int Level { get; set; }
 
         public ResourceCachePools()
         {
             mPools = new Dictionary<int, ResourceCachePool>();
             mAcquiredItems = new Dictionary<int, ResourceCacheEntity>();
-            DeviceLevel = DeviceLevel.High;
+            Level = DeviceLevel.High;
         }
 
         public void ChangePoolMaskFromTo(ResourceCacheMask from, ResourceCacheMask to)
@@ -45,7 +46,7 @@ namespace Nullspace
                         if (pool == null)
                         {
                             pool = new ResourceCachePool();
-                            pool.Initialize(config, ResourceCacheBindParent.CacheUnused, GetLevelIndex(), this, cacheOn);
+                            pool.Initialize(config, ResourceCacheBindParent.CacheUnused, GetLevel(), this, cacheOn);
                             mPools.Add(config.Id, pool);
                         }
                     }
@@ -193,9 +194,9 @@ namespace Nullspace
             }
         }
 
-        protected virtual DeviceLevel GetLevelIndex()
+        protected virtual int GetLevel()
         {
-            return DeviceLevel.High;
+            return Level;
         }
 
         protected virtual bool CheckLevelShow(int level)

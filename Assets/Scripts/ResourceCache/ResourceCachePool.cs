@@ -12,11 +12,11 @@ namespace Nullspace
     }
 
 
-    public enum DeviceLevel
+    public static class  DeviceLevel
     {
-        High = 0,
-        Mid = 1,
-        Low = 2,
+        public const int High = 0;
+        public const int Mid = 1;
+        public const int Low = 2;
     }
 
     public partial class ResourceCachePool
@@ -118,7 +118,8 @@ namespace Nullspace
                     ResetOrigin(entity);
                     if (entity.Behaviour == null)
                     {
-                        Type behaviourType = GetBehaviourType();
+                        Type behaviourType = Type.GetType(GetBehaviourName());
+                        Debug.Assert(behaviourType != null, "" + GetBehaviourName());
                         Debug.Assert(behaviourType != null, "null behaviourType");
                         entity.Behaviour = (ResourceCacheBehaviour)entity.GameObject.AddComponent(behaviourType);
                         entity.Behaviour.InitializeBase(this, entity);
@@ -157,7 +158,7 @@ namespace Nullspace
         private Quaternion OriginRotation { get; set; }
         public ResourceCachePools OwnedPools { get; set; }
 
-        public void Initialize(ResourceConfig config, Transform parent, DeviceLevel quality, ResourceCachePools ownedPools, bool cacheOn)
+        public void Initialize(ResourceConfig config, Transform parent, int quality, ResourceCachePools ownedPools, bool cacheOn)
         {
             Config = config;
             Parent = parent;
@@ -168,7 +169,7 @@ namespace Nullspace
             OriginPos = Vector3.zero;
             OriginScale = Vector3.one;
             OriginRotation = Quaternion.identity;
-            SetLevelIndex((int)quality);
+            SetLevelIndex(quality);
             SetStrategy();
             InitialDelay();
             IsInitialized = true;
@@ -359,9 +360,9 @@ namespace Nullspace
             return Config.LifeTime;
         }
 
-        public Type GetBehaviourType()
+        public string GetBehaviourName()
         {
-            return Config.BehaviourType;
+            return Config.BehaviourName;
         }
 
         public int GetMask()

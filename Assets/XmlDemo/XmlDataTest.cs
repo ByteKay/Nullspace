@@ -17,7 +17,6 @@ namespace Nullspace
 
     public class XmlDataTest : MonoBehaviour
     {
-        private const string SUFFIX = "1599960";
         public const string FileName = "test_person";
 
         private void OnGUI()
@@ -29,7 +28,7 @@ namespace Nullspace
 
             if (GUILayout.Button("Load XML"))
             {
-                XmlDataLoader.Instance.InitAndLoad("Nullspace", SUFFIX);
+                XmlDataLoader.Instance.InitAndLoad("Nullspace", ResourceCachePools.SUFFIX_FLAG);
                 DebugUtils.Info("XmlDataTest", TestXmlData.DataMap.Count);
             }
         }
@@ -38,12 +37,12 @@ namespace Nullspace
         private void SaveXMl()
         {
             List<TestXmlData> datas = new List<TestXmlData>();
-            datas.Add(new TestXmlData() { id = 1, Age = 10, Name = "kay1"});
-            datas.Add(new TestXmlData() { id = 2, Age = 9, Name = "kay2" });
-            datas.Add(new TestXmlData() { id = 3, Age = 10, Name = "kay3" });
-            datas.Add(new TestXmlData() { id = 4, Age = 12, Name = "kay4" });
-            datas.Add(new TestXmlData() { id = 5, Age = 13, Name = "kay5" });
-            XmlFileUtils.SaveXML(Application.dataPath + "/XmlData/test_person" + SUFFIX, datas);
+            datas.Add(new TestXmlData() { Id = 1, Age = 10, Name = "kay1"});
+            datas.Add(new TestXmlData() { Id = 2, Age = 9, Name = "kay2" });
+            datas.Add(new TestXmlData() { Id = 3, Age = 10, Name = "kay3" });
+            datas.Add(new TestXmlData() { Id = 4, Age = 12, Name = "kay4" });
+            datas.Add(new TestXmlData() { Id = 5, Age = 13, Name = "kay5" });
+            XmlFileUtils.SaveXML(Application.dataPath + "/XmlData/test_person" + ResourceCachePools.SUFFIX_FLAG, datas);
         }
     }
 }

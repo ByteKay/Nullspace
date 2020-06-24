@@ -1,4 +1,4 @@
-﻿#define LoadXmlAsync        // 同步接口，异步加载
+﻿// #define LoadXmlAsync        // 同步接口，异步加载
 using System;
 using System.Collections.Generic;
 using System.Reflection;
