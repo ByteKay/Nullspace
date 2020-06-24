@@ -23,18 +23,18 @@ namespace Nullspace
 
         protected virtual void Initialize()
         {
-            ReleasedTimePoint = Time.realtimeSinceStartup;
+            ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();
         }
 
         // 这个只能通过 ObjectPools.Instance.Release --> ObjectPool.Release -> Release 过来
         public virtual void Release()
         {
-            ReleasedTimePoint = Time.realtimeSinceStartup;
+            ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
         }
 
         public virtual bool IsExpired(float life)
         {
-            return Time.realtimeSinceStartup - ReleasedTimePoint >= life;
+            return TimeUtils.GetTimeStampSeconds() - ReleasedTimePoint >= life;
         }
     }
 

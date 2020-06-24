@@ -21,6 +21,7 @@ namespace Nullspace
                 mClientSocket.Shutdown(SocketShutdown.Both);
                 mClientSocket.Close();
                 mClientSocket = null;
+                SetConnectState(ClientConnectState.Closed);
             }
         }
         protected override void Connect()

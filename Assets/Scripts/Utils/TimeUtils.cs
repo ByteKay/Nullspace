@@ -60,7 +60,11 @@ namespace Nullspace
             TimeSpan ts = DateTime.UtcNow - ZERO;
             return Convert.ToInt64(ts.TotalMilliseconds);
         }
-
+        public static float GetTimeStampSeconds()
+        {
+            TimeSpan ts = DateTime.UtcNow - ZERO;
+            return Convert.ToSingle(ts.TotalSeconds);
+        }
         public static string GetTimeStampS()
         {
             TimeSpan ts = DateTime.UtcNow - ZERO;

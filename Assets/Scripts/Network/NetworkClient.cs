@@ -12,7 +12,8 @@ namespace Nullspace
         Already,
         Connectted,
         Reconnectting,
-        Disconnected
+        Disconnected,
+        Closed
     }
 
     public abstract class AbstractNetworkClient
@@ -48,7 +49,7 @@ namespace Nullspace
             }
         }
 
-        public void Run()
+        public void Start()
         {
             if (IsConnectState(ClientConnectState.Already))
             {
@@ -70,11 +71,13 @@ namespace Nullspace
         public virtual void Stop()
         {
             isStop = true;
-            mSendWait.Set();
-            mReceiveWait.Set();
+            //mSendWait.Set();
+            //mReceiveWait.Set();
+            mReceiveThread.Interrupt();
+            mSendThread.Interrupt();
             Close();
-            mSendWait.Close();
-            mReceiveWait.Close();
+            mSendWait.Reset();
+            mReceiveWait.Reset();
         }
         protected abstract void Init();
         protected abstract void Connect();
@@ -134,6 +137,19 @@ namespace Nullspace
                 mSendWait.Set();
                 mReceiveWait.Set();
             }
+            else if(IsConnectState(ClientConnectState.Closed))
+            {
+                if (mHeartTimerId != int.MaxValue)
+                {
+                    TimerTaskQueue.Instance.DelTimer(mHeartTimerId);
+                    mHeartTimerId = int.MaxValue;
+                }
+                if (mReconnectTimerId != int.MaxValue)
+                {
+                    TimerTaskQueue.Instance.DelTimer(mReconnectTimerId);
+                    mReconnectTimerId = int.MaxValue;
+                }
+            }
         }
         private bool IsConnectState(ClientConnectState state)
         {
@@ -169,10 +185,8 @@ namespace Nullspace
         private void InitThread()
         {
             mReceiveThread = new Thread(ReceiveMessage);
-            mReceiveThread.IsBackground = true;
             mReceiveThread.Start();
             mSendThread = new Thread(SendMessage);
-            mSendThread.IsBackground = true;
             mSendThread.Start();
         }
         private void StartConnect()
@@ -185,6 +199,9 @@ namespace Nullspace
                 Reconnect();
             }
         }
+
+        // 这里实际上可以一帧末尾并包发送。一次发送就好
+        // 或者 设置一次的发射字节数量上限值，多次发送。
         private void SendMessage()
         {
             while (!isStop)
@@ -254,7 +271,7 @@ namespace Nullspace
         {
             isStop = false;
             mIP = ip;
-            GetIP(ip);
+            // GetIP(ip);
             mHead = new NetworkHeadFormat();
             mContents = null;
             mPort = port;

@@ -30,7 +30,7 @@ public partial class TestNetwork : MonoBehaviour
 #else
         mClient = new NetworkCppClient(mIP, mPort);
 #endif
-        mClient.Run();
+        mClient.Start();
         yield return null;
     }
 
