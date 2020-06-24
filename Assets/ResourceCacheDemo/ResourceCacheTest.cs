@@ -28,7 +28,7 @@ namespace Nullspace
             }
             if (!IsInitialized && GUILayout.Button("Initialize"))
             {
-                XmlDataLoader.Instance.InitAndLoad(XmlFileNameDefine.NAMESPACE, XmlFileNameDefine.SUFFIX_FLAG);
+                XmlDataLoader.Instance.InitAndLoad(XmlFileNameDefine.Namespace, XmlFileNameDefine.SuffixFlag);
                 DebugUtils.Info("EffectConfig", "DataPath " + Application.dataPath + " Count: " + EffectConfig.DataMap.Count);
                 EffectPools.Initialize(ResourceCacheMask.Testing, EffectConfig.DataMap);
                 IsInitialized = true;
@@ -68,7 +68,7 @@ namespace Nullspace
             EffectConfig.CheckDuplicatedDatas("ResourceConfig", configs);
             SortById<EffectConfig> inst = new SortById<EffectConfig>();
             configs.Sort(inst);
-            XmlFileUtils.SaveXML(string.Format("{0}/{1}/{2}{3}", Application.dataPath, XmlFileNameDefine.DIRECTORY, XmlFileNameDefine.ResourceCache, XmlFileNameDefine.SUFFIX_FLAG), configs);
+            XmlFileUtils.SaveXML(string.Format("{0}/{1}/{2}{3}", Application.dataPath, XmlFileNameDefine.Directory, XmlFileNameDefine.ResourceCache, XmlFileNameDefine.SuffixFlag), configs);
         }
     }
 }

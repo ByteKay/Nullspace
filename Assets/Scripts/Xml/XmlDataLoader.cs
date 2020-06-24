@@ -270,7 +270,7 @@ namespace Nullspace
             {
                 fileName = fileName + XmlData.mXmlSuffix;
             }
-            fileName = string.Format("{0}/{1}/{2}", Application.dataPath, XmlFileNameDefine.DIRECTORY, fileName);
+            fileName = string.Format("{0}/{1}/{2}", Application.dataPath, XmlFileNameDefine.Directory, fileName);
             content = XmlFileUtils.LoadText(fileName);
 #endif
             return content;
