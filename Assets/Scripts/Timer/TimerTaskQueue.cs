@@ -107,6 +107,11 @@ namespace Nullspace
             }
         }
 
+        private void Update()
+        {
+            Tick();
+        }
+
         public void Tick()
         {
             mCurrentTick += (int)mStopWatch.ElapsedMilliseconds;

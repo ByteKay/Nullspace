@@ -24,7 +24,8 @@ namespace Nullspace
         public const string mKeyValueFieldName = "DataMap";
         public const string mXmlSuffix = ".xml";
         public const string mFileName = "fileName";
-        public int Id { get; set; }
+        private int mId;
+        public int Id { get { return mId; } set { mId = value; } }
 
     }
 
@@ -39,14 +40,14 @@ namespace Nullspace
     public abstract class XmlData<T> : XmlData where T : XmlData<T>
     {
         public static SortById<T> SortInstance = new SortById<T>();
-        public static void CheckDuplicatedDatas(string prefix, List<T> xmlDatas)
+        public static void CheckDuplicatedDatas<U>(string prefix, List<U> xmlDatas) where U : XmlData
         {
-            Dictionary<int, List<T>> tmp = new Dictionary<int, List<T>>();
-            foreach (T t in xmlDatas)
+            Dictionary<int, List<U>> tmp = new Dictionary<int, List<U>>();
+            foreach (U t in xmlDatas)
             {
                 if (!tmp.ContainsKey(t.Id))
                 {
-                    tmp.Add(t.Id, new List<T>());
+                    tmp.Add(t.Id, new List<U>());
                 }
                 tmp[t.Id].Add(t);
             }

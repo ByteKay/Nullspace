@@ -6,12 +6,25 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    public enum EffectConfigName
+    {
+        THIRD_PERSON = 0,
+    }
+
+    // 空继承，区分 xml 而已
+    [XmlData("ResourceCache")]
+    public class EffectConfig : ResourceConfig<EffectConfig>
+    {
+
+    }
+
     public class ResourceCacheTest : MonoBehaviour
     {
         private bool IsInitialized = false;
+        private ResourceCachePools EffectPools;
         private void Start()
         {
-            
+            EffectPools = new ResourceCachePools();
         }
 
         private void OnGUI()
@@ -23,43 +36,28 @@ namespace Nullspace
             if (!IsInitialized && GUILayout.Button("Initialize"))
             {
                 XmlDataLoader.Instance.InitAndLoad("Nullspace", ResourceCachePools.SUFFIX_FLAG);
-                DebugUtils.Info("ResourceConfig", "Count: " + ResourceConfig.DataMap.Count);
+                DebugUtils.Info("EffectConfig", "DataPath " + Application.dataPath + " Count: " + EffectConfig.DataMap.Count);
+                EffectPools.Initialize(ResourceCacheMask.Testing, EffectConfig.DataMap);
                 IsInitialized = true;
             }
             if (IsInitialized)
             {
                 if (GUILayout.Button("Play"))
                 {
-
+                    int poolId = EnumUtils.EnumToInt(EffectConfigName.THIRD_PERSON);
+                    EffectPools.Play(poolId, 5000, ResourceCacheBindParent.WorldEffectBind);
                 }
             }
         }
         private void Save()
         {
             int id = 0;
-            List<ResourceConfig> configs = new List<ResourceConfig>();
+            List<EffectConfig> configs = new List<EffectConfig>();
 
-            ResourceConfig config = new ResourceConfig();
-            config.Id = id++;
-            config.Directory = "ResourceCacheDemo/Prefabs";
-            config.Names = new List<string>() { "1_test0.prefab", "1_test1.prefab", "1_test2.prefab" };
-            config.Delay = false;
-            config.StrategyType = StrategyType.FixedForce;
-            config.MaxSize = 4;
-            config.MinSize = 1;
-            config.LifeTime = 2000;
-            config.GoName = "Test";
-            config.Reset = true;
-            config.BehaviourName = typeof(FlyBehaviour).FullName;
-            config.Mask = EnumUtils.EnumToInt(ResourceCacheMask.Testing);
-            config.Level = DeviceLevel.High;
-            config.IsTimerOn = true;
-            configs.Add(config);
-
-            config = new ResourceConfig();
-            config.Id = id++;
-            config.Directory = "ResourceCacheDemo/Prefabs";
-            config.Names = new List<string>() { "2_test0.prefab", "2_test1.prefab", "2_test2.prefab" };
+            EffectConfig config = new EffectConfig();
+            config.Id = EnumUtils.EnumToInt(EffectConfigName.THIRD_PERSON);
+            config.Directory = "CameraFollowDemo/ThirdPersonCharacter/Prefabs";
+            config.Names = new List<string>() { "ThirdPersonController.prefab" };
             config.Delay = false;
             config.StrategyType = StrategyType.FixedForce;
             config.MaxSize = 4;
@@ -73,8 +71,9 @@ namespace Nullspace
             config.IsTimerOn = true;
             configs.Add(config);
 
-            ResourceConfig.CheckDuplicatedDatas("ResourceConfig", configs);
-            configs.Sort(ResourceConfig.SortInstance);
+            EffectConfig.CheckDuplicatedDatas("ResourceConfig", configs);
+            SortById<EffectConfig> inst = new SortById<EffectConfig>();
+            configs.Sort(inst);
             XmlFileUtils.SaveXML(Application.dataPath + "/XmlData/ResourceCache"+ ResourceCachePools.SUFFIX_FLAG, configs);
         }
     }

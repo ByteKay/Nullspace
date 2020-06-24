@@ -1,24 +1,8 @@
-<ResourceConfigs>
-  <ResourceConfig>
+<EffectConfigs>
+  <EffectConfig>
     <Id>0</Id>
-    <Directory>ResourceCacheDemo/Prefabs</Directory>
-    <Names>1_test0.prefab;1_test1.prefab;1_test2.prefab</Names>
-    <Delay>False</Delay>
-    <StrategyType>1</StrategyType>
-    <MaxSize>4</MaxSize>
-    <MinSize>1</MinSize>
-    <LifeTime>2000</LifeTime>
-    <GoName>Test</GoName>
-    <Reset>True</Reset>
-    <BehaviourName>Nullspace.FlyBehaviour</BehaviourName>
-    <Mask>1</Mask>
-    <Level>0</Level>
-    <IsTimerOn>True</IsTimerOn>
-  </ResourceConfig>
-  <ResourceConfig>
-    <Id>1</Id>
-    <Directory>ResourceCacheDemo/Prefabs</Directory>
-    <Names>2_test0.prefab;2_test1.prefab;2_test2.prefab</Names>
+    <Directory>CameraFollowDemo/ThirdPersonCharacter/Prefabs</Directory>
+    <Names>ThirdPersonController.prefab</Names>
     <Delay>False</Delay>
     <StrategyType>1</StrategyType>
     <MaxSize>4</MaxSize>
@@ -30,5 +14,5 @@
     <Mask>1</Mask>
     <Level>0</Level>
     <IsTimerOn>True</IsTimerOn>
-  </ResourceConfig>
-</ResourceConfigs>
+  </EffectConfig>
+</EffectConfigs>

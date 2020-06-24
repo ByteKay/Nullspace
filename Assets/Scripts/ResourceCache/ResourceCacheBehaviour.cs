@@ -144,7 +144,10 @@ namespace Nullspace
 
         public virtual void PostCallback()
         {
-            Param.InvokeCallback();
+            if (Param != null)
+            {
+                Param.InvokeCallback();
+            }
         }
 
         public void Process(ResourceCacheBehaviourParam param)
@@ -159,7 +162,7 @@ namespace Nullspace
 
         protected virtual bool ParseDelay()
         {
-            if (Param.DelayShow > 0)
+            if (Param != null && Param.DelayShow > 0)
             {
                 IntializeBeforeDelay();
                 StartDelayTimer();

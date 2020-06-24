@@ -7,6 +7,15 @@ namespace Nullspace
 {
     public class EffectBehaviour : ResourceCacheBehaviour
     {
+        public override void StartByDerive()
+        {
+            DebugUtils.Info("EffectBehaviour", "StartByDerive");
+        }
 
+
+        protected override void InterruptWhenUsing()
+        {
+            DebugUtils.Info("EffectBehaviour", "InterruptWhenUsing");
+        }
     }
 }

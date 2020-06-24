@@ -151,14 +151,14 @@ namespace Nullspace
         private bool IsInitialized { get; set; }
         private StrategyBase Strategy { get; set; }
         private bool CacheOn { get; set; }
-        private ResourceConfig Config { get; set; }
+        private IResourceConfig Config { get; set; }
         private LinkedList<ResourceCacheEntity> Container { get; set; }
         private Vector3 OriginPos { get; set; }
         private Vector3 OriginScale { get; set; }
         private Quaternion OriginRotation { get; set; }
         public ResourceCachePools OwnedPools { get; set; }
 
-        public void Initialize(ResourceConfig config, Transform parent, int quality, ResourceCachePools ownedPools, bool cacheOn)
+        public void Initialize<T>(ResourceConfig<T> config, Transform parent, int quality, ResourceCachePools ownedPools, bool cacheOn)
         {
             Config = config;
             Parent = parent;
@@ -192,9 +192,12 @@ namespace Nullspace
 
         public void LoadAsset()
         {
-            if (IsAssetSet())
+            if (IsAssetSet() && Asset == null)
             {
-                Asset = Resources.Load<GameObject>(GetAssetFilePath(null));
+#if UNITY_EDITOR
+                string path = GetAssetFilePath(null);
+                Asset = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+#endif
                 if (Asset != null)
                 {
                     OriginPos = Asset.transform.position;
@@ -219,6 +222,8 @@ namespace Nullspace
                 num = num + 1;
             }
         }
+
+        public int Count { get { return Container.Count; } }
 
         private bool IsAssetSet()
         {
@@ -291,14 +296,15 @@ namespace Nullspace
 
         public string GetAssetFilePath(string baseDir)
         {
-            if (baseDir != null)
+            string format = baseDir != null ? baseDir + "/{0}/{1}" : "{0}/{1}";
+            format = format.Replace("//", "/");
+            format = format.Replace("\\", "/");
+            string name = GetResourceName();
+            if (!name.EndsWith(".prefab"))
             {
-                return string.Format("{0}/{1}/{2}.prefab", baseDir, GetResourceDirectory(), GetResourceName());
+                format += ".prefab";
             }
-            else
-            {
-                return string.Format("{0}/{1}.prefab", GetResourceDirectory(), GetResourceName());
-            }
+            return string.Format(format, GetResourceDirectory(), GetResourceName());
         }
 
         public string GetResourceDirectory()

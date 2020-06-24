@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
 using UnityEngine;
 
 namespace Nullspace
 {
     public class ResourceCacheBindParent
     {
-        public static Transform CacheUnused = null;
-        public static void Initialize()
+        public static Transform CacheUnused;
+        public static Transform WorldEffectBind;
+
+        static ResourceCacheBindParent()
         {
             CacheUnused = new GameObject("CacheUnused").transform;
+            WorldEffectBind = new GameObject("WorldEffectBind").transform;
         }
+
+        
 
         public static bool IsCacheUnusedParent(GameObject go)
         {

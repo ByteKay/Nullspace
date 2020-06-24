@@ -8,11 +8,10 @@ namespace Nullspace
 {
     public class ResourceCachePools
     {
-        private static List<int> CACHE = new List<int>();
         public static string SUFFIX_FLAG = "19500";
+        private static List<int> CACHE = new List<int>();
         private Dictionary<int, ResourceCachePool> mPools;
         private Dictionary<int, ResourceCacheEntity> mAcquiredItems;
-
         public int Level { get; set; }
 
         public ResourceCachePools()
@@ -22,28 +21,22 @@ namespace Nullspace
             Level = DeviceLevel.High;
         }
 
-        public void ChangePoolMaskFromTo(ResourceCacheMask from, ResourceCacheMask to)
+        public void ChangePoolMaskFromTo<T>(ResourceCacheMask from, ResourceCacheMask to, Dictionary<int, ResourceConfig<T>> configs)
         {
             Clear(from);
-            Initialize(to);
+            Initialize(to, configs);
         }
 
-        public virtual void Initialize(ResourceCacheMask mask, bool cacheOn = true)
+        public virtual void Initialize<T>(ResourceCacheMask mask, Dictionary<int, ResourceConfig<T>> configs, bool cacheOn = true)
         {
-            Dictionary<int, ResourceConfig> configs = new Dictionary<int, ResourceConfig>();
-            Initialize(mask, configs, cacheOn);
-        }
-
-        public virtual void Initialize(ResourceCacheMask mask, Dictionary<int, ResourceConfig> configs, bool cacheOn = true)
-        {
-            foreach (ResourceConfig config in configs.Values)
+            ResourceCachePool pool = null;
+            foreach (ResourceConfig<T> config in configs.Values)
             {
                 if (CheckLevelShow(config.Level))
                 {
                     if (((int)mask & config.Mask) != 0)
                     {
-                        ResourceCachePool pool = mPools[config.Id];
-                        if (pool == null)
+                        if (!mPools.ContainsKey(config.Id))
                         {
                             pool = new ResourceCachePool();
                             pool.Initialize(config, ResourceCacheBindParent.CacheUnused, GetLevel(), this, cacheOn);
@@ -52,6 +45,10 @@ namespace Nullspace
                     }
                 }
             }
+#if UNITY_EDITOR
+            PrintTimerId = -1;
+            PrintTimer(true);
+#endif
         }
 
         public virtual void Clear(ResourceCacheMask mask)
@@ -69,17 +66,17 @@ namespace Nullspace
             }
         }
 
-        public virtual int Play(int poolId, Transform parent, ResourceCacheBehaviourParam param, int delay = 0)
+        public virtual int Play(int poolId, Transform parent, ResourceCacheBehaviourParam param = null, int delay = 0)
         {
             return Play(poolId,int.MaxValue, parent, param, delay);
         }
 
-        public virtual int Play(int poolId, int duration, Transform parent, ResourceCacheBehaviourParam param, int delay = 0)
+        public virtual int Play(int poolId, int duration, Transform parent, ResourceCacheBehaviourParam param = null, int delay = 0)
         {
             int instanceId = -1;
             ResourceCacheEntity entity;
             ResourceCachePool pool = GetEntityFromManager(poolId, out entity);
-            if (entity != null)
+            if (pool != null && entity != null)
             {
                 entity.SetParent(parent, false);
                 AdjustParam(ref param, ref duration, delay);
@@ -131,6 +128,7 @@ namespace Nullspace
         {
             if (delay > 0)
             {
+                Debug.Assert(param != null, "wrong");
                 duration += delay;
                 param.DelayShow = delay;
             }
@@ -139,10 +137,11 @@ namespace Nullspace
         protected virtual ResourceCachePool GetEntityFromManager(int poolId, out ResourceCacheEntity entity)
         {
             entity = null;
-            ResourceCachePool pool = mPools[poolId];
-            if (pool != null)
+            ResourceCachePool pool = null;
+            if (mPools.ContainsKey(poolId))
             {
-                entity = pool.Acquire();
+                pool = mPools[poolId];
+                entity = mPools[poolId].Acquire(); ;
             }
             return pool;
         }
@@ -212,8 +211,55 @@ namespace Nullspace
             }
             else
             {
-                DebugUtils.Info("ObjectMaster:RemoveByDestroy", "{0} is not right set", obj.name);
+                DebugUtils.Info("ObjectMaster:RemoveByDestroy", string.Format("{0} is not right set", obj.name));
             }
         }
+
+#if UNITY_EDITOR
+        private int PrintTimerId;
+
+        private void PrintInfo()
+        {
+            string printStr = "";
+            int cnt = 0;
+            foreach (ResourceCacheEntity entity in mAcquiredItems.Values)
+            {
+                cnt = cnt + 1;
+                printStr = printStr + " " + entity.ManagerId;
+            }
+            DebugUtils.Info("ResourceCachePools:PrintInfo", string.Format("Entity Used Total: {0} {1}", cnt, printStr));
+            cnt = 0;
+            printStr = "";
+            int totalCnt = 0;
+            foreach (ResourceCachePool pool in mPools.Values)
+            {
+                cnt = cnt + 1;
+                printStr = printStr + " id: " + pool.GetManagerId() + ", count: " + pool.Count;
+                totalCnt = totalCnt + pool.Count;
+            }
+            DebugUtils.Info("ResourceCachePools:PrintInfo", string.Format("Manager Cached Total:  {0}, {1}", totalCnt, printStr));
+        }
+
+        private void PrintTimer(bool timerOn)
+        {
+            if (timerOn)
+            {
+                if (PrintTimerId > -1)
+                {
+                    PrintTimer(false);
+                }
+                PrintTimerId = TimerTaskQueue.Instance.AddTimer(0, 2000, PrintInfo);
+            }
+            else
+            {
+                if (PrintTimerId > -1)
+                {
+                    TimerTaskQueue.Instance.DelTimer(PrintTimerId);
+                    PrintTimerId = -1;
+                }
+            }
+        }
+#endif
+
     }
 }

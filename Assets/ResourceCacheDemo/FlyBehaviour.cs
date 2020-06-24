@@ -7,6 +7,15 @@ namespace Nullspace
 {
     public class FlyBehaviour : ResourceCacheBehaviour
     {
+        public override void StartByDerive()
+        {
+            DebugUtils.Info("FlyBehaviour", "StartByDerive");
+        }
 
+
+        protected override void InterruptWhenUsing()
+        {
+            DebugUtils.Info("FlyBehaviour", "InterruptWhenUsing");
+        }
     }
 }

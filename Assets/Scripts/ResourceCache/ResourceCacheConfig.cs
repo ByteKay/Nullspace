@@ -5,21 +5,52 @@ using System.Text;
 
 namespace Nullspace
 {
-    [XmlData("ResourceCache")]
-    public class ResourceConfig : XmlData<ResourceConfig>
+    public interface IResourceConfig
     {
-        public string Directory { get; set; }
-        public List<string> Names { get; set; }
-        public bool Delay { get; set; }
-        public StrategyType StrategyType { get; internal set; }
-        public int MaxSize { get; internal set; }
-        public int MinSize { get; internal set; }
-        public int LifeTime { get; internal set; }
-        public string GoName { get; internal set; }
-        public bool Reset { get; internal set; }
-        public string BehaviourName { get; internal set; }
-        public int Mask { get; internal set; }
-        public int Level { get; internal set; }
-        public bool IsTimerOn { get; internal set; }
+        int Id { get; set; }
+        string Directory { get; set; }
+        List<string> Names { get; set; }
+        bool Delay { get; set; }
+        StrategyType StrategyType { get; set; }
+        int MaxSize { get; set; }
+        int MinSize { get; set; }
+        int LifeTime { get; set; }
+        string GoName { get; set; }
+        bool Reset { get; set; }
+        string BehaviourName { get; set; }
+        int Mask { get; set; }
+        int Level { get; set; }
+        bool IsTimerOn { get; set; }
+    }
+
+    public class ResourceConfig<T> : XmlData<ResourceConfig<T>>, IResourceConfig
+    {
+        private string mDirectory;
+        private List<string> mNames;
+        private bool mDelay;
+        private StrategyType mStrategyType;
+        private int mMaxSize;
+        private int mMinSize;
+        private int mLifeTime;
+        private string mGoName;
+        private bool mReset;
+        private string mBehaviourName;
+        private int mMask;
+        private int mLevel;
+        private bool mIsTimerOn;
+
+        public string Directory { get { return mDirectory; } set { mDirectory = value; } }
+        public List<string> Names { get { return mNames; } set { mNames = value; } }
+        public bool Delay { get { return mDelay; } set { mDelay = value; } }
+        public StrategyType StrategyType { get { return mStrategyType; } set { mStrategyType = value; } }
+        public int MaxSize { get { return mMaxSize; } set { mMaxSize = value; } }
+        public int MinSize { get { return mMinSize; } set { mMinSize = value; } }
+        public int LifeTime { get { return mLifeTime; } set { mLifeTime = value; } }
+        public string GoName { get { return mGoName; } set { mGoName = value; } }
+        public bool Reset { get { return mReset; } set { mReset = value; } }
+        public string BehaviourName { get { return mBehaviourName; } set { mBehaviourName = value; } }
+        public int Mask { get { return mMask; } set { mMask = value; } }
+        public int Level { get { return mLevel; } set { mLevel = value; } }
+        public bool IsTimerOn { get { return mIsTimerOn; } set { mIsTimerOn = value; } }
     }
 }
