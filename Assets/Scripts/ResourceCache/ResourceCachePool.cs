@@ -195,7 +195,7 @@ namespace Nullspace
             if (IsAssetSet() && Asset == null)
             {
 #if UNITY_EDITOR
-                string path = GetAssetFilePath(null);
+                string path = GetAssetFilePath("Assets");
                 Asset = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
 #endif
                 if (Asset != null)

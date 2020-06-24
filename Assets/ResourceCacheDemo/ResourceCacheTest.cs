@@ -45,7 +45,8 @@ namespace Nullspace
                 if (GUILayout.Button("Play"))
                 {
                     int poolId = EnumUtils.EnumToInt(EffectConfigName.THIRD_PERSON);
-                    EffectPools.Play(poolId, 5000, ResourceCacheBindParent.WorldEffectBind);
+                    ResourceCacheBehaviourParam param = new ResourceCacheBehaviourParam();
+                    EffectPools.Play(poolId, 5000, ResourceCacheBindParent.WorldEffectBind, param);
                 }
             }
         }

@@ -103,7 +103,7 @@ namespace Nullspace
             StopDelayTimer();
             if (ResourceCacheBindParent.IsCacheUnusedParent(gameObject))
             {
-                DebugUtils.Info("BaseBehaviour:Destroying", "{0}  wrong destroyed ", gameObject.name);
+                DebugUtils.Info("BaseBehaviour:Destroying", string.Format("{0}  wrong destroyed ", gameObject.name));
                 Pool.OwnedPools.RemoveByDestroy(Entity.InstanceId, gameObject);
             }
             Param = null;
@@ -114,7 +114,7 @@ namespace Nullspace
         public void StartLifeTimer()
         {
             StopLifeTimer();
-            LifeTimerId = TimerTaskQueue.Instance.AddTimer(0, LifeTime, LifeEnd);
+            LifeTimerId = TimerTaskQueue.Instance.AddTimer(LifeTime, 0, LifeEnd);
         }
 
         public void StopLifeTimer()
@@ -174,7 +174,7 @@ namespace Nullspace
         private void StartDelayTimer()
         {
             StopDelayTimer();
-            DelayTimerId = TimerTaskQueue.Instance.AddTimer(0, Param.DelayShow, ActiveShow);
+            DelayTimerId = TimerTaskQueue.Instance.AddTimer(Param.DelayShow, 0, ActiveShow);
         }
 
         private void StopDelayTimer()

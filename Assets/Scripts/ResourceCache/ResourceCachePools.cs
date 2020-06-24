@@ -66,12 +66,12 @@ namespace Nullspace
             }
         }
 
-        public virtual int Play(int poolId, Transform parent, ResourceCacheBehaviourParam param = null, int delay = 0)
+        public virtual int Play(int poolId, Transform parent, ResourceCacheBehaviourParam param, int delay = 0)
         {
             return Play(poolId,int.MaxValue, parent, param, delay);
         }
 
-        public virtual int Play(int poolId, int duration, Transform parent, ResourceCacheBehaviourParam param = null, int delay = 0)
+        public virtual int Play(int poolId, int duration, Transform parent, ResourceCacheBehaviourParam param, int delay = 0)
         {
             int instanceId = -1;
             ResourceCacheEntity entity;
@@ -116,7 +116,7 @@ namespace Nullspace
         {
             if (entity.IsTimerOn)
             {
-                return TimerTaskQueue.Instance.AddTimer(0, duration, TimerCallback, entity);
+                return TimerTaskQueue.Instance.AddTimer(duration, 0, TimerCallback, entity);
             }
             else
             {
@@ -126,9 +126,9 @@ namespace Nullspace
 
         protected virtual void AdjustParam(ref ResourceCacheBehaviourParam param, ref int duration, int delay)
         {
+            Debug.Assert(param != null, "wrong");
             if (delay > 0)
             {
-                Debug.Assert(param != null, "wrong");
                 duration += delay;
                 param.DelayShow = delay;
             }
