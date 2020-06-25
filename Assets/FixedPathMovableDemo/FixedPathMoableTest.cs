@@ -9,6 +9,10 @@ namespace Nullspace
     public class FixedPathMoableTest : MonoBehaviour, IPathTrigger
     {
         private FixedPathController PathCtl;
+        public NavPathType PathType = NavPathType.CurvePosCurveDir;
+        public Vector3 Offset = Vector3.zero;
+        public bool FlipOn = false;
+        public int Subdivisions = 5;
         private void Awake()
         {
             PathCtl = new FixedPathController();
@@ -24,7 +28,7 @@ namespace Nullspace
             string pointsStr = "-40.8,0.0;0.0,-13.0;20.26,-0.24;0.0,13.0;-20.56,-0.49;30.46,14.27;-24.65,-14.44;-25.59,16.77;40.00,-15.00";
             List<Vector3> wayPoints = new List<Vector3>();
             NavPathUtils.ParseVector3Array(pointsStr, ref wayPoints);
-            AbstractNavPath navPath = NavPathUtils.Create(NavPathType.CurvePosCurveDir, Vector3.zero, false, this, wayPoints, 5);
+            AbstractNavPath navPath = NavPathUtils.Create(PathType, Offset, FlipOn, this, wayPoints, Subdivisions);
             PathCtl.StartMove(navPath, 20, Vector3.zero, false);
             PathCtl.EnableMove(true);
 
