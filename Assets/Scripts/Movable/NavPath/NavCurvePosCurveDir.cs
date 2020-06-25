@@ -92,7 +92,7 @@ namespace Nullspace
         }
 
 #if UNITY_EDITOR
-        private List<Vector3> trackPos = null;// new List<Vector3>();
+        private List<Vector3> trackPos = new List<Vector3>();
         private float mMovedTime = 0;
         private float mMovedLength = 0;
         public override void OnDrawGizmos()

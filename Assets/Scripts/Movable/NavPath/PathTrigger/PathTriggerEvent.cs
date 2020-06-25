@@ -28,11 +28,9 @@ namespace Nullspace
 
         public override void OnTrigger(IPathTrigger handler)
         {
-            if (mCallback != null && handler != null)
+            if (handler != null)
             {
                 handler.OnPathTrigger(mCallback);
-                ObjectPools.Instance.Release(mCallback);
-                mCallback = null;
             }
         }
     }

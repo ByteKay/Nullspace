@@ -1,11 +1,77 @@
 ﻿
+using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Nullspace
 {
     public class NavPathUtils
     {
+        private static Regex RegexVector = new Regex("-?\\d+\\.\\d+");
+
+        private static MatchCollection MatchVector(string inputString)
+        {
+            return RegexVector.Matches(inputString);
+        }
+
+        /// <summary>
+        /// 将指定格式(1.0, 2, 3.4) 转换为 Vector3 
+        /// </summary>
+        /// <param name="inputString"></param>
+        /// <param name="result"></param>
+        /// <returns>返回 true/false 表示是否成功</returns>
+        public static bool ParseVector3Array(string inputString, ref List<Vector3> results)
+        {
+            results.Clear();
+            string[] strs = inputString.Split(';');
+            foreach (string str in strs)
+            {
+                Vector3 v;
+                if (ParseVector3(str, out v))
+                {
+                    results.Add(v);
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 将指定格式(1.0, 2, 3.4) 转换为 Vector3 
+        /// </summary>
+        /// <param name="inputString"></param>
+        /// <param name="result"></param>
+        /// <returns>返回 true/false 表示是否成功</returns>
+        public static bool ParseVector3(string inputString, out Vector3 result)
+        {
+            MatchCollection collects = MatchVector(inputString);
+            result = new Vector3();
+            try
+            {
+                if (collects.Count == 3)
+                {
+                    result[0] = float.Parse(collects[0].Value);
+                    result[1] = float.Parse(collects[1].Value);
+                    result[2] = float.Parse(collects[2].Value);
+                }
+                else if (collects.Count == 2)
+                {
+                    result[0] = float.Parse(collects[0].Value);
+                    result[2] = float.Parse(collects[1].Value);
+                }
+                else if (collects.Count == 1)
+                {
+                    result[0] = float.Parse(collects[0].Value);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("XmlData|" + "Parse Vector3 error: " + inputString + e.ToString());
+                return false;
+            }
+            return true;
+        }
+
         public static AbstractNavPath Create(NavPathType pathType, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler, List<Vector3> waypoints, int subdivisions = 5)
         {
             NavPathData pathData = CreatePathData(waypoints, subdivisions);
