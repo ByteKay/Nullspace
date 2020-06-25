@@ -20,6 +20,8 @@
         {
             return mHead.Merge(mContent);
         }
+
+        public int CommandId { get { return mHead.mType; } }
     }
 
 }

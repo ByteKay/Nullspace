@@ -121,17 +121,17 @@ namespace Nullspace
                     }
                     if (conn != -1)
                     {
-                        SetConnectState(ClientConnectState.Connectted);
+                        SetConnectState(NetworkConnectState.Connectted);
                     }
                     else
                     {
-                        SetConnectState(ClientConnectState.Disconnected);
+                        SetConnectState(NetworkConnectState.Disconnected);
                     }
                 }
             }
             catch (Exception e)
             {
-                SetConnectState(ClientConnectState.Disconnected);
+                SetConnectState(NetworkConnectState.Disconnected);
             }
         }
         protected override void Send(byte[] msg)
@@ -142,7 +142,7 @@ namespace Nullspace
                 Marshal.Copy(msg, 0, ptr, msg.Length);
                 if (send(mSocket, ptr, (uint)msg.Length, 0) == -1)
                 {
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(NetworkConnectState.Disconnected);
                 }
                 Marshal.FreeHGlobal(ptr);
             }
@@ -201,7 +201,7 @@ namespace Nullspace
                 if (size == -1 || size == 0)
                 {
                     Debug.Log("receive 0 -1");
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(NetworkConnectState.Disconnected);
                     return false;
                 }
                 else

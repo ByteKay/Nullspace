@@ -26,7 +26,7 @@ public partial class TestNetwork : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
 #if UNITY_EDITOR
-        mClient = new NetworkSynClient(mIP, mPort);
+        mClient = new NetworkCSharpClient(mIP, mPort);
 #else
         mClient = new NetworkCppClient(mIP, mPort);
 #endif

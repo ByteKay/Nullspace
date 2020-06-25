@@ -1,91 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 
 namespace Nullspace
 {
-    public abstract class NetworkCommand
-    {
-        public abstract void HandlePacket(NetworkPacket packet);
-
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class CommandTypeAttribute : Attribute
-    {
-        public CommandTypeAttribute(int id, string desc)
-        {
-            Id = id;
-            Description = desc;
-        }
-        public CommandTypeAttribute()
-        {
-
-        }
-        public int Id { get; set; }
-
-        public string Description { get; set; }
-
-    }
-
-    public class NetworkCommandFactory
-    {
-        private static Dictionary<int, Type> mAllCommandClasses = new Dictionary<int, Type>();
-        private static bool isRegistered = false;
-
-        public static void RegisterCommand()
-        {
-            if (!isRegistered)
-            {
-                mAllCommandClasses.Add(CommandType.HeartCodec, typeof(HeartCommand));
-                mAllCommandClasses.Add(CommandType.GM, typeof(GMCommand));
-                isRegistered = true;
-            }
-        }
-        public static void RegisterCommand(string spacename, Assembly ass)
-        {
-            if (!isRegistered)
-            {
-                var types = ass.GetTypes();
-                foreach (var item in types)
-                {
-                    if (item.Namespace == spacename)
-                    {
-                        var type = item.BaseType;
-                        while (type != null)
-                        {
-                            if (type == typeof(NetworkCommand))
-                            {
-                                CommandTypeAttribute attr = CommandTypeAttribute.GetCustomAttribute(item, typeof(CommandTypeAttribute), false) as CommandTypeAttribute;
-                                if (!mAllCommandClasses.ContainsKey(attr.Id))
-                                {
-                                    mAllCommandClasses.Add(attr.Id, item);
-                                }
-                                break;
-                            }
-                            else
-                            {
-                                type = type.BaseType;
-                            }
-                        }
-                    }
-                }
-                isRegistered = true;
-            }
-        }
-
-        public static NetworkCommand GetCommand(int mid)
-        {
-            if (mAllCommandClasses.ContainsKey(mid))
-            {
-                return (NetworkCommand)Activator.CreateInstance(mAllCommandClasses[mid]);
-            }
-            return null;
-        }
-    }
-
     /// <summary>
     /// should initialize firstly
     /// </summary>
@@ -180,7 +101,6 @@ namespace Nullspace
             mWaitHandle.Set();
         }
     }
-
 
 
 }

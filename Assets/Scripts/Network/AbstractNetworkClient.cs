@@ -7,14 +7,6 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public enum ClientConnectState
-    {
-        Already,
-        Connectted,
-        Reconnectting,
-        Disconnected,
-    }
-
     public abstract class AbstractNetworkClient
     {
         private static object mSendLock = new object();
@@ -37,7 +29,7 @@ namespace Nullspace
         private Thread mSendThread;
         private bool isStop;
         public int mSessionId = -1;
-        public ClientConnectState ConnectState { get; set; }
+        public NetworkConnectState ConnectState { get; set; }
         public AbstractNetworkClient(string ip, int port)
         {
             try
@@ -53,7 +45,7 @@ namespace Nullspace
 
         public void Start()
         {
-            if (IsConnectState(ClientConnectState.Already))
+            if (IsConnectState(NetworkConnectState.Already))
             {
                 Connect();
                 InitThread();
@@ -62,7 +54,7 @@ namespace Nullspace
         
         public void Enqueue(byte[] msg)
         {
-            if (IsConnectState(ClientConnectState.Connectted))
+            if (IsConnectState(NetworkConnectState.Connectted))
             {
                 lock (mSendLock)
                 {
@@ -79,6 +71,8 @@ namespace Nullspace
             mSendWait.Reset();
             mReceiveWait.Reset();
         }
+
+
         protected abstract void Init();
         protected abstract void Connect();
         protected abstract void Send(byte[] bytes);
@@ -86,12 +80,10 @@ namespace Nullspace
         protected abstract bool ProcessHead();
         protected abstract bool ProcessContent();
 
-
-
         private void Reconnect()
         {
             Connect();
-            if (IsConnectState(ClientConnectState.Connectted))
+            if (IsConnectState(NetworkConnectState.Connectted))
             {
                 // to do
             }
@@ -106,16 +98,17 @@ namespace Nullspace
         private void ProcessPacket()
         {
             NetworkPacket packet = new NetworkPacket(mHead.Clone(), mContents, this);
-            NetworkCommandHandler.Instance.AddPacket(packet);
+            NetworkEventHandler.Instance.AddPacket(packet);
+            // NetworkCommandHandler.Instance.AddPacket(packet);
         }
-        protected void SetConnectState(ClientConnectState state)
+        protected void SetConnectState(NetworkConnectState state)
         {
             if (ConnectState == state)
             {
                 return;
             }
             ConnectState = state;
-            if (IsConnectState(ClientConnectState.Reconnectting))
+            if (IsConnectState(NetworkConnectState.Reconnectting))
             {
                 if (mReconnectTimerId == int.MaxValue)
                 {
@@ -127,7 +120,7 @@ namespace Nullspace
                     mHeartTimerId = int.MaxValue;
                 }
             }
-            else if (IsConnectState(ClientConnectState.Connectted))
+            else if (IsConnectState(NetworkConnectState.Connectted))
             {
                 if (mReconnectTimerId != int.MaxValue)
                 {
@@ -141,7 +134,7 @@ namespace Nullspace
                 mSendWait.Set();
                 mReceiveWait.Set();
             }
-            else if(IsConnectState(ClientConnectState.Disconnected))
+            else if(IsConnectState(NetworkConnectState.Disconnected))
             {
                 if (mHeartTimerId != int.MaxValue)
                 {
@@ -155,7 +148,7 @@ namespace Nullspace
                 }
             }
         }
-        private bool IsConnectState(ClientConnectState state)
+        private bool IsConnectState(NetworkConnectState state)
         {
             return ConnectState == state;
         }
@@ -196,7 +189,7 @@ namespace Nullspace
 
         private void StartConnect()
         {
-            if (IsConnectState(ClientConnectState.Reconnectting))
+            if (IsConnectState(NetworkConnectState.Reconnectting))
             {
                 Close();
                 mNeedSendMessages.Clear();
@@ -210,7 +203,7 @@ namespace Nullspace
             {
                 try
                 {
-                    if (IsConnectState(ClientConnectState.Connectted))
+                    if (IsConnectState(NetworkConnectState.Connectted))
                     {
                         mSendPack.Clear();
                         while (mNeedSendMessages.Count > 0)
@@ -242,7 +235,7 @@ namespace Nullspace
                     {
                         break;
                     }
-                    SetConnectState(ClientConnectState.Reconnectting);
+                    SetConnectState(NetworkConnectState.Reconnectting);
                     Debug.Log(e.Message);
                 }
                 Thread.Sleep(16);
@@ -254,7 +247,7 @@ namespace Nullspace
             {
                 try
                 {
-                    if (IsConnectState(ClientConnectState.Connectted))
+                    if (IsConnectState(NetworkConnectState.Connectted))
                     {
                         Receive();
                     }
@@ -269,7 +262,7 @@ namespace Nullspace
                     {
                         break;
                     }
-                    SetConnectState(ClientConnectState.Reconnectting);
+                    SetConnectState(NetworkConnectState.Reconnectting);
                     Debug.Log(e.Message);
                 }
                 Thread.Sleep(0);
@@ -283,11 +276,12 @@ namespace Nullspace
             mHead = new NetworkHeadFormat();
             mContents = null;
             mPort = port;
-            ConnectState = ClientConnectState.Already;
+            ConnectState = NetworkConnectState.Already;
             NetworkHeadFormat temp = new NetworkHeadFormat();
-            temp.mType = CommandType.HeartCodec;
+            temp.mType = NetworkCommandType.HeartCodec;
             mHeartBytes = temp.Merge(null);
         }
+
         private void HeartBeat()
         {
             Enqueue(mHeartBytes);

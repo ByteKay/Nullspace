@@ -10,8 +10,9 @@ namespace Nullspace
 
         private void Awake()
         {
-            ClientSocket = new NetworkSynClient("127.0.0.1", 9898);
-            NetworkCommandHandler.Instance.Initialize();
+            ClientSocket = new NetworkCSharpClient("127.0.0.1", 9898);
+            NetworkEventHandler.Instance.Initialize();
+            // NetworkCommandHandler.Instance.Initialize();
         }
 
         private void OnGUI()
@@ -26,13 +27,13 @@ namespace Nullspace
             {
                 IsConnect = false;
                 ClientSocket.Stop();
-                ClientSocket = new NetworkSynClient("127.0.0.1", 9898);
+                ClientSocket = new NetworkCSharpClient("127.0.0.1", 9898);
             }
         }
 
         private void OnDestroy()
         {
-            if (ClientSocket.ConnectState == ClientConnectState.Connectted)
+            if (ClientSocket.ConnectState == NetworkConnectState.Connectted)
             {
                 ClientSocket.Stop();
             }

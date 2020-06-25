@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class NetworkSynClient : AbstractNetworkClient
+    public class NetworkCSharpClient : AbstractNetworkClient
     {
         private byte[] mBufferHead = new byte[NetworkHeadFormat.Size()];
         private IPAddress mAddress;
         private Socket mClientSocket;
-        public NetworkSynClient(string ip, int port) : base(ip, port)
+        public NetworkCSharpClient(string ip, int port) : base(ip, port)
         {
 
         }
@@ -24,7 +24,7 @@ namespace Nullspace
                     mClientSocket.Close();
                     mClientSocket = null;
                 }
-                SetConnectState(ClientConnectState.Disconnected);
+                SetConnectState(NetworkConnectState.Disconnected);
             }
         }
         protected override void Connect()
@@ -43,17 +43,17 @@ namespace Nullspace
                 bool connect = result.AsyncWaitHandle.WaitOne(3000, true);
                 if (connect)
                 {
-                    SetConnectState(ClientConnectState.Connectted);
+                    SetConnectState(NetworkConnectState.Connectted);
                     Debug.Log("connect: " + mIP);
                 }
                 else
                 {
-                    SetConnectState(ClientConnectState.Reconnectting);
+                    SetConnectState(NetworkConnectState.Reconnectting);
                 }
             }
             catch (Exception e)
             {
-                SetConnectState(ClientConnectState.Reconnectting);
+                SetConnectState(NetworkConnectState.Reconnectting);
                 Debug.Log("test Connect Exception: " + e.Message);
             }
 
@@ -85,7 +85,7 @@ namespace Nullspace
                 int len = mClientSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
                 if (len <= 0)
                 {
-                    SetConnectState(ClientConnectState.Reconnectting);
+                    SetConnectState(NetworkConnectState.Reconnectting);
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace Nullspace
                 int size = mClientSocket.Receive(ptr, len, total - len, SocketFlags.None);
                 if (size == -1 || size == 0)
                 {
-                    SetConnectState(ClientConnectState.Reconnectting);
+                    SetConnectState(NetworkConnectState.Reconnectting);
                     return false;
                 }
                 else
