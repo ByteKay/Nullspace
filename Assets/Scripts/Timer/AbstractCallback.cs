@@ -9,6 +9,14 @@ namespace Nullspace
             get;
             set;
         }
+        public override void Initialize()
+        {
+
+        }
+        public override void Release()
+        {
+
+        }
 
         public abstract void Run();
     }

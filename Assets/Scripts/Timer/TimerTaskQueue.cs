@@ -15,14 +15,21 @@ namespace Nullspace
 
         public void DoAction()
         {
-            Callback.Run();
+            if (Callback != null)
+            {
+                Callback.Run();
+            }
+        }
+
+        public override void Initialize()
+        {
+            Callback = null;
         }
 
         public override void Release()
         {
             ObjectPools.Instance.Release(Callback);
             Callback = null;
-            base.Release();
         }
     }
 

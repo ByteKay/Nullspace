@@ -6,36 +6,39 @@ using UnityEditor;
 #endif
 namespace Nullspace
 {
-    public class ObjectCacheBase
+    public abstract class ObjectCacheBase
     {
         private static uint CurrentSize = 0;
         private static uint NextKey { get { return CurrentSize++; } }
 
         private float ReleasedTimePoint;
-        
+        private bool IsReleased;
         public ObjectCacheBase()
         {
             Key = NextKey;
-            Initialize();
+            IsReleased = false;
+            // 构造的时候，会放进缓存先。所以，构造的时刻就是 释放的时刻
+            ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();
         }
 
         public uint Key { get; set; }
 
-        protected virtual void Initialize()
-        {
-            ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();
-        }
-
         // 这个只能通过 ObjectPools.Instance.Release --> ObjectPool.Release -> Release 过来
-        public virtual void Release()
+        public void Clear()
         {
+            Release();
             ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
+            IsReleased = true;
         }
 
-        public virtual bool IsExpired(float life)
+        public bool IsExpired(float life)
         {
             return TimeUtils.GetTimeStampSeconds() - ReleasedTimePoint >= life;
         }
+        
+        public abstract void Initialize();
+        public abstract void Release();
+
     }
 
     public class ObjectPool

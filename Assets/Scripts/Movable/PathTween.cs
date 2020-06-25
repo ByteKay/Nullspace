@@ -5,14 +5,12 @@ using UnityEngine.Events;
 
 namespace Nullspace
 {
-    public class PathTween
+    public class GameObjectPathTween : MonoBehaviour, IPathTrigger
     {
-
-
         private AbstractNavPath NavPath;
         private NavPathType PathType;
         private float Speed;
-        private PathTween(NavPathType pathType, AbstractNavPath navPath)
+        private GameObjectPathTween(NavPathType pathType, AbstractNavPath navPath)
         {
             PathType = pathType;
             NavPath = navPath;
@@ -38,6 +36,26 @@ namespace Nullspace
         public void Play()
         {
 
+        }
+
+        public void OnPathStart()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnPathEnd()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnPathTrigger(int triggerId)
+        {
+            
+        }
+
+        public void OnPathTrigger(AbstractCallback callback)
+        {
+            
         }
     }
 }
