@@ -6,12 +6,14 @@ namespace Nullspace
 {
     public abstract class NetworkMessage
     {
-        protected byte[] mCacheBytes = null;
+        protected byte[] mCacheBytes;
         private int mReadIndex = 0;
-        protected List<Byte> mSendBytes = new List<byte>();
+        protected List<byte> mSendBytes;
 
         public NetworkMessage()
         {
+            mCacheBytes = null;
+            mSendBytes = new List<byte>();
             Initialize();
         }
 
@@ -30,10 +32,7 @@ namespace Nullspace
         public void WriteLength()
         {
             byte[] size = System.BitConverter.GetBytes(mSendBytes.Count);
-            for (int i = size.Length - 1; i >= 0; --i)
-            {
-                mSendBytes.Insert(0, size[i]);
-            }
+            mSendBytes.InsertRange(0, size);
         }
 
         public Int16 ReadInt16()
@@ -61,19 +60,13 @@ namespace Nullspace
         public void WriteUInt16(UInt16 value)
         {
             byte[] bytes = System.BitConverter.GetBytes(value);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public void WriteInt16(Int16 value)
         {
             byte[] bytes = System.BitConverter.GetBytes(value);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public Int32 ReadInt32()
@@ -90,10 +83,7 @@ namespace Nullspace
         public void WriteInt32(int value)
         {
             byte[] bytes = System.BitConverter.GetBytes(value);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public Int64 ReadInt64()
@@ -110,10 +100,7 @@ namespace Nullspace
         public void WriteInt64(Int64 value)
         {
             byte[] bytes = System.BitConverter.GetBytes(value);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public void WriteBoolean(bool value)
@@ -147,10 +134,7 @@ namespace Nullspace
         public void WriteFloat(float value)
         {
             byte[] bytes = System.BitConverter.GetBytes(value);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public double ReadDouble()
@@ -167,10 +151,7 @@ namespace Nullspace
         public void WriteDouble(double value)
         {
             byte[] bytes = System.BitConverter.GetBytes(value);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public string ReadWString()
@@ -215,10 +196,7 @@ namespace Nullspace
 
         public void WriteBytes(byte[] bytes)
         {
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public void WriteString(string value)
@@ -235,10 +213,7 @@ namespace Nullspace
         {
             byte[] bytes = Encoding.Unicode.GetBytes(value);
             WriteInt32(bytes.Length);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            mSendBytes.AddRange(bytes);
         }
 
         public bool CanRead(int len)
