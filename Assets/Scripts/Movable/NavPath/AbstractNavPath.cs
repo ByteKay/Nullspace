@@ -230,9 +230,9 @@ namespace Nullspace
             {
                 absoluteLength += mPathLengthMoved;
             }
-            if (absoluteLength > mPathData.pathLength)
+            if (absoluteLength > mPathData.PathLength)
             {
-                absoluteLength = mPathData.pathLength;
+                absoluteLength = mPathData.PathLength;
             }
             RegisterTrigger(new PathTriggerIndex(pathTriggerId, absoluteLength));
         }
@@ -254,9 +254,9 @@ namespace Nullspace
             {
                 absoluteLength += mPathLengthMoved;
             }
-            if (absoluteLength > mPathData.pathLength)
+            if (absoluteLength > mPathData.PathLength)
             {
-                absoluteLength = mPathData.pathLength;
+                absoluteLength = mPathData.PathLength;
             }
             RegisterTrigger(new PathTriggerEvent(absoluteLength, callback));
         }
@@ -281,7 +281,7 @@ namespace Nullspace
         /// <param name="callback">触发器回调</param>
         public void InsertTriggerByPercent(bool relateCurrentPos, float percent, UnityAction callback)
         {
-            InsertTriggerByLength(relateCurrentPos, percent * mPathData.pathLength, callback);
+            InsertTriggerByLength(relateCurrentPos, percent * mPathData.PathLength, callback);
         }
     }
 
@@ -394,7 +394,7 @@ namespace Nullspace
         {
             get
             {
-                return mPathData.pathLength;
+                return mPathData.PathLength;
             }
         }
 
@@ -428,7 +428,7 @@ namespace Nullspace
         /// <returns>路径是否完毕</returns>
         protected bool IsFinished()
         {
-            return mPathLengthMoved >= mPathData.pathLength;
+            return mPathLengthMoved >= mPathData.PathLength;
         }
 
         /// <summary>

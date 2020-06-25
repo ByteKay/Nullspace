@@ -72,14 +72,14 @@ namespace Nullspace
                 pathData.WayPoints.Add(wayPoints[wayPoints.Count - 1]);
             }
             cnt = pathData.WayPoints.Count;
-            pathData.pathLength = 0.0f;
+            pathData.PathLength = 0.0f;
             pathData.RangeLengths.Add(0.0f);
             for (int i = 1; i < cnt; ++i)
             {
                 Vector3 diff = pathData.WayPoints[i] - pathData.WayPoints[i - 1];
                 float length = diff.magnitude;
-                pathData.pathLength += length;
-                pathData.RangeLengths.Add(pathData.pathLength);
+                pathData.PathLength += length;
+                pathData.RangeLengths.Add(pathData.PathLength);
             }
             return pathData;
         }
