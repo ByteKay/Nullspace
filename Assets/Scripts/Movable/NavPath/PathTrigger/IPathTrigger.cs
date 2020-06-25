@@ -28,6 +28,6 @@ namespace Nullspace
         /// 触发器通过注册绑定回调函数
         /// </summary>
         /// <param name="callback"></param>
-        void OnPathTrigger(UnityAction callback);
+        void OnPathTrigger(AbstractCallback callback);
     }
 }

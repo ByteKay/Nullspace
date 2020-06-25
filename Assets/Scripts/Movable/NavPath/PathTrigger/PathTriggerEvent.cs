@@ -10,9 +10,9 @@ namespace Nullspace
     public class PathTriggerEvent : PathTrigger
     {
         // 触发回调
-        public UnityAction mCallback;
+        public AbstractCallback mCallback;
 
-        public PathTriggerEvent(float length, UnityAction callback)
+        public PathTriggerEvent(float length, AbstractCallback callback)
         {
             mTriggerLength = length;
             mCallback = callback;
@@ -28,12 +28,11 @@ namespace Nullspace
 
         public override void OnTrigger(IPathTrigger handler)
         {
-            if (mCallback != null)
+            if (mCallback != null && handler != null)
             {
-                if (handler != null)
-                {
-                    handler.OnPathTrigger(mCallback);
-                }
+                handler.OnPathTrigger(mCallback);
+                ObjectPools.Instance.Release(mCallback);
+                mCallback = null;
             }
         }
     }

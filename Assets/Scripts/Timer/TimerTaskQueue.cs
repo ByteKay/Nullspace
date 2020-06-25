@@ -11,7 +11,7 @@ namespace Nullspace
 
         public int NextTick { get; set; }
 
-        public TimerCallback Callback { get; set; }
+        public AbstractCallback Callback { get; set; }
 
         public void DoAction()
         {
@@ -173,7 +173,7 @@ namespace Nullspace
             return p.TimerId;
         }
 
-        private TimerTask GetTimerData(TimerCallback callback, int start, int interval)
+        private TimerTask GetTimerData(AbstractCallback callback, int start, int interval)
         {
             TimerTask task = ObjectPools.Instance.Acquire<TimerTask>();
             task.Callback = callback;

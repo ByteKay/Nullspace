@@ -8,15 +8,15 @@ namespace Nullspace
 {
     public class ResourceCacheBehaviourParam
     {
-        public List<TimerCallback> Callback { get; set; }
+        public List<AbstractCallback> Callback { get; set; }
         public int DelayShow { get; set; }
 
         public ResourceCacheBehaviourParam()
         {
-            Callback = new List<TimerCallback>();
+            Callback = new List<AbstractCallback>();
         }
 
-        public void AddCallback(TimerCallback task)
+        public void AddCallback(AbstractCallback task)
         {
             if (task != null)
             {

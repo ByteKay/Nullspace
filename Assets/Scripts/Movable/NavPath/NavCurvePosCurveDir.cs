@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class NavCurvePath : AbstractNavPath
+    public class NavCurvePosCurveDir : AbstractNavPath
     {
-        public NavCurvePath(int pathId, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathId, offset, pathFlipOn, triggerHandler)
+        public NavCurvePosCurveDir(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathData, offset, pathFlipOn, triggerHandler)
         {
 
         }

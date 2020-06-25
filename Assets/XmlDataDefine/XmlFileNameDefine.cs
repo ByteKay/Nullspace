@@ -9,5 +9,7 @@ namespace Nullspace
 
         public const string ResourceCache = "ResourceCache";
         public const string TestPerson = "test_person";
+        public const string PathData = "PathData";
+        public const string TriggerData = "TriggerData";
     }
 }

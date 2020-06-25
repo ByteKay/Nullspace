@@ -243,7 +243,7 @@ namespace Nullspace
         /// <param name="relateCurrentPos">length是否相对当前位置</param>
         /// <param name="length">长度值</param>
         /// <param name="callback">触发器回调</param>
-        public void InsertTriggerByLength(bool relateCurrentPos, float length, UnityAction callback)
+        public void InsertTriggerByLength(bool relateCurrentPos, float length, AbstractCallback callback)
         {
             if (callback == null)
             {
@@ -258,7 +258,7 @@ namespace Nullspace
             {
                 absoluteLength = mPathData.PathLength;
             }
-            RegisterTrigger(new PathTriggerEvent(absoluteLength, callback));
+            RegisterTrigger(new PathTriggerEvent(absoluteLength, callback), true);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace Nullspace
         /// <param name="speed">速度</param>
         /// <param name="time">时间</param>
         /// <param name="callback">触发器回调</param>
-        public void InsertTriggerByTime(bool relateCurrentPos, float speed, float time, UnityAction callback)
+        public void InsertTriggerByTime(bool relateCurrentPos, float speed, float time, AbstractCallback callback)
         {
             InsertTriggerByLength(relateCurrentPos, speed * time, callback);
         }
@@ -279,7 +279,7 @@ namespace Nullspace
         /// <param name="relateCurrentPos">是否相对当前位置</param>
         /// <param name="percent">路径长度值的占比</param>
         /// <param name="callback">触发器回调</param>
-        public void InsertTriggerByPercent(bool relateCurrentPos, float percent, UnityAction callback)
+        public void InsertTriggerByPercent(bool relateCurrentPos, float percent, AbstractCallback callback)
         {
             InsertTriggerByLength(relateCurrentPos, percent * mPathData.PathLength, callback);
         }
@@ -287,7 +287,6 @@ namespace Nullspace
 
     public abstract partial class AbstractNavPath
     {      
-        protected int mPathId;                      // 路径配置数据    
         protected Vector3 mOffset;                  // 路径偏移     
         protected bool bFlipped;                    // 是否开启镜像
         protected NavPathData mPathData;               // 路径数据   
@@ -300,12 +299,11 @@ namespace Nullspace
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="pathId">路径Id， 见 PathData </param>
+        /// <param name="pathData">见 NavPathData </param>
         /// <param name="offset">路径偏移</param>
         /// <param name="pathFlipOn">路径中心对称(x, y, z) -> (-x, y, -z)</param>
-        public AbstractNavPath(int pathId, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler)
+        public AbstractNavPath(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler)
         {
-            mPathId = pathId;
             mOffset = offset;
             bFlipped = pathFlipOn;
             mPathLengthMoved = 0.0f;
@@ -314,7 +312,7 @@ namespace Nullspace
             mCurInfo = new NavPathPoint();
             mWaypointAppend = new Vector3[2];
             mTriggerHandler = triggerHandler;
-            mPathData = NavPathData.DataMap[mPathId];
+            mPathData = pathData;
             Initialize();
         }
 

@@ -4,18 +4,37 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class NavLinePosCurveTangentPath : AbstractNavPath
+    public class NavLinePosLineAngle : AbstractNavPath
     {
-        public NavLinePosCurveTangentPath(int pathId, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathId, offset, pathFlipOn, triggerHandler)
+        private float mFrameCountInv;   // 插值帧数的倒数
+        private int mCurFrame;          // 当前执行的帧数
+        private Vector3 mLast;          // 插值的起始方向
+        private Vector3 mNext;          // 插值的结束方向
+
+        public NavLinePosLineAngle(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler, float frameCount) : base(pathData, offset, pathFlipOn, triggerHandler)
         {
+            // 会先执行 Initialize()
+            mFrameCountInv = 1.0f / frameCount;
+            mCurFrame = 0;
+            CurInfo.isDirChanged = true;
+            UpdatePosAndTangent();
+            CurInfo.curveDir = mNext;
+            mLast = mNext;
 #if UNITY_EDITOR
             mMovedTime = 0;
             mMovedLength = 0;
 #endif
         }
 
+        protected override void Initialize()
+        {
+            InitializeAppendWaypoint();
+            RegisterAllTriggers();
+        }
+
         protected override void UpdatePosAndTangent()
         {
+            mCurFrame++;
             float len = mPathLengthMoved - GetLength(mCurrentWaypointIndex);
             float lenTotal = GetLength(mCurrentWaypointIndex + 1) - GetLength(mCurrentWaypointIndex);
             float u = len / lenTotal;
@@ -26,16 +45,23 @@ namespace Nullspace
             mMovedTime += Time.deltaTime;
             mMovedLength += (linePos - mCurInfo.linePos).magnitude;
 #endif
-            Vector3 prevStart = mCurrentWaypointIndex == 0 ? mWaypointAppend[0] : GetWaypoint(mCurrentWaypointIndex - 1);
-            Vector3 endNext = (mCurrentWaypointIndex + 2) >= mPathData.WayPoints.Count ? mWaypointAppend[1] : GetWaypoint(mCurrentWaypointIndex + 2);
-            Vector3 tangent = .5f * (
-                   (-prevStart + 3f * start - 3f * end + endNext) * (3 * u * u)
-                   + (-prevStart + end)) + (2f * prevStart - 5f * start + 4f * end - endNext) * u;
-            mCurInfo.linePos = linePos;
-            mCurInfo.lineDir = (end - start).normalized;
-            mCurInfo.curvePos = (1 - u) * start + u * end;
-            mCurInfo.curveDir = tangent.normalized;
-
+            CurInfo.linePos = linePos;
+            CurInfo.curvePos = linePos;
+            if (CurInfo.isDirChanged)
+            {
+                mLast = CurInfo.curveDir;
+                mNext = (end - start).normalized;
+                mCurFrame = 0;
+            }
+            float pro = mCurFrame * mFrameCountInv;
+            if (pro < 1)
+            {
+                CurInfo.curveDir = GeoUtils.Interpolation(mLast, mNext, pro).normalized;
+            }
+            else
+            {
+                CurInfo.curveDir = mNext;
+            }
 #if UNITY_EDITOR
             // 记录曲线点和切向，以及线上点和切向
             if (trackPos != null)
@@ -47,6 +73,7 @@ namespace Nullspace
             }
 #endif
         }
+
 
 #if UNITY_EDITOR
         private List<Vector3> trackPos = new List<Vector3>();
@@ -80,10 +107,9 @@ namespace Nullspace
             {
                 Gizmos.color = (i % 2 == 0) ? Color.black : Color.white;
                 Gizmos.DrawLine(trackPos[(i - 1) * step + 2] + mOffset, trackPos[i * step + 2] + mOffset);
-                //Gizmos.color = (i % 2 == 0) ? Color.blue : Color.green;
-                //Gizmos.DrawLine(trackPos[(i - 1) * step] + mOffset, trackPos[i * step] + mOffset);
             }
         }
 #endif
+
     }
 }

@@ -1,12 +1,8 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Nullspace
 {
-    public abstract class TimerCallback : ObjectCacheBase
+    public abstract class AbstractCallback : ObjectCacheBase
     {
         public abstract Delegate Handler
         {
@@ -17,7 +13,7 @@ namespace Nullspace
         public abstract void Run();
     }
 
-    public class Callback : TimerCallback
+    public class Callback : AbstractCallback
     {
         private Action mAction;
         public override Delegate Handler
@@ -32,7 +28,7 @@ namespace Nullspace
         }
     }
 
-    public class Callback<T> : TimerCallback
+    public class Callback<T> : AbstractCallback
     {
         private Action<T> mAction;
         public T Arg1 { get; set; }
@@ -48,7 +44,7 @@ namespace Nullspace
         }
     }
 
-    public class Callback<T, U> : TimerCallback
+    public class Callback<T, U> : AbstractCallback
     {
         private Action<T, U> mAction;
         public T Arg1 { get; set; }
@@ -66,7 +62,7 @@ namespace Nullspace
         }
     }
 
-    public class Callback<T, U, V> : TimerCallback
+    public class Callback<T, U, V> : AbstractCallback
     {
         private Action<T, U, V> mAction;
         public T Arg1 { get; set; }
@@ -86,7 +82,7 @@ namespace Nullspace
             mAction(Arg1, Arg2, Arg3);
         }
     }
-    public class Callback<T, U, V, W> : TimerCallback
+    public class Callback<T, U, V, W> : AbstractCallback
     {
         private Action<T, U, V, W> mAction;
         public T Arg1 { get; set; }

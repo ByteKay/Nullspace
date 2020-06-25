@@ -4,15 +4,16 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class NavLinePath : AbstractNavPath
+    public class NavLinePosCurveDir : AbstractNavPath
     {
-        public NavLinePath(int pathId, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathId, offset, pathFlipOn, triggerHandler)
+        public NavLinePosCurveDir(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathData, offset, pathFlipOn, triggerHandler)
         {
 #if UNITY_EDITOR
             mMovedTime = 0;
             mMovedLength = 0;
 #endif
         }
+
         protected override void UpdatePosAndTangent()
         {
             float len = mPathLengthMoved - GetLength(mCurrentWaypointIndex);
@@ -25,10 +26,15 @@ namespace Nullspace
             mMovedTime += Time.deltaTime;
             mMovedLength += (linePos - mCurInfo.linePos).magnitude;
 #endif
+            Vector3 prevStart = mCurrentWaypointIndex == 0 ? mWaypointAppend[0] : GetWaypoint(mCurrentWaypointIndex - 1);
+            Vector3 endNext = (mCurrentWaypointIndex + 2) >= mPathData.WayPoints.Count ? mWaypointAppend[1] : GetWaypoint(mCurrentWaypointIndex + 2);
+            Vector3 tangent = .5f * (
+                   (-prevStart + 3f * start - 3f * end + endNext) * (3 * u * u)
+                   + (-prevStart + end)) + (2f * prevStart - 5f * start + 4f * end - endNext) * u;
             mCurInfo.linePos = linePos;
-            mCurInfo.curvePos = linePos;
             mCurInfo.lineDir = (end - start).normalized;
-            mCurInfo.curveDir = mCurInfo.lineDir;
+            mCurInfo.curvePos = (1 - u) * start + u * end;
+            mCurInfo.curveDir = tangent.normalized;
 
 #if UNITY_EDITOR
             // 记录曲线点和切向，以及线上点和切向
@@ -42,12 +48,10 @@ namespace Nullspace
 #endif
         }
 
-
 #if UNITY_EDITOR
         private List<Vector3> trackPos = new List<Vector3>();
         private float mMovedTime = 0;
         private float mMovedLength = 0;
-
         public override void OnDrawGizmos()
         {
             if (trackPos == null)
@@ -76,10 +80,10 @@ namespace Nullspace
             {
                 Gizmos.color = (i % 2 == 0) ? Color.black : Color.white;
                 Gizmos.DrawLine(trackPos[(i - 1) * step + 2] + mOffset, trackPos[i * step + 2] + mOffset);
+                //Gizmos.color = (i % 2 == 0) ? Color.blue : Color.green;
+                //Gizmos.DrawLine(trackPos[(i - 1) * step] + mOffset, trackPos[i * step] + mOffset);
             }
         }
 #endif
-
-
     }
 }
