@@ -16,19 +16,31 @@ namespace Nullspace
         public ObjectCacheBase()
         {
             Key = NextKey;
-            IsReleased = false;
             // 构造的时候，会放进缓存先。所以，构造的时刻就是 释放的时刻
+            IsReleased = true;
             ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();
         }
 
         public uint Key { get; set; }
 
-        // 这个只能通过 ObjectPools.Instance.Release --> ObjectPool.Release -> Release 过来
-        public void Clear()
+        public void Acquired()
         {
-            Release();
-            ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
-            IsReleased = true;
+            if (IsReleased)
+            {
+                IsReleased = false;
+                Initialize();
+            }
+        }
+
+        // 这个只能通过 ObjectPools.Instance.Release --> ObjectPool.Release -> Release 过来
+        public void Released()
+        {
+            if (!IsReleased)
+            {
+                Clear();
+                ReleasedTimePoint = TimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
+                IsReleased = true;
+            }
         }
 
         public bool IsExpired(float life)
@@ -37,7 +49,7 @@ namespace Nullspace
         }
         
         public abstract void Initialize();
-        public abstract void Release();
+        public abstract void Clear();
 
     }
 
@@ -73,7 +85,7 @@ namespace Nullspace
 
         public virtual void Release(ObjectCacheBase t)
         {
-            t.Release();
+            t.Released();
             if (!CircleCaches.ContainsKey(t.Key))
             {
                 CircleCaches.Add(t.Key, t);
@@ -90,6 +102,7 @@ namespace Nullspace
             while (itr.MoveNext() && result.Count < num)
             {
                 ObjectCacheBase circle = itr.Current;
+                circle.Acquired();
                 result.Add(circle);
             }
 
@@ -116,22 +129,24 @@ namespace Nullspace
             var itr = CircleCaches.Values.GetEnumerator();
             itr.MoveNext();
             ObjectCacheBase circle = itr.Current;
+            circle.Acquired();
             CircleCaches.Remove(circle.Key);
             return circle;
         }
 
         public virtual void Clear()
         {
-            var itr = CircleCaches.Values.GetEnumerator();
-            while (itr.MoveNext())
-            {
-                ObjectCacheBase item = itr.Current;
-                item.Release();
-            }
+            // 实际上 缓存中的物体 不用调用 Released
+            //var itr = CircleCaches.Values.GetEnumerator();
+            //while (itr.MoveNext())
+            //{
+            //    ObjectCacheBase item = itr.Current;
+            //    item.Released();
+            //}
             CircleCaches.Clear();
         }
 
-        public void RemoveExpired()
+        public void RemoveExpired(int lifeSeconds)
         {
             var itr = CircleCaches.Values.GetEnumerator();
             float timeStamp = Time.realtimeSinceStartup;
@@ -148,6 +163,11 @@ namespace Nullspace
             {
                 CircleCaches.Remove(key);
             }
+        }
+
+        public void RemoveExpired()
+        {
+            RemoveExpired(LifeTimeSecond);
         }
 
         public bool IsEmpty()
@@ -196,7 +216,7 @@ namespace Nullspace
             }
             else
             {
-                obj.Release();
+                obj.Released();
             }
         }
 

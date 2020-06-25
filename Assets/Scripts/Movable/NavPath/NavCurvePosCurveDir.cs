@@ -68,25 +68,25 @@ namespace Nullspace
 #if UNITY_EDITOR
             // 保存 当前时刻曲线的点坐标
             mMovedTime += Time.deltaTime;
-            mMovedLength += (inter - mCurInfo.curvePos).magnitude;
+            mMovedLength += (inter - CurInfo.curvePos).magnitude;
 #endif
             // 线性插值 计算当前时刻所处线段的点
-            mCurInfo.linePos = (1 - u) * start + u * end;
+            CurInfo.linePos = (1 - u) * start + u * end;
             // 计算当前时刻所处线段的方向
-            mCurInfo.lineDir = (end - start).normalized;
+            CurInfo.lineDir = (end - start).normalized;
             // 保存 当前时刻点
-            mCurInfo.curvePos = inter;
+            CurInfo.curvePos = inter;
             // 保存 当前时刻点坐标的切向
-            mCurInfo.curveDir = tangent.normalized;
+            CurInfo.curveDir = tangent.normalized;
 
 #if UNITY_EDITOR
             // 记录曲线点和切向，以及线上点和切向
             if (trackPos != null)
             {
-                trackPos.Add(mCurInfo.linePos);
-                trackPos.Add(mCurInfo.lineDir);
-                trackPos.Add(mCurInfo.curvePos);
-                trackPos.Add(mCurInfo.curveDir);
+                trackPos.Add(CurInfo.linePos);
+                trackPos.Add(CurInfo.lineDir);
+                trackPos.Add(CurInfo.curvePos);
+                trackPos.Add(CurInfo.curveDir);
             }
 #endif
         }

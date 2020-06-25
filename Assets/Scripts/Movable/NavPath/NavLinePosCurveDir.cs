@@ -24,26 +24,26 @@ namespace Nullspace
             Vector3 linePos = (1 - u) * start + u * end;
 #if UNITY_EDITOR
             mMovedTime += Time.deltaTime;
-            mMovedLength += (linePos - mCurInfo.linePos).magnitude;
+            mMovedLength += (linePos - CurInfo.linePos).magnitude;
 #endif
             Vector3 prevStart = mCurrentWaypointIndex == 0 ? mWaypointAppend[0] : GetWaypoint(mCurrentWaypointIndex - 1);
             Vector3 endNext = (mCurrentWaypointIndex + 2) >= mPathData.WayPoints.Count ? mWaypointAppend[1] : GetWaypoint(mCurrentWaypointIndex + 2);
             Vector3 tangent = .5f * (
                    (-prevStart + 3f * start - 3f * end + endNext) * (3 * u * u)
                    + (-prevStart + end)) + (2f * prevStart - 5f * start + 4f * end - endNext) * u;
-            mCurInfo.linePos = linePos;
-            mCurInfo.lineDir = (end - start).normalized;
-            mCurInfo.curvePos = (1 - u) * start + u * end;
-            mCurInfo.curveDir = tangent.normalized;
+            CurInfo.linePos = linePos;
+            CurInfo.lineDir = (end - start).normalized;
+            CurInfo.curvePos = (1 - u) * start + u * end;
+            CurInfo.curveDir = tangent.normalized;
 
 #if UNITY_EDITOR
             // 记录曲线点和切向，以及线上点和切向
             if (trackPos != null)
             {
-                trackPos.Add(mCurInfo.linePos);
-                trackPos.Add(mCurInfo.lineDir);
-                trackPos.Add(mCurInfo.curvePos);
-                trackPos.Add(mCurInfo.curveDir);
+                trackPos.Add(CurInfo.linePos);
+                trackPos.Add(CurInfo.lineDir);
+                trackPos.Add(CurInfo.curvePos);
+                trackPos.Add(CurInfo.curveDir);
             }
 #endif
         }

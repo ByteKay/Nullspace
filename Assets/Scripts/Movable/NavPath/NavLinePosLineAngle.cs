@@ -43,7 +43,7 @@ namespace Nullspace
             Vector3 linePos = (1 - u) * start + u * end;
 #if UNITY_EDITOR
             mMovedTime += Time.deltaTime;
-            mMovedLength += (linePos - mCurInfo.linePos).magnitude;
+            mMovedLength += (linePos - CurInfo.linePos).magnitude;
 #endif
             CurInfo.linePos = linePos;
             CurInfo.curvePos = linePos;
@@ -66,10 +66,10 @@ namespace Nullspace
             // 记录曲线点和切向，以及线上点和切向
             if (trackPos != null)
             {
-                trackPos.Add(mCurInfo.linePos);
-                trackPos.Add(mCurInfo.lineDir);
-                trackPos.Add(mCurInfo.curvePos);
-                trackPos.Add(mCurInfo.curveDir);
+                trackPos.Add(CurInfo.linePos);
+                trackPos.Add(CurInfo.lineDir);
+                trackPos.Add(CurInfo.curvePos);
+                trackPos.Add(CurInfo.curveDir);
             }
 #endif
         }

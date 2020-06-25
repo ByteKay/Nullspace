@@ -38,13 +38,13 @@ namespace Nullspace
             }
 
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(mCurInfo.curvePos, mCurInfo.curvePos + 10 * mCurInfo.curveDir);
+            Gizmos.DrawLine(CurInfo.curvePos, CurInfo.curvePos + 10 * CurInfo.curveDir);
             cnt = mTriggers.Count;
             for (int i = 0; i < cnt; ++i)
             {
                 mTriggers[i].OnDrawGizmos(TriggerPos(mTriggers[i].mTriggerLength));
             }
-            Gizmos.DrawSphere(mCurInfo.linePos, 0.5f);
+            Gizmos.DrawSphere(CurInfo.linePos, 0.5f);
         }
 
         /// <summary>
@@ -293,7 +293,6 @@ namespace Nullspace
         protected float mPathLengthMoved;           // 运行时已经移动的长度
         protected int mCurrentWaypointIndex;        // 运行时当前的路点索引
         protected Vector3[] mWaypointAppend;        // 首尾两点的控制点
-        protected NavPathPoint mCurInfo;               // 当前信息记录 
         protected List<PathTrigger> mTriggers;      // 运行时触发器列表
         protected IPathTrigger mTriggerHandler;  // 触发器处理实例
         /// <summary>
@@ -309,7 +308,7 @@ namespace Nullspace
             mPathLengthMoved = 0.0f;
             mCurrentWaypointIndex = 0;
             mTriggers = new List<PathTrigger>();
-            mCurInfo = new NavPathPoint();
+            CurInfo = new NavPathPoint();
             mWaypointAppend = new Vector3[2];
             mTriggerHandler = triggerHandler;
             mPathData = pathData;
@@ -326,8 +325,8 @@ namespace Nullspace
             // 累加已走路径长度
             mPathLengthMoved += moved;
             // 是否走完路径
-            mCurInfo.isFinished = IsFinished();
-            if (!mCurInfo.isFinished)
+            CurInfo.isFinished = IsFinished();
+            if (!CurInfo.isFinished)
             {
                 // 更新路点索引
                 UpdateWaypointIndex();
@@ -336,13 +335,8 @@ namespace Nullspace
             }
             // 触发器执行
             UpdateTrigger();
-            return mCurInfo;
+            return CurInfo;
         }
-
-        /// <summary>
-        /// 获取当前信息
-        /// </summary>
-        public NavPathPoint CurInfo { get { return mCurInfo; } }
 
         /// <summary>
         /// 初始化数据，并指定触发器响应对象
@@ -365,10 +359,7 @@ namespace Nullspace
         /// </summary>
         protected void InitializeAppendWaypoint()
         {
-            if (mPathData.WayPoints.Count == 1)
-            {
-                Debug.LogError("wrong data");
-            }
+            Debug.Assert(mPathData.WayPoints.Count > 1, "wrong");
             if (mPathData.WayPoints.Count == 2)
             {
                 Vector3 diff1 = mPathData.WayPoints[0] - mPathData.WayPoints[1];
@@ -388,21 +379,17 @@ namespace Nullspace
         /// <summary>
         /// 路径总长度获取
         /// </summary>
-        public float PathLength
-        {
-            get
-            {
-                return mPathData.PathLength;
-            }
-        }
+        public float PathLength { get { return mPathData.PathLength; } }
 
         /// <summary>
         /// 路径触发器个数
         /// </summary>
-        public int TriggerCount
-        {
-            get { return mTriggers.Count; }
-        }
+        public int TriggerCount { get { return mTriggers.Count; } }
+
+        /// <summary>
+        /// 获取当前信息
+        /// </summary>
+        public NavPathPoint CurInfo { get; set; }
 
         /// <summary>
         /// 更新路点索引
@@ -416,7 +403,7 @@ namespace Nullspace
             {
                 mCurrentWaypointIndex = nextWayIndex++;
             }
-            mCurInfo.isDirChanged = lastWayIndex != mCurrentWaypointIndex;
+            CurInfo.isDirChanged = lastWayIndex != mCurrentWaypointIndex;
             return lastWayIndex;
         }
 

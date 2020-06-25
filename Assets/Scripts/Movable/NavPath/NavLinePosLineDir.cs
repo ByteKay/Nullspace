@@ -23,21 +23,21 @@ namespace Nullspace
             Vector3 linePos = (1 - u) * start + u * end;
 #if UNITY_EDITOR
             mMovedTime += Time.deltaTime;
-            mMovedLength += (linePos - mCurInfo.linePos).magnitude;
+            mMovedLength += (linePos - CurInfo.linePos).magnitude;
 #endif
-            mCurInfo.linePos = linePos;
-            mCurInfo.curvePos = linePos;
-            mCurInfo.lineDir = (end - start).normalized;
-            mCurInfo.curveDir = mCurInfo.lineDir;
+            CurInfo.linePos = linePos;
+            CurInfo.curvePos = linePos;
+            CurInfo.lineDir = (end - start).normalized;
+            CurInfo.curveDir = CurInfo.lineDir;
 
 #if UNITY_EDITOR
             // 记录曲线点和切向，以及线上点和切向
             if (trackPos != null)
             {
-                trackPos.Add(mCurInfo.linePos);
-                trackPos.Add(mCurInfo.lineDir);
-                trackPos.Add(mCurInfo.curvePos);
-                trackPos.Add(mCurInfo.curveDir);
+                trackPos.Add(CurInfo.linePos);
+                trackPos.Add(CurInfo.lineDir);
+                trackPos.Add(CurInfo.curvePos);
+                trackPos.Add(CurInfo.curveDir);
             }
 #endif
         }

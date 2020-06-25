@@ -23,13 +23,16 @@ namespace Nullspace
 
         public override void Initialize()
         {
-            Callback = null;
+            Clear();
         }
 
-        public override void Release()
+        public override void Clear()
         {
-            ObjectPools.Instance.Release(Callback);
-            Callback = null;
+            if (Callback != null)
+            {
+                ObjectPools.Instance.Release(Callback);
+                Callback = null;
+            }
         }
     }
 

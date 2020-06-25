@@ -13,7 +13,7 @@ namespace Nullspace
         {
 
         }
-        public override void Release()
+        public override void Clear()
         {
 
         }
