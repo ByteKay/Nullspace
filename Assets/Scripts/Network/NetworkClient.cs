@@ -13,7 +13,6 @@ namespace Nullspace
         Connectted,
         Reconnectting,
         Disconnected,
-        Closed
     }
 
     public abstract class AbstractNetworkClient
@@ -71,8 +70,6 @@ namespace Nullspace
         public virtual void Stop()
         {
             isStop = true;
-            //mSendWait.Set();
-            //mReceiveWait.Set();
             mReceiveThread.Interrupt();
             mSendThread.Interrupt();
             Close();
@@ -110,8 +107,12 @@ namespace Nullspace
         }
         protected void SetConnectState(ClientConnectState state)
         {
+            if (ConnectState == state)
+            {
+                return;
+            }
             ConnectState = state;
-            if (IsConnectState(ClientConnectState.Disconnected))
+            if (IsConnectState(ClientConnectState.Reconnectting))
             {
                 if (mReconnectTimerId == int.MaxValue)
                 {
@@ -137,7 +138,7 @@ namespace Nullspace
                 mSendWait.Set();
                 mReceiveWait.Set();
             }
-            else if(IsConnectState(ClientConnectState.Closed))
+            else if(IsConnectState(ClientConnectState.Disconnected))
             {
                 if (mHeartTimerId != int.MaxValue)
                 {
@@ -189,13 +190,13 @@ namespace Nullspace
             mSendThread = new Thread(SendMessage);
             mSendThread.Start();
         }
+
         private void StartConnect()
         {
-            if (IsConnectState(ClientConnectState.Disconnected))
+            if (IsConnectState(ClientConnectState.Reconnectting))
             {
                 Close();
                 mNeedSendMessages.Clear();
-                ConnectState = ClientConnectState.Reconnectting;
                 Reconnect();
             }
         }
@@ -234,7 +235,7 @@ namespace Nullspace
                     {
                         break;
                     }
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(ClientConnectState.Reconnectting);
                     Debug.Log(e.Message);
                 }
                 Thread.Sleep(0);
@@ -261,7 +262,7 @@ namespace Nullspace
                     {
                         break;
                     }
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(ClientConnectState.Reconnectting);
                     Debug.Log(e.Message);
                 }
                 Thread.Sleep(0);

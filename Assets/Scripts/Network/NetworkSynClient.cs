@@ -16,12 +16,15 @@ namespace Nullspace
         }
         protected override void Close()
         {
-            if (mClientSocket != null && mClientSocket.Connected)
+            if (mClientSocket != null)
             {
-                mClientSocket.Shutdown(SocketShutdown.Both);
-                mClientSocket.Close();
-                mClientSocket = null;
-                SetConnectState(ClientConnectState.Closed);
+                if (mClientSocket.Connected)
+                {
+                    mClientSocket.Shutdown(SocketShutdown.Both);
+                    mClientSocket.Close();
+                    mClientSocket = null;
+                }
+                SetConnectState(ClientConnectState.Disconnected);
             }
         }
         protected override void Connect()
@@ -45,12 +48,12 @@ namespace Nullspace
                 }
                 else
                 {
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(ClientConnectState.Reconnectting);
                 }
             }
             catch (Exception e)
             {
-                SetConnectState(ClientConnectState.Disconnected);
+                SetConnectState(ClientConnectState.Reconnectting);
                 Debug.Log("test Connect Exception: " + e.Message);
             }
 
@@ -82,7 +85,7 @@ namespace Nullspace
                 int len = mClientSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
                 if (len <= 0)
                 {
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(ClientConnectState.Reconnectting);
                 }
             }
         }
@@ -106,7 +109,7 @@ namespace Nullspace
                 int size = mClientSocket.Receive(ptr, len, total - len, SocketFlags.None);
                 if (size == -1 || size == 0)
                 {
-                    SetConnectState(ClientConnectState.Disconnected);
+                    SetConnectState(ClientConnectState.Reconnectting);
                     return false;
                 }
                 else
