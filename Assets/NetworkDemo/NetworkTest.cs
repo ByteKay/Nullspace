@@ -14,11 +14,6 @@ namespace Nullspace
             NetworkCommandHandler.Instance.Initialize();
         }
 
-
-        private void Update()
-        {
-            NetworkCommandHandler.Instance.Update();
-        }
         private void OnGUI()
         {
             GUILayout.Label("ConnectState: " + EnumUtils.EnumToString(ClientSocket.ConnectState));
