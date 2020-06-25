@@ -112,8 +112,8 @@ namespace Nullspace
                 mWaitHandle = new AutoResetEvent(false);
                 mCommandPacket = new Queue<NetworkPacket>();
                 isClose = false;
-                mHandleThread = new Thread(HandlePacket) { IsBackground = true };
-                mHandleThread.Start();
+                //mHandleThread = new Thread(HandlePacket) { IsBackground = true };
+                //mHandleThread.Start();
             }
         }
         public void Initialize(string spacename, Assembly ass)
@@ -125,8 +125,23 @@ namespace Nullspace
                 mWaitHandle = new AutoResetEvent(false);
                 mCommandPacket = new Queue<NetworkPacket>();
                 isClose = false;
-                mHandleThread = new Thread(HandlePacket) { IsBackground = true };
-                mHandleThread.Start();
+                //mHandleThread = new Thread(HandlePacket) { IsBackground = true };
+                //mHandleThread.Start();
+            }
+        }
+
+        public void Update()
+        {
+            lock (mLock)
+            {
+                while (mCommandPacket.Count > 0)
+                {
+                    NetworkPacket packet = mCommandPacket.Dequeue();
+                    if (packet != null)
+                    {
+                        Handle(packet);
+                    }
+                }
             }
         }
 
@@ -134,34 +149,33 @@ namespace Nullspace
         {
             mWaitHandle.Set();
             isClose = true;
-            mHandleThread.Join();
+            // mHandleThread.Join();
             mWaitHandle.Close();
             mCommandPacket.Clear();
         }
 
-        public void HandlePacket()
-        {
-            while (!isClose)
-            {
-                NetworkPacket packet = null;
-                lock (mLock)
-                {
-                    if (mCommandPacket.Count > 0)
-                    {
-                        packet = mCommandPacket.Dequeue();
-                    }
-                }
-                if (packet != null)
-                {
-                    Handle(packet);
-                }
-                else
-                {
-                    mWaitHandle.WaitOne();
-                }
-            }
-
-        }
+        //public void HandlePacket()
+        //{
+        //    while (!isClose)
+        //    {
+        //        NetworkPacket packet = null;
+        //        lock (mLock)
+        //        {
+        //            if (mCommandPacket.Count > 0)
+        //            {
+        //                packet = mCommandPacket.Dequeue();
+        //            }
+        //        }
+        //        if (packet != null)
+        //        {
+        //            Handle(packet);
+        //        }
+        //        else
+        //        {
+        //            mWaitHandle.WaitOne();
+        //        }
+        //    }
+        //}
 
         private void Handle(NetworkPacket packet)
         {

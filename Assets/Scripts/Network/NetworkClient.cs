@@ -24,6 +24,9 @@ namespace Nullspace
         private static EventWaitHandle mSendWait = new AutoResetEvent(false);
         private static EventWaitHandle mReceiveWait = new AutoResetEvent(false);
         private Queue<byte[]> mNeedSendMessages = new Queue<byte[]>();
+        // 这里实际上可以一帧末尾并包发送。一次发送就好
+        // 或者 设置一次的发射字节数量上限值，多次发送。
+        private List<byte> mSendPack = new List<byte>();
         private int mReconnectTimerId = int.MaxValue;
         private int mHeartTimerId = int.MaxValue;
         protected string mIP = null;
@@ -201,8 +204,6 @@ namespace Nullspace
             }
         }
 
-        // 这里实际上可以一帧末尾并包发送。一次发送就好
-        // 或者 设置一次的发射字节数量上限值，多次发送。
         private void SendMessage()
         {
             while (!isStop)
@@ -211,6 +212,7 @@ namespace Nullspace
                 {
                     if (IsConnectState(ClientConnectState.Connectted))
                     {
+                        mSendPack.Clear();
                         while (mNeedSendMessages.Count > 0)
                         {
                             byte[] msg = null;
@@ -220,8 +222,13 @@ namespace Nullspace
                             }
                             if (msg != null)
                             {
-                                Send(msg);
+                                mSendPack.AddRange(msg);
                             }
+                        }
+                        if (mSendPack.Count > 0)
+                        {
+                            Send(mSendPack.ToArray());
+                            mSendPack.Clear();
                         }
                     }
                     else
@@ -238,7 +245,7 @@ namespace Nullspace
                     SetConnectState(ClientConnectState.Reconnectting);
                     Debug.Log(e.Message);
                 }
-                Thread.Sleep(0);
+                Thread.Sleep(16);
             }
         }
         private void ReceiveMessage()
