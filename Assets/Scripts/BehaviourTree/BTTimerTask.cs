@@ -2,34 +2,32 @@
 
 namespace Nullspace
 {
-    public class BTTimerTask<T>
+    /// <summary>
+    /// 时间单位为 秒
+    /// </summary>
+    public class BTTimerTask
     {
-        private long mCurrentTicks;
-        private long mInterval;
-        private long mNextTicks;
-        private Callback<T> mCallback = null;
+        private float mCurrentSeconds;
+        private float mInterval;
+        private float mNextSeconds;
+        private AbstractCallback mCallback = null;
         private bool isStop;
-        public BTTimerTask(float interval, Action<T> action)
+        public BTTimerTask(float interval, AbstractCallback callback)
         {
-            if (action != null)
-            {
-                mCallback = new Callback<T>();
-                mCallback.Handler = action;
-            }
-            mCurrentTicks = System.DateTime.Now.Ticks;
-            mInterval = (long)(interval * 10000000);
-            mNextTicks = mCurrentTicks + mInterval;
+            mCallback = callback;
+            mCurrentSeconds = TimeUtils.GetTimeStampSeconds();
+            mInterval = interval;
+            mNextSeconds = mCurrentSeconds + mInterval;
             isStop = true;
         }
 
-        public bool Process(T obj)
+        public bool Process<T>(T obj)
         {
             Start();
-            if (System.DateTime.Now.Ticks > mNextTicks)
+            if (TimeUtils.GetTimeStampSeconds() > mNextSeconds)
             {
                 if (mCallback != null)
                 {
-                    mCallback.Arg1 = obj;
                     mCallback.Run();
                 }
                 Stop();
@@ -43,15 +41,15 @@ namespace Nullspace
             if (isStop)
             {
                 isStop = false;
-                mCurrentTicks = System.DateTime.Now.Ticks;
-                mNextTicks = mCurrentTicks + mInterval;
+                mCurrentSeconds = TimeUtils.GetTimeStampSeconds();
+                mNextSeconds = mCurrentSeconds + mInterval;
             }
         }
 
         public void Stop()
         {
             isStop = true;
-            mCurrentTicks = 0;
+            mCurrentSeconds = 0;
         }
     }
 

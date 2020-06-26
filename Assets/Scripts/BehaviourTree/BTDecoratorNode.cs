@@ -72,10 +72,10 @@ namespace Nullspace
     // 运行时间内
     public class BTTimerLimitNode<T> : BTDecoratorNode<T>
     {
-        private BTTimerTask<T> mTimerTask;
+        private BTTimerTask mTimerTask;
         public BTTimerLimitNode(float interval) : base()
         {
-            mTimerTask = new BTTimerTask<T>(interval, null);
+            mTimerTask = new BTTimerTask(interval, null);
         }
 
         public override BTNodeState Process(T obj)
@@ -100,10 +100,10 @@ namespace Nullspace
     // 定时器
     public class BTTimerNode<T> : BTDecoratorNode<T>
     {
-        private BTTimerTask<T> mTimerTask;
+        private BTTimerTask mTimerTask;
         public BTTimerNode(float interval) : base()
         {
-            mTimerTask = new BTTimerTask<T>(interval, null);
+            mTimerTask = new BTTimerTask(interval, null);
         }
 
         public override BTNodeState Process(T obj)
@@ -120,10 +120,10 @@ namespace Nullspace
     // 直接装饰器 定时器
     public class BTTSimpleTimerNode<T> : BehaviourTreeNode<T>
     {
-        private BTTimerTask<T> mTimerTask;
-        public BTTSimpleTimerNode(float interval, Action<T> action) : base()
+        private BTTimerTask mTimerTask;
+        public BTTSimpleTimerNode(float interval, AbstractCallback callback) : base()
         {
-            mTimerTask = new BTTimerTask<T>(interval, action);
+            mTimerTask = new BTTimerTask(interval, callback);
         }
 
         public override BTNodeState Process(T obj)
