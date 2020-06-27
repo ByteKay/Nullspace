@@ -19,7 +19,7 @@ namespace Nullspace
         /// <param name="comType">比较类别</param>
         /// <param name="value">目标值</param>
         /// <returns></returns>
-        public StateConditions With(string parameterName, StateConditionType comType, object value)
+        public StateConditions With(string parameterName, ConditionOperationType comType, object value)
         {
             // 这里不去重复
             // 比如 条件是一个区间

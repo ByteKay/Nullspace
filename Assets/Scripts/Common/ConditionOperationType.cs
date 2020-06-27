@@ -2,7 +2,7 @@
 namespace Nullspace
 {
 
-    public enum StateConditionType
+    public enum ConditionOperationType
     {
         EQUAL,
         NOT_EQUAL,
@@ -11,4 +11,5 @@ namespace Nullspace
         LESS_EQUAL,
         GREATER_EQUAL
     }
+
 }

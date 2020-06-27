@@ -12,17 +12,6 @@ namespace Nullspace
         {
             return BTNodeState.Ready;
         }
-
-
-    }
-    public enum BTConditionLogic
-    {
-        LESS,
-        GREATER,
-        EQUAL,
-        LESS_EQUAL,
-        GREATER_EQUAL,
-        NOT_EQUAL,
     }
 
     public enum BTConditionBoolean
@@ -40,12 +29,12 @@ namespace Nullspace
     // <,>,==,>=,<=,!=
     public class BTConditionSingleOperation<T> : BehaviourTreeNode<T>
     {
-        private BTConditionLogic OperationLogic;
+        private ConditionOperationType OperationLogic;
         private BTConditionValueType ValueType;
         private object TargetValue;
         private MethodInfo GetterFunc;
 
-        public BTConditionSingleOperation(BTConditionLogic operation, BTConditionValueType valueType, object targetValue, MethodInfo getter) : base()
+        public BTConditionSingleOperation(ConditionOperationType operation, BTConditionValueType valueType, object targetValue, MethodInfo getter) : base()
         {
             OperationLogic = operation;
             ValueType = valueType;
@@ -74,22 +63,22 @@ namespace Nullspace
             bool result = false;
             switch (OperationLogic)
             {
-                case BTConditionLogic.EQUAL:
+                case ConditionOperationType.EQUAL:
                     result = current == target;
                     break;
-                case BTConditionLogic.GREATER:
+                case ConditionOperationType.GREATER:
                     result = current > target;
                     break;
-                case BTConditionLogic.GREATER_EQUAL:
+                case ConditionOperationType.GREATER_EQUAL:
                     result = current >= target;
                     break;
-                case BTConditionLogic.LESS:
+                case ConditionOperationType.LESS:
                     result = current < target;
                     break;
-                case BTConditionLogic.LESS_EQUAL:
+                case ConditionOperationType.LESS_EQUAL:
                     result = current <= target;
                     break;
-                case BTConditionLogic.NOT_EQUAL:
+                case ConditionOperationType.NOT_EQUAL:
                     result = current != target;
                     break;
             }
@@ -101,16 +90,16 @@ namespace Nullspace
             bool result = false;
             switch (OperationLogic)
             {
-                case BTConditionLogic.EQUAL:
+                case ConditionOperationType.EQUAL:
                     result = current == target;
                     break;
-                case BTConditionLogic.NOT_EQUAL:
+                case ConditionOperationType.NOT_EQUAL:
                     result = current != target;
                     break;
-                case BTConditionLogic.GREATER:
-                case BTConditionLogic.GREATER_EQUAL:
-                case BTConditionLogic.LESS:
-                case BTConditionLogic.LESS_EQUAL:
+                case ConditionOperationType.GREATER:
+                case ConditionOperationType.GREATER_EQUAL:
+                case ConditionOperationType.LESS:
+                case ConditionOperationType.LESS_EQUAL:
                     throw new Exception("不支持字符串 大于 或 小于 比较！");
             }
             return result;
@@ -136,7 +125,7 @@ namespace Nullspace
         private BTConditionSingleOperation<T> LeftOperation;
         private BTConditionSingleOperation<T> RightOperation;
         private BTConditionBoolean RangeBoolean; // || && 
-        public BTConditionRangeOperation(BTConditionBoolean rangeBoolean, BTConditionLogic leftOperation, object leftValue, BTConditionLogic rightOperation, object rightValue, BTConditionValueType valueType, MethodInfo getter) : base()
+        public BTConditionRangeOperation(BTConditionBoolean rangeBoolean, ConditionOperationType leftOperation, object leftValue, ConditionOperationType rightOperation, object rightValue, BTConditionValueType valueType, MethodInfo getter) : base()
         {
             LeftOperation = new BTConditionSingleOperation<T>(leftOperation, valueType, leftOperation, getter);
             RightOperation = new BTConditionSingleOperation<T>(leftOperation, valueType, leftOperation, getter);

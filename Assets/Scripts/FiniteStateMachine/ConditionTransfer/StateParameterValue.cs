@@ -17,7 +17,7 @@ namespace Nullspace
 
     public class StateCondition : StateParameterValue
     {
-        public StateConditionType CompareType;
+        public ConditionOperationType CompareType;
     }
 
 }

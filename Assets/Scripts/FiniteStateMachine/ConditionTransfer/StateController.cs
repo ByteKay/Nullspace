@@ -142,21 +142,21 @@ namespace Nullspace
             return true;
         }
 
-        public static bool CheckFloat(float a, float b, StateConditionType type)
+        public static bool CheckFloat(float a, float b, ConditionOperationType type)
         {
             switch (type)
             {
-                case StateConditionType.EQUAL:
+                case ConditionOperationType.EQUAL:
                     return a == b;
-                case StateConditionType.GREATER:
+                case ConditionOperationType.GREATER:
                     return a > b;
-                case StateConditionType.GREATER_EQUAL:
+                case ConditionOperationType.GREATER_EQUAL:
                     return a >= b;
-                case StateConditionType.LESS:
+                case ConditionOperationType.LESS:
                     return a < b;
-                case StateConditionType.LESS_EQUAL:
+                case ConditionOperationType.LESS_EQUAL:
                     return a <= b;
-                case StateConditionType.NOT_EQUAL:
+                case ConditionOperationType.NOT_EQUAL:
                     return a != b;
             }
             return false;
