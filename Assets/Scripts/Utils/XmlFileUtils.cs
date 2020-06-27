@@ -16,21 +16,21 @@ namespace Nullspace
         /// <summary>
         /// 键值分隔符： ‘:’
         /// </summary>
-        private const Char KEY_VALUE_SPRITER = ':';
+        private const char KEY_VALUE_SPRITER = ':';
         /// <summary>
         /// 字典项分隔符： ‘,’
         /// </summary>
-        private const Char MAP_SPRITER = ',';
+        private const char MAP_SPRITER = ',';
         /// <summary>
         /// 数组分隔符： ','
         /// </summary>
-        private const Char LIST_SPRITER = ';';
+        private const char LIST_SPRITER = ';';
 
         // 可以扩展成递归模式，多个类型嵌套的
         public static void SaveXML<T>(string path, List<T> data)
         {
             string attrName = typeof(T).Name;
-            var root = new System.Security.SecurityElement(attrName + "s");
+            var root = new SecurityElement(attrName + "s");
             
             var props = typeof(T).GetProperties();
             var keyProp = props[0];         
@@ -45,9 +45,9 @@ namespace Nullspace
             foreach (var item in data)
             {
                 // 下面在LoadXML时，key id必须先加载，所以这里第一个创建 id
-                var xml = new System.Security.SecurityElement(attrName);
+                var xml = new SecurityElement(attrName);
                 object obj = keyProp.GetGetMethod().Invoke(item, null);
-                xml.AddChild(new System.Security.SecurityElement(keyProp.Name, obj.ToString()));
+                xml.AddChild(new SecurityElement(keyProp.Name, obj.ToString()));
                 foreach (var prop in props)
                 {
                     if (prop == keyProp)
@@ -55,7 +55,7 @@ namespace Nullspace
                         continue;
                     }
                     var type = prop.PropertyType;
-                    String result = String.Empty;
+                    string result = string.Empty;
                     obj = prop.GetGetMethod().Invoke(item, null);
                     if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                     {
@@ -74,7 +74,7 @@ namespace Nullspace
                     else if (type.BaseType == typeof(Enum))
                     {
                         Type underType = Enum.GetUnderlyingType(type);
-                        if (underType == typeof(Int32))
+                        if (underType == typeof(int))
                         {
                             obj = EnumUtils.EnumToInt(obj) + "";
                         }
@@ -86,7 +86,7 @@ namespace Nullspace
                     }
                     if (result != null)
                     {
-                        xml.AddChild(new System.Security.SecurityElement(prop.Name, result));
+                        xml.AddChild(new SecurityElement(prop.Name, result));
                     }
                 }
                 root.AddChild(xml);
@@ -99,7 +99,7 @@ namespace Nullspace
             {
                 output = output + ".xml";
             }
-            XmlFileUtils.SaveText(output, element.ToString());
+            SaveText(output, element.ToString());
         }
 
         public static List<T> LoadXML<T>(string path)
@@ -108,13 +108,13 @@ namespace Nullspace
             List<T> list = new List<T>();
             try
             {
-                if (String.IsNullOrEmpty(text))
+                if (string.IsNullOrEmpty(text))
                 {
                     return list;
                 }
                 Type type = typeof(T);
-                var xml = XmlFileUtils.LoadXML(text);
-                Dictionary<Int32, Dictionary<String, String>> map = XmlFileUtils.LoadIntMap(xml, text);
+                var xml = LoadXML(text);
+                Dictionary<int, Dictionary<String, String>> map = LoadIntMap(xml, text);
                 var props = type.GetProperties();
                 foreach (var item in map)
                 {
@@ -149,7 +149,7 @@ namespace Nullspace
             return list;
         }
 
-        public static string LoadTextFile(String fileName)
+        public static string LoadTextFile(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -160,7 +160,7 @@ namespace Nullspace
             }
             else
             {
-                return String.Empty;
+                return string.Empty;
             }
         }
 
@@ -171,9 +171,9 @@ namespace Nullspace
         /// <param name="keyValueSpriter">键值分隔符</param>
         /// <param name="mapSpriter">字典项分隔符</param>
         /// <returns>字典对象</returns>
-        public static Dictionary<Int32, Int32> ParseMapIntInt(String strMap, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static Dictionary<int, int> ParseMapIntInt(string strMap, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
-            Dictionary<Int32, Int32> result = new Dictionary<Int32, Int32>();
+            Dictionary<int, int> result = new Dictionary<int, int>();
             var strResult = ParseMap(strMap, keyValueSpriter, mapSpriter);
             foreach (var item in strResult)
             {
@@ -185,7 +185,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Error("XmlData", String.Format("Parse failure: {0}, {1}", item.Key, item.Value));
+                    DebugUtils.Error("XmlData", string.Format("Parse failure: {0}, {1}", item.Key, item.Value));
                 }
             }
             return result;
@@ -197,9 +197,9 @@ namespace Nullspace
         /// <param name="keyValueSpriter">键值分隔符</param>
         /// <param name="mapSpriter">字典项分隔符</param>
         /// <returns>字典对象</returns>
-        public static Dictionary<Int32, float> ParseMapIntFloat(String strMap, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static Dictionary<int, float> ParseMapIntFloat(string strMap, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
-            var result = new Dictionary<Int32, float>();
+            var result = new Dictionary<int, float>();
             var strResult = ParseMap(strMap, keyValueSpriter, mapSpriter);
             foreach (var item in strResult)
             {
@@ -211,7 +211,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Error("XmlData", String.Format("Parse failure: {0}, {1}", item.Key, item.Value));
+                    DebugUtils.Error("XmlData", string.Format("Parse failure: {0}, {1}", item.Key, item.Value));
                 }
             }
             return result;
@@ -223,9 +223,9 @@ namespace Nullspace
         /// <param name="keyValueSpriter">键值分隔符</param>
         /// <param name="mapSpriter">字典项分隔符</param>
         /// <returns>字典对象</returns>
-        public static Dictionary<Int32, String> ParseMapIntString(String strMap, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static Dictionary<int, string> ParseMapIntString(string strMap, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
-            Dictionary<Int32, String> result = new Dictionary<Int32, String>();
+            Dictionary<int, string> result = new Dictionary<int, string>();
             var strResult = ParseMap(strMap, keyValueSpriter, mapSpriter);
             foreach (var item in strResult)
             {
@@ -236,7 +236,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Error("XmlData", String.Format("Parse failure: {0}", item.Key));
+                    DebugUtils.Error("XmlData", string.Format("Parse failure: {0}", item.Key));
                 }
             }
             return result;
@@ -248,9 +248,9 @@ namespace Nullspace
         /// <param name="keyValueSpriter">键值分隔符</param>
         /// <param name="mapSpriter">字典项分隔符</param>
         /// <returns>字典对象</returns>
-        public static Dictionary<String, float> ParseMapStringFloat(String strMap, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static Dictionary<string, float> ParseMapStringFloat(String strMap, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
-            Dictionary<String, float> result = new Dictionary<String, float>();
+            Dictionary<string, float> result = new Dictionary<string, float>();
             var strResult = ParseMap(strMap, keyValueSpriter, mapSpriter);
             foreach (var item in strResult)
             {
@@ -261,7 +261,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Error("XmlData", String.Format("Parse failure: {0}", item.Value));
+                    DebugUtils.Error("XmlData", string.Format("Parse failure: {0}", item.Value));
                 }
             }
             return result;
@@ -273,9 +273,9 @@ namespace Nullspace
         /// <param name="keyValueSpriter">键值分隔符</param>
         /// <param name="mapSpriter">字典项分隔符</param>
         /// <returns>字典对象</returns>
-        public static Dictionary<String, Int32> ParseMapStringInt(String strMap, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static Dictionary<string, int> ParseMapStringInt(string strMap, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
-            Dictionary<String, Int32> result = new Dictionary<String, Int32>();
+            Dictionary<string, int> result = new Dictionary<string, int>();
             var strResult = ParseMap(strMap, keyValueSpriter, mapSpriter);
             foreach (var item in strResult)
             {
@@ -286,7 +286,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Error("XmlData", String.Format("Parse failure: {0}", item.Value));
+                    DebugUtils.Error("XmlData", string.Format("Parse failure: {0}", item.Value));
                 }
             }
             return result;
@@ -334,10 +334,10 @@ namespace Nullspace
         /// <param name="keyValueSpriter">键值分隔符</param>
         /// <param name="mapSpriter">字典项分隔符</param>
         /// <returns>字典对象</returns>
-        public static Dictionary<String, String> ParseMap(String strMap, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static Dictionary<string, string> ParseMap(string strMap, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
-            Dictionary<String, String> result = new Dictionary<String, String>();
-            if (String.IsNullOrEmpty(strMap))
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(strMap))
             {
                 return result;
             }
@@ -345,7 +345,7 @@ namespace Nullspace
             var map = strMap.Split(mapSpriter);//根据字典项分隔符分割字符串，获取键值对字符串
             for (int i = 0; i < map.Length; i++)
             {
-                if (String.IsNullOrEmpty(map[i]))
+                if (string.IsNullOrEmpty(map[i]))
                 {
                     continue;
                 }
@@ -359,12 +359,12 @@ namespace Nullspace
                     }
                     else
                     {
-                        DebugUtils.Error("XmlData", String.Format("Key {0} already exist, index {1} of {2}.", keyValuePair[0], i, strMap));
+                        DebugUtils.Error("XmlData", string.Format("Key {0} already exist, index {1} of {2}.", keyValuePair[0], i, strMap));
                     }
                 }
                 else
                 {
-                    DebugUtils.Error("XmlData", String.Format("KeyValuePair are not match: {0}, index {1} of {2}.", map[i], i, strMap));
+                    DebugUtils.Error("XmlData", string.Format("KeyValuePair are not match: {0}, index {1} of {2}.", map[i], i, strMap));
                 }
             }
             return result;
@@ -376,7 +376,7 @@ namespace Nullspace
         /// <typeparam name="U">字典Value类型</typeparam>
         /// <param name="map">字典对象</param>
         /// <returns>字典字符串</returns>
-        public static String PackMap<T, U>(IEnumerable<KeyValuePair<T, U>> map, Char keyValueSpriter = KEY_VALUE_SPRITER, Char mapSpriter = MAP_SPRITER)
+        public static string PackMap<T, U>(IEnumerable<KeyValuePair<T, U>> map, char keyValueSpriter = KEY_VALUE_SPRITER, char mapSpriter = MAP_SPRITER)
         {
             if (map.Count() == 0)
             {
@@ -399,7 +399,7 @@ namespace Nullspace
         /// <param name="strList">列表字符串</param>
         /// <param name="listSpriter">数组分隔符</param>
         /// <returns>列表对象</returns>
-        public static List<T> ParseListAny<T>(String strList, Char listSpriter = LIST_SPRITER)
+        public static List<T> ParseListAny<T>(string strList, char listSpriter = LIST_SPRITER)
         {
             var type = typeof(T);
             var list = ParseList(strList, listSpriter);
@@ -420,23 +420,23 @@ namespace Nullspace
         /// <param name="strList">列表字符串</param>
         /// <param name="listSpriter">数组分隔符</param>
         /// <returns>列表对象</returns>
-        public static List<String> ParseList(String strList, Char listSpriter = LIST_SPRITER)
+        public static List<string> ParseList(string strList, char listSpriter = LIST_SPRITER)
         {
-            var result = new List<String>();
-            if (String.IsNullOrEmpty(strList))
+            var result = new List<string>();
+            if (string.IsNullOrEmpty(strList))
             {
                 return result;
             }
 
             var trimString = strList.Trim();
-            if (String.IsNullOrEmpty(strList))
+            if (string.IsNullOrEmpty(strList))
             {
                 return result;
             }
             var detials = trimString.Split(listSpriter);//.Substring(1, trimString.Length - 2)
             foreach (var item in detials)
             {
-                if (!String.IsNullOrEmpty(item))
+                if (!string.IsNullOrEmpty(item))
                 {
                     result.Add(item.Trim());
                 }
@@ -451,7 +451,7 @@ namespace Nullspace
         /// <param name="list">列表对象</param>
         /// <param name="listSpriter">列表分隔符</param>
         /// <returns>列表字符串</returns>
-        public static String PackList<T>(List<T> list, Char listSpriter = LIST_SPRITER)
+        public static string PackList<T>(List<T> list, char listSpriter = LIST_SPRITER)
         {
             if (list.Count == 0)
             {
@@ -469,7 +469,7 @@ namespace Nullspace
             }
 
         }
-        public static String PackArray<T>(T[] array, Char listSpriter = LIST_SPRITER)
+        public static string PackArray<T>(T[] array, char listSpriter = LIST_SPRITER)
         {
             var list = new List<T>();
             list.AddRange(array);
@@ -481,7 +481,7 @@ namespace Nullspace
         /// <param name="value">字符串值内容</param>
         /// <param name="type">值的类型</param>
         /// <returns>对应类型的值</returns>
-        public static object GetValue(String value, Type type)
+        public static object GetValue(string value, Type type)
         {
             if (type == typeof(Vector3))
             {
@@ -497,7 +497,7 @@ namespace Nullspace
             {
                 return value;
             }
-            if (type == typeof(Int32))
+            if (type == typeof(int))
             {
                 return Convert.ToInt32(Convert.ToDouble(value == "" ? "-1" : value));
             }
@@ -513,23 +513,23 @@ namespace Nullspace
             {
                 return Convert.ToSByte(Convert.ToDouble(value == "" ? "0" : value));
             }
-            if (type == typeof(UInt32))
+            if (type == typeof(uint))
             {
                 return Convert.ToUInt32(Convert.ToDouble(value == "" ? "0" : value));
             }
-            if (type == typeof(Int16))
+            if (type == typeof(short))
             {
                 return Convert.ToInt16(Convert.ToDouble(value == "" ? "0" : value));
             }
-            if (type == typeof(Int64))
+            if (type == typeof(long))
             {
                 return Convert.ToInt64(Convert.ToDouble(value == "" ? "0" : value));
             }
-            if (type == typeof(UInt16))
+            if (type == typeof(ushort))
             {
                 return Convert.ToUInt16(Convert.ToDouble(value == "" ? "0" : value));
             }
-            if (type == typeof(UInt64))
+            if (type == typeof(ulong))
             {
                 return Convert.ToUInt64(Convert.ToDouble(value == "" ? "0" : value));
             }
@@ -766,7 +766,7 @@ namespace Nullspace
         /// <param name="fileName">文件的 URL，该文件包含要加载的 XML 文档</param>
         /// <param name="key">XML 文档关键字</param>
         /// <returns>map 数据</returns>
-        public static Dictionary<String, Dictionary<String, String>> LoadMap(String fileName, out String key)
+        public static Dictionary<string, Dictionary<string, string>> LoadMap(string fileName, out string key)
         {
             key = Path.GetFileNameWithoutExtension(fileName);
             var xml = Load(fileName);
@@ -783,7 +783,7 @@ namespace Nullspace
         /// <param name="fileName">文件的 URL，该文件包含要加载的 XML 文档</param>
         /// <param name="map">map 数据</param>
         /// <returns>是否加载成功</returns>
-        public static Boolean LoadMap(String fileName, out Dictionary<String, Dictionary<String, String>> map)
+        public static bool LoadMap(string fileName, out Dictionary<string, Dictionary<string, string>> map)
         {
             try
             {
@@ -810,11 +810,11 @@ namespace Nullspace
         /// <param name="file">文件的 URL，该文件包含要加载的 XML 文档 或者 XML文本内容</param>
         /// <param name="map">map 数据</param>
         /// <returns>是否加载成功</returns>
-        public static Boolean LoadIntMap(String content, out Dictionary<Int32, Dictionary<String, String>> map)
+        public static bool LoadIntMap(string content, out Dictionary<int, Dictionary<string, string>> map)
         {
             try
             {
-                if (String.IsNullOrEmpty(content))
+                if (string.IsNullOrEmpty(content))
                 {
                     DebugUtils.Error("IsNullOrEmpty", "File not exist");
                     map = null;
@@ -846,9 +846,9 @@ namespace Nullspace
         /// </summary>
         /// <param name="xml">XML 文档</param>
         /// <returns>map 数据</returns>
-        public static Dictionary<Int32, Dictionary<String, String>> LoadIntMap(SecurityElement xml, string source)
+        public static Dictionary<int, Dictionary<string, string>> LoadIntMap(SecurityElement xml, string source)
         {
-            var result = new Dictionary<Int32, Dictionary<String, String>>();
+            var result = new Dictionary<int, Dictionary<string, string>>();
             if (xml.Children == null)
             {
                 return result;
@@ -867,14 +867,14 @@ namespace Nullspace
                 {
                     continue;
                 }
-                Int32 key = Int32.Parse(text);
+                int key = int.Parse(text);
                 if (result.ContainsKey(key))
                 {
-                    DebugUtils.Error("LoadIntMap", String.Format("Key {0} already exist, in {1}.", key, source));
+                    DebugUtils.Error("LoadIntMap", string.Format("Key {0} already exist, in {1}.", key, source));
                     continue;
                 }
 
-                var children = new Dictionary<String, String>();
+                var children = new Dictionary<string, string>();
                 result.Add(key, children);
                 for (int i = 1; i < subMap.Children.Count; i++)
                 {
@@ -885,7 +885,7 @@ namespace Nullspace
                         string tag = node.Tag;
                         if (!children.ContainsKey(tag))
                         {
-                            if (String.IsNullOrEmpty(node.Text))
+                            if (string.IsNullOrEmpty(node.Text))
                             {
                                 children.Add(tag, "IsNullOrEmpty");
                             }
@@ -896,7 +896,7 @@ namespace Nullspace
                         }
                         else
                         {
-                            DebugUtils.Error("LoadIntMap", String.Format("Key {0} already exist, index {1} of {2}.", node.Tag, i, node.ToString()));
+                            DebugUtils.Error("LoadIntMap", string.Format("Key {0} already exist, index {1} of {2}.", node.Tag, i, node.ToString()));
                         }
                     }
                 }
@@ -909,17 +909,17 @@ namespace Nullspace
         /// </summary>
         /// <param name="xml">XML 文档</param>
         /// <returns>map 数据</returns>
-        public static Dictionary<String, Dictionary<String, String>> LoadMap(SecurityElement xml)
+        public static Dictionary<string, Dictionary<string, string>> LoadMap(SecurityElement xml)
         {
-            var result = new Dictionary<String, Dictionary<String, String>>();
+            var result = new Dictionary<string, Dictionary<string, string>>();
             if (xml != null)
             {
                 foreach (SecurityElement subMap in xml.Children)
                 {
-                    String key = (subMap.Children[0] as SecurityElement).Text.Trim();
+                    string key = (subMap.Children[0] as SecurityElement).Text.Trim();
                     if (result.ContainsKey(key))
                     {
-                        Debug.LogError(String.Format("Key {0} already exist, in {1}.", key, xml.ToString()));
+                        Debug.LogError(string.Format("Key {0} already exist, in {1}.", key, xml.ToString()));
                         continue;
                     }
 
@@ -930,7 +930,7 @@ namespace Nullspace
                         var node = subMap.Children[i] as SecurityElement;
                         if (node != null && !children.ContainsKey(node.Tag))
                         {
-                            if (String.IsNullOrEmpty(node.Text))
+                            if (string.IsNullOrEmpty(node.Text))
                             {
                                 children.Add(node.Tag, "IsNullOrEmpty");
                             }
@@ -943,7 +943,7 @@ namespace Nullspace
                         {
                             if (node != null)
                             {
-                                DebugUtils.Error("LoadMap", String.Format("Key {0} already exist, index {1} of {2}.", node.Tag, i, node.ToString()));
+                                DebugUtils.Error("LoadMap", string.Format("Key {0} already exist, index {1} of {2}.", node.Tag, i, node.ToString()));
                             }
                         }
                     }
@@ -952,7 +952,7 @@ namespace Nullspace
             return result;
         }
 
-        public static String LoadText(String fileName)
+        public static string LoadText(string fileName)
         {
             try
             {
@@ -965,7 +965,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    return String.Empty;
+                    return string.Empty;
                 }
             }
             catch (Exception ex)
@@ -988,10 +988,10 @@ namespace Nullspace
         /// <exception cref="System.OutOfMemoryException">内存不足，无法为返回的字符串分配缓冲区。</exception>
         /// <exception cref="System.IO.IOException">发生 I/O 错误。</exception>
         /// <returns>编码安全对象的 XML 对象模型。</returns>
-        public static SecurityElement Load(String fileName)
+        public static SecurityElement Load(string fileName)
         {
-            String xmlText = LoadText(fileName);
-            if (String.IsNullOrEmpty(xmlText))
+            string xmlText = LoadText(fileName);
+            if (string.IsNullOrEmpty(xmlText))
             {
                 return null;
             }
@@ -1014,9 +1014,9 @@ namespace Nullspace
         /// <exception cref="System.OutOfMemoryException">内存不足，无法为返回的字符串分配缓冲区。</exception>
         /// <exception cref="System.IO.IOException">发生 I/O 错误。</exception>
         /// <returns>编码安全对象的 XML 对象模型。</returns>
-        public static SecurityElement LoadFromXmlStr(String xmlContent)
+        public static SecurityElement LoadFromXmlStr(string xmlContent)
         {
-            if (String.IsNullOrEmpty(xmlContent))
+            if (string.IsNullOrEmpty(xmlContent))
             {
                 return null;
             }
@@ -1031,7 +1031,7 @@ namespace Nullspace
         /// </summary>
         /// <param name="xml">包含要加载的 XML 文档的字符串。</param>
         /// <returns>编码安全对象的 XML 对象模型。</returns>
-        public static SecurityElement LoadXML(String xml)
+        public static SecurityElement LoadXML(string xml)
         {
             try
             {
@@ -1051,7 +1051,7 @@ namespace Nullspace
         /// </summary>
         /// <param name="fileName">文档名称</param>
         /// <param name="xml">XML内容</param>
-        public static void SaveBytes(String fileName, byte[] buffer)
+        public static void SaveBytes(string fileName, byte[] buffer)
         {
             if (!Directory.Exists(GetDirectoryName(fileName)))
             {
@@ -1081,7 +1081,7 @@ namespace Nullspace
         /// </summary>
         /// <param name="fileName">文档名称</param>
         /// <param name="text">XML内容</param>
-        public static void SaveText(String fileName, String text)
+        public static void SaveText(string fileName, string text)
         {
             if (!Directory.Exists(GetDirectoryName(fileName)))
             {
