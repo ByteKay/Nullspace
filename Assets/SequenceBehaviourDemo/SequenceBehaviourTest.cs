@@ -12,8 +12,11 @@ namespace Nullspace
         private void Start()
         {
             Seq = SequenceBehaviour.Create();
+            Seq.PrependInterval(3.0f);
             Seq.Insert(0.2f, transform.LocalScaleTo(new Vector3(4, 5, 5)), 4.0f);
-            Seq.Insert(0.2f, transform.RotateTo(Quaternion.FromToRotation(Vector3.back, Vector3.left)), 4.0f);
+            Seq.Append(transform.RotateTo(Quaternion.FromToRotation(Vector3.back, Vector3.left)), 4.0f);
+            Seq.InsertCallback(3.0f, InsertCallback, 2);
+            Seq.OnComplete(OnComplete, 4);
         }
 
         private void OnDestroy()
@@ -22,6 +25,24 @@ namespace Nullspace
             {
                 Seq.Kill();
             }
+        }
+
+        public void Update()
+        {
+            if (Seq != null)
+            {
+                DebugUtils.Info("SequenceBehaviourTest", "Update TimeLine ", Seq.TimeLine);
+            }
+        }
+
+        private void OnComplete(int id)
+        {
+            DebugUtils.Info("SequenceBehaviourTest", "OnComplete ", id);
+        }
+
+        private void InsertCallback(int id)
+        {
+            DebugUtils.Info("SequenceBehaviourTest", "InsertCallback ", id);
         }
     }
 }
