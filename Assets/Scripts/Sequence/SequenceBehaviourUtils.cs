@@ -195,6 +195,28 @@ namespace Nullspace
             return beh;
         }
 
+
+        public static BehaviourTimeCallback PathTo(this Transform trans, float duration, List<Vector3> waypoints, NavPathType pathType = NavPathType.LinePosLineDir, int subdivisions = 5)
+        {
+            FixedPathController pathCtrl = new FixedPathController();
+            AbstractNavPath navPath = NavPathUtils.Create(pathType, Vector3.zero, false, null, waypoints, subdivisions);
+            pathCtrl.StartMove(navPath, navPath.PathLength / duration, Vector3.zero, false);
+            pathCtrl.mCtlPosition = trans;
+            pathCtrl.mCtlRotate = trans;
+
+            Callback<FixedPathController, BehaviourTimeCallback> callback = new Callback<FixedPathController, BehaviourTimeCallback>();
+            callback.Arg1 = pathCtrl;
+            callback.Handler = (Action<FixedPathController, BehaviourTimeCallback>)PathTo;
+            BehaviourTimeCallback beh = new BehaviourTimeCallback(callback);
+            callback.Arg2 = beh;
+            return beh;
+        }
+
+        private static void PathTo(FixedPathController pathCtl, BehaviourTimeCallback beh)
+        {
+            pathCtl.Update(Time.deltaTime);
+        }
+
         private static void MoveTo(Transform trans, Vector3 start, Vector3 end, BehaviourTimeCallback beh)
         {
             if (trans != null)
