@@ -31,7 +31,7 @@ namespace Nullspace
         {
             if (Seq != null)
             {
-                DebugUtils.Info("SequenceBehaviourTest", "Update TimeLine ", Seq.TimeLine);
+                // DebugUtils.Info("SequenceBehaviourTest", "Update TimeLine ", Seq.TimeLine);
             }
         }
 

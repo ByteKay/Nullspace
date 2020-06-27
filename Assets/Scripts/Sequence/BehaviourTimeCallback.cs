@@ -16,18 +16,22 @@ namespace Nullspace
     public class BehaviourTimeCallback
     {
         public float StartTime;
-        private float Duration;
-        private float EndTime;
-        private AbstractCallback Callback;
-        private float TimeElappsed;
-        private ThreeState State;
-        private bool IsOneShot; // 只执行一次.起始时间等于结束时间
+        protected float Duration;
+        protected float EndTime;
+        protected AbstractCallback BeginCallback;
+        protected AbstractCallback ProcessCallback;
+        protected AbstractCallback EndCallback;
+        protected float TimeElappsed;
+        protected ThreeState State;
+        protected bool IsOneShot; // 只执行一次.起始时间等于结束时间
 
-        public BehaviourTimeCallback(AbstractCallback behaviour)
+        public BehaviourTimeCallback(AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
         {
             TimeElappsed = 0;
             State = ThreeState.Ready;
-            Callback = behaviour;
+            BeginCallback = begin;
+            ProcessCallback = process;
+            EndCallback = end;
             SetStartTime(0, 0);
         }
 
@@ -39,7 +43,7 @@ namespace Nullspace
             IsOneShot = StartTime == EndTime;
         }
 
-        public void Reset()
+        public virtual void Reset()
         {
             TimeElappsed = 0;
             State = ThreeState.Ready;
@@ -62,27 +66,30 @@ namespace Nullspace
             {
                 if (IsOneShot)
                 {
+                    // 此时 Duration == 0, 调用 Percent 可能会有问题
                     Process();
                     State = ThreeState.Finished;
-                    return false;
-                }
-                if (State == ThreeState.Ready)
-                {
-                    Begin();
-                    State = ThreeState.Playing;
-                }
-                if (TimeElappsed > EndTime)
-                {
-                    if (State == ThreeState.Playing)
-                    {
-                        State = ThreeState.Finished;
-                        End();
-                    }
                 }
                 else
                 {
-                    Debug.Assert(State == ThreeState.Playing, "wrong");
-                    Process();
+                    if (State == ThreeState.Ready)
+                    {
+                        Begin();
+                        State = ThreeState.Playing;
+                    }
+                    if (TimeElappsed > EndTime)
+                    {
+                        if (State == ThreeState.Playing)
+                        {
+                            State = ThreeState.Finished;
+                            End();
+                        }
+                    }
+                    else
+                    {
+                        Debug.Assert(State == ThreeState.Playing, "wrong");
+                        Process();
+                    }
                 }
             }
             return State != ThreeState.Finished;
@@ -96,19 +103,25 @@ namespace Nullspace
 
         public virtual void Begin()
         {
-
+            if (BeginCallback != null)
+            {
+                BeginCallback.Run();
+            }
         }
 
         public virtual void Process()
         {
-            if (Callback != null)
+            if (ProcessCallback != null)
             {
-                Callback.Run();
+                ProcessCallback.Run();
             }
         }
         public virtual void End()
         {
-
+            if (EndCallback != null)
+            {
+                EndCallback.Run();
+            }
         }
     }
 }
