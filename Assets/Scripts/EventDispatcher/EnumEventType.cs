@@ -10,5 +10,6 @@ namespace Nullspace
         JoystickPress,
         JoystickDrag,
         JoystickRelease,
+        SecondPast
     }
 }
