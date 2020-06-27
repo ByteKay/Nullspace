@@ -6,11 +6,11 @@ using System.Text;
 namespace Nullspace
 {
 
-    public class SequenceBehaviour
+    public class ParallelSequenceBehaviour : IUpdate
     {
-        public static SequenceBehaviour Create()
+        public static ParallelSequenceBehaviour Create()
         {
-            SequenceBehaviour sb = new SequenceBehaviour();
+            ParallelSequenceBehaviour sb = new ParallelSequenceBehaviour();
             SequenceBehaviourManager.Instance.AddSequence(sb);
             return sb;
         }
@@ -22,7 +22,7 @@ namespace Nullspace
         private float PrependTime;
         private float MaxDuration;
 
-        private SequenceBehaviour()
+        private ParallelSequenceBehaviour()
         {
             TimeLine = 0;
             State = ThreeState.Ready;
@@ -184,7 +184,7 @@ namespace Nullspace
                 foreach (BehaviourTimeCallback beh in Behaviours)
                 {
                     // 只要有一个没执行完，就代表没结束
-                    if (beh.Update(timeElappsed))
+                    if (!beh.IsFinished && beh.Update(timeElappsed))
                     {
                         completed = false;
                     }

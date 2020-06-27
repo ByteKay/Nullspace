@@ -250,5 +250,6 @@ namespace Nullspace
                 trans.localRotation = Quaternion.Lerp(start, end, beh.Percent);
             }
         }
+
     }
 }

@@ -24,7 +24,7 @@ namespace Nullspace
         protected float TimeElappsed;
         protected ThreeState State;
         protected bool IsOneShot; // 只执行一次.起始时间等于结束时间
-
+        public object Obj { get; set; }
         public BehaviourTimeCallback(AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
         {
             TimeElappsed = 0;
@@ -35,6 +35,22 @@ namespace Nullspace
             SetStartTime(0, 0);
         }
 
+        public BehaviourTimeCallback Begin(AbstractCallback begin)
+        {
+            BeginCallback = begin;
+            return this;
+        }
+
+        public BehaviourTimeCallback Process(AbstractCallback process)
+        {
+            ProcessCallback = process;
+            return this;
+        }
+        public BehaviourTimeCallback End(AbstractCallback end)
+        {
+            EndCallback = end;
+            return this;
+        }
         public void SetStartTime(float startTime, float duration)
         {
             StartTime = startTime;
@@ -96,7 +112,7 @@ namespace Nullspace
         }
 
         public bool IsPlaying { get { return State == ThreeState.Playing; } }
-
+        public bool IsFinished { get { return State == ThreeState.Finished; } }
         public float Elappsed { get { return Mathf.Clamp(TimeElappsed - StartTime, 0, Duration); } }
 
         public float Percent { get { return Mathf.Clamp((TimeElappsed - StartTime) / Duration, 0, 1); } }

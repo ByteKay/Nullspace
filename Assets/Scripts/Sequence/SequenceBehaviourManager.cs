@@ -8,11 +8,11 @@ namespace Nullspace
 {
     public class SequenceBehaviourManager : Singleton<SequenceBehaviourManager>
     {
-        private List<SequenceBehaviour> Behaviours;
+        private List<IUpdate> Behaviours;
         private List<int> FinishedList = new List<int>();
         private void Awake()
         {
-            Behaviours = new List<SequenceBehaviour>();
+            Behaviours = new List<IUpdate>();
         }
 
         public void Update()
@@ -21,7 +21,7 @@ namespace Nullspace
             FinishedList.Clear();
             for (int i = 0; i < count; ++i)
             {
-                SequenceBehaviour sb = Behaviours[i];
+                IUpdate sb = Behaviours[i];
                 sb.Update(Time.deltaTime);
                 if (!sb.IsPlaying)
                 {
@@ -38,7 +38,7 @@ namespace Nullspace
             }
         }
 
-        public void AddSequence(SequenceBehaviour seq)
+        public void AddSequence(IUpdate seq)
         {
             // 这里即使 Update 调用到这里，不会打断 循环
             Behaviours.Add(seq);

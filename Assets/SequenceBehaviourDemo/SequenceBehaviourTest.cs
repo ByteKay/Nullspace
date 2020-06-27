@@ -8,10 +8,10 @@ namespace Nullspace
 {
     public class SequenceBehaviourTest : MonoBehaviour
     {
-        private SequenceBehaviour Seq;
+        private ParallelSequenceBehaviour Seq;
         private void Start()
         {
-            Seq = SequenceBehaviour.Create();
+            Seq = ParallelSequenceBehaviour.Create();
             Seq.PrependInterval(3.0f);
             Seq.Insert(0.2f, transform.LocalScaleTo(new Vector3(4, 5, 5)), 4.0f);
             Seq.Append(transform.RotateTo(Quaternion.FromToRotation(Vector3.back, Vector3.left)), 4.0f);
