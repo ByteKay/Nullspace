@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
 
 namespace Nullspace
 {
-    /// <summary>
-    /// interval == 0, 表示非 loop
-    /// interval > 0, 表示 以 interval 循环
-    /// </summary>
-    public class TimerTaskQueue : Singleton<TimerTaskQueue>
+    public  class FrameTimerTaskHeap : Singleton<FrameTimerTaskHeap>
     {
         private int mNextTimerId;
         private int mCurrentTick;
         private PriorityQueue<int, TimerTask, int> mPriorityQueue;
-        private Stopwatch mStopWatch;
         private readonly object mQueueLock = new object();
 
         private void Awake()
         {
             mPriorityQueue = new PriorityQueue<int, TimerTask, int>();
-            mStopWatch = new Stopwatch();
             mCurrentTick = 0;
             mNextTimerId = 0;
         }
@@ -71,6 +68,7 @@ namespace Nullspace
             TimerTask p = GetTimerData(callback, start, interval);
             return AddTimer(p);
         }
+
         public void DelTimer(int timerId)
         {
             TimerTask p = null;
@@ -91,9 +89,7 @@ namespace Nullspace
 
         public void Tick()
         {
-            mCurrentTick += (int)mStopWatch.ElapsedMilliseconds;
-            mStopWatch.Reset();
-            mStopWatch.Start();
+            mCurrentTick += (int)(1000 * Time.deltaTime);
             while (mPriorityQueue.Size != 0)
             {
                 TimerTask p;
@@ -130,7 +126,6 @@ namespace Nullspace
         {
             mCurrentTick = 0;
             mNextTimerId = 0;
-            mStopWatch.Stop();
             lock (mQueueLock)
             {
                 while (mPriorityQueue.Size != 0)
@@ -163,6 +158,4 @@ namespace Nullspace
         public int NextTimerId { get { return ++mNextTimerId; } }
 
     }
-
 }
-
