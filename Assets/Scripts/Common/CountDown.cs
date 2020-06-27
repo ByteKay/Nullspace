@@ -24,25 +24,24 @@ namespace Nullspace
         /// <summary>
         /// days:天数；hours:小时数；minutes:分钟数；seconds:秒数
         /// </summary>
-        private int Days;
-        private int Hours;
-        private int Minutes;
-        private int Seconds;
-        private string CountingText;
-        private string StopText;
-        private string EndText;
+        private int mDays;
+        private int mHours;
+        private int mMinutes;
+        private int mSeconds;
+        private string mCountingText;
+        private string mStopText;
+        private string mEndText;
+        private Text mText;
+        private Action mEndAction;
+        private TimeStringType mTimeType;
+        private string mYearMonthSplitSign = "/";
+        private string mMonthDaySplitSign = "/";
+        private string mDayHourSplitSign = " ";
+        private string mHourMinuteSplitSign = ":";
+        private string mMinuteSecondSplitSign = ":";
+        private string mSecondSign = "";
         private bool IsStillCountingDown = true;
-        private TimeStringType TimeType;
-        private string YearMonthSplitSign = "/";
-        private string MonthDaySplitSign = "/";
-        private string DayHourSplitSign = " ";
-        private string HourMinuteSplitSign = ":";
-        private string MinuteSecondSplitSign = ":";
-        private string SecondSign = "";
-        private bool HasRelease = false;
-        private Text Text;
-        private Action EndAction;
-
+        private bool IsRelease = false;
         /// <summary>
         /// CD构造函数
         /// </summary>
@@ -50,18 +49,18 @@ namespace Nullspace
         /// <param name="theEndAction">CD结束时回调</param>
         public AutoCountDown(Text theLabel, Action theEndAction = null)
         {
-            Text = theLabel;
-            CountingText = "";
-            StopText = "";
-            EndText = "";
-            Days = 0;
-            Hours = 0;
-            Minutes = 0;
-            Seconds = 0;
+            mText = theLabel;
+            mCountingText = "";
+            mStopText = "";
+            mEndText = "";
+            mDays = 0;
+            mHours = 0;
+            mMinutes = 0;
+            mSeconds = 0;
             IsStillCountingDown = true;
-            EndAction = theEndAction;
-            TimeType = TimeStringType.UpToMinutes;
-            Text.text = FormatTime();
+            mEndAction = theEndAction;
+            mTimeType = TimeStringType.UpToMinutes;
+            mText.text = FormatTime();
             EnumEventDispatcher.AddEventListener(EnumEventType.SecondPast, CountDown);
         }
 
@@ -75,18 +74,18 @@ namespace Nullspace
         /// <param name="theEndAction">CD结束时回调</param>
         public AutoCountDown(Text theLabel, int theHours, int theMinutes, int theSeconds, Action theEndAction = null)
         {
-            Text = theLabel;
-            CountingText = "";
-            StopText = "";
-            EndText = "";
-            Days = 0;
-            Hours = theHours;
-            Minutes = theMinutes;
-            Seconds = theSeconds;
+            mText = theLabel;
+            mCountingText = "";
+            mStopText = "";
+            mEndText = "";
+            mDays = 0;
+            mHours = theHours;
+            mMinutes = theMinutes;
+            mSeconds = theSeconds;
             IsStillCountingDown = true;
-            EndAction = theEndAction;
-            TimeType = TimeStringType.UpToMinutes;
-            Text.text = FormatTime();
+            mEndAction = theEndAction;
+            mTimeType = TimeStringType.UpToMinutes;
+            mText.text = FormatTime();
             EnumEventDispatcher.AddEventListener(EnumEventType.SecondPast, CountDown);
         }
 
@@ -103,18 +102,18 @@ namespace Nullspace
         /// <param name="theEndAction">CD结束时回调</param>
         public AutoCountDown(Text theLabel, int theHours, int theMinutes, int theSeconds, string theCountingText, string theStopText, string theEndText, Action theEndAction = null)
         {
-            Text = theLabel;
-            CountingText = theCountingText;
-            StopText = theStopText;
-            EndText = theEndText;
-            Days = 0;
-            Hours = theHours;
-            Minutes = theMinutes;
-            Seconds = theSeconds;
+            mText = theLabel;
+            mCountingText = theCountingText;
+            mStopText = theStopText;
+            mEndText = theEndText;
+            mDays = 0;
+            mHours = theHours;
+            mMinutes = theMinutes;
+            mSeconds = theSeconds;
             IsStillCountingDown = true;
-            EndAction = theEndAction;
-            TimeType = TimeStringType.UpToMinutes;
-            Text.text = FormatTime();
+            mEndAction = theEndAction;
+            mTimeType = TimeStringType.UpToMinutes;
+            mText.text = FormatTime();
             EnumEventDispatcher.AddEventListener(EnumEventType.SecondPast, CountDown);
         }
 
@@ -132,18 +131,18 @@ namespace Nullspace
         /// <param name="theEndAction">CD结束时回调</param>
         public AutoCountDown(Text theLabel, int theHours, int theMinutes, int theSeconds, string theCountingText, string theStopText, string theEndText, TimeStringType theTimeStringType, Action theEndAction = null)
         {
-            Text = theLabel;
-            CountingText = theCountingText;
-            StopText = theStopText;
-            EndText = theEndText;
-            Days = 0;
-            Hours = theHours;
-            Minutes = theMinutes;
-            Seconds = theSeconds;
+            mText = theLabel;
+            mCountingText = theCountingText;
+            mStopText = theStopText;
+            mEndText = theEndText;
+            mDays = 0;
+            mHours = theHours;
+            mMinutes = theMinutes;
+            mSeconds = theSeconds;
             IsStillCountingDown = true;
-            EndAction = theEndAction;
-            TimeType = theTimeStringType;
-            Text.text = FormatTime();
+            mEndAction = theEndAction;
+            mTimeType = theTimeStringType;
+            mText.text = FormatTime();
             EnumEventDispatcher.AddEventListener(EnumEventType.SecondPast, CountDown);
         }
 
@@ -162,18 +161,18 @@ namespace Nullspace
         /// <param name="theEndAction">CD结束时回调</param>
         public AutoCountDown(Text theLabel, int theDays, int theHours, int theMinutes, int theSeconds, string theCountingText, string theStopText, string theEndText, TimeStringType theTimeStringType, Action theEndAction = null)
         {
-            Text = theLabel;
-            CountingText = theCountingText;
-            StopText = theStopText;
-            EndText = theEndText;
-            Days = theDays;
-            Hours = theHours;
-            Minutes = theMinutes;
-            Seconds = theSeconds;
+            mText = theLabel;
+            mCountingText = theCountingText;
+            mStopText = theStopText;
+            mEndText = theEndText;
+            mDays = theDays;
+            mHours = theHours;
+            mMinutes = theMinutes;
+            mSeconds = theSeconds;
             IsStillCountingDown = true;
-            EndAction = theEndAction;
-            TimeType = theTimeStringType;
-            Text.text = FormatTime();
+            mEndAction = theEndAction;
+            mTimeType = theTimeStringType;
+            mText.text = FormatTime();
             EnumEventDispatcher.AddEventListener(EnumEventType.SecondPast, CountDown);
         }
 
@@ -189,18 +188,18 @@ namespace Nullspace
         /// <param name="theEndAction">CD结束时回调</param>
         public AutoCountDown(Text theLabel, int secondsNum, string theCountingText, string theStopText, string theEndText, TimeStringType theTimeStringType, Action theEndAction = null)
         {
-            Text = theLabel;
-            CountingText = theCountingText;
-            StopText = theStopText;
-            EndText = theEndText;
-            Days = secondsNum / SECONDS_DAY;
-            Hours = secondsNum % SECONDS_DAY / SECONDS_HOUR;
-            Minutes = secondsNum % SECONDS_HOUR / SECONDS_MINUTE;
-            Seconds = secondsNum % SECONDS_MINUTE;
+            mText = theLabel;
+            mCountingText = theCountingText;
+            mStopText = theStopText;
+            mEndText = theEndText;
+            mDays = secondsNum / SECONDS_DAY;
+            mHours = secondsNum % SECONDS_DAY / SECONDS_HOUR;
+            mMinutes = secondsNum % SECONDS_HOUR / SECONDS_MINUTE;
+            mSeconds = secondsNum % SECONDS_MINUTE;
             IsStillCountingDown = true;
-            EndAction = theEndAction;
-            TimeType = theTimeStringType;
-            Text.text = FormatTime();
+            mEndAction = theEndAction;
+            mTimeType = theTimeStringType;
+            mText.text = FormatTime();
             EnumEventDispatcher.AddEventListener(EnumEventType.SecondPast, CountDown);
         }
 
@@ -209,7 +208,7 @@ namespace Nullspace
         /// </summary>
         ~AutoCountDown()
         {
-            if (!HasRelease)
+            if (!IsRelease)
             {
                 Release();
             }
@@ -222,7 +221,7 @@ namespace Nullspace
             {
                 EnumEventDispatcher.RemoveEventListener(EnumEventType.SecondPast, CountDown);
             }
-            HasRelease = true;
+            IsRelease = true;
         }
 
         /// <summary>
@@ -232,43 +231,43 @@ namespace Nullspace
         {
             if (IsStillCountingDown)
             {
-                Seconds--;
-                if (Seconds < 0)
+                mSeconds--;
+                if (mSeconds < 0)
                 {
-                    Seconds = 59;
-                    Minutes--;
-                    if (Minutes < 0)
+                    mSeconds = 59;
+                    mMinutes--;
+                    if (mMinutes < 0)
                     {
-                        Minutes = 59;
-                        Hours--;
-                        if (Hours < 0)
+                        mMinutes = 59;
+                        mHours--;
+                        if (mHours < 0)
                         {
-                            Days--;
-                            if (Days < 0)
+                            mDays--;
+                            if (mDays < 0)
                             {
                                 IsStillCountingDown = false;
                                 EnumEventDispatcher.RemoveEventListener(EnumEventType.SecondPast, CountDown);
-                                if (Text != null)
+                                if (mText != null)
                                 {
-                                    Text.text = EndText;
+                                    mText.text = mEndText;
                                 }
-                                if (EndAction != null)
+                                if (mEndAction != null)
                                 {
-                                    EndAction();
+                                    mEndAction();
                                 }
                                 return;
                             }
                             else
                             {
-                                Hours = 23;
+                                mHours = 23;
                             }
                         }
                     }
                 }
             }
-            if (Text != null)
+            if (mText != null)
             {
-                Text.text = FormatTime();
+                mText.text = FormatTime();
             } 
         }
 
@@ -278,9 +277,9 @@ namespace Nullspace
         public void StopCountDown()
         {
             IsStillCountingDown = false;
-            if (Text != null)
+            if (mText != null)
             {
-                Text.text = StopText;
+                mText.text = mStopText;
             }
         }
 
@@ -291,9 +290,9 @@ namespace Nullspace
         {
             IsStillCountingDown = false;
             EnumEventDispatcher.RemoveEventListener(EnumEventType.SecondPast, CountDown);
-            if (Text != null)
+            if (mText != null)
             {
-                Text.text = EndText;
+                mText.text = mEndText;
             }
         }
 
@@ -304,55 +303,55 @@ namespace Nullspace
         public int GetLastSeconds()
         {
             int lastSeconds = 0;
-            if (Days > 0)
+            if (mDays > 0)
             {
-                lastSeconds += Days * SECONDS_DAY;
+                lastSeconds += mDays * SECONDS_DAY;
             }
-            if (Hours > 0)
+            if (mHours > 0)
             {
-                lastSeconds += Hours * SECONDS_HOUR;
+                lastSeconds += mHours * SECONDS_HOUR;
             }
-            if (Minutes > 0)
+            if (mMinutes > 0)
             {
-                lastSeconds += Minutes * SECONDS_MINUTE;
+                lastSeconds += mMinutes * SECONDS_MINUTE;
             }
-            if (Seconds > 0)
+            if (mSeconds > 0)
             {
-                lastSeconds += Seconds;
+                lastSeconds += mSeconds;
             }
             return lastSeconds;
         }
 
         public void SetSplitSign(string splitSign)
         {
-            YearMonthSplitSign = splitSign;
-            MonthDaySplitSign = splitSign;
-            DayHourSplitSign = splitSign;
+            mYearMonthSplitSign = splitSign;
+            mMonthDaySplitSign = splitSign;
+            mDayHourSplitSign = splitSign;
 
-            HourMinuteSplitSign = splitSign;
-            MinuteSecondSplitSign = splitSign;
+            mHourMinuteSplitSign = splitSign;
+            mMinuteSecondSplitSign = splitSign;
         }
 
         public void SetSplitSign(string theHourMinuteSplitSign, string theMinuteSecondSplitSign)
         {
-            HourMinuteSplitSign = theHourMinuteSplitSign;
-            MinuteSecondSplitSign = theMinuteSecondSplitSign;
+            mHourMinuteSplitSign = theHourMinuteSplitSign;
+            mMinuteSecondSplitSign = theMinuteSecondSplitSign;
         }
 
         public void SetSplitSign(string theYearMonthSplitSign, string theMonthDaySplitSign, string theDayHourSplitSign, string theHourMinuteSplitSign, string theMinuteSecondSplitSign, string theSecondSign)
         {
-            YearMonthSplitSign = theYearMonthSplitSign;
-            MonthDaySplitSign = theMonthDaySplitSign;
-            DayHourSplitSign = theDayHourSplitSign;
+            mYearMonthSplitSign = theYearMonthSplitSign;
+            mMonthDaySplitSign = theMonthDaySplitSign;
+            mDayHourSplitSign = theDayHourSplitSign;
 
-            HourMinuteSplitSign = theHourMinuteSplitSign;
-            MinuteSecondSplitSign = theMinuteSecondSplitSign;
-            SecondSign = theSecondSign;
+            mHourMinuteSplitSign = theHourMinuteSplitSign;
+            mMinuteSecondSplitSign = theMinuteSecondSplitSign;
+            mSecondSign = theSecondSign;
         }
 
         public void UpdateCountingText(string newCountingText, bool isFlushNow = false)
         {
-            CountingText = newCountingText;
+            mCountingText = newCountingText;
             if (isFlushNow)
             {
                 FormatTime();
@@ -361,7 +360,7 @@ namespace Nullspace
 
         public void UpdateStopText(string newStopText, bool isFlushNow = false)
         {
-            StopText = newStopText;
+            mStopText = newStopText;
             if (isFlushNow)
             {
                 StopCountDown();
@@ -370,7 +369,7 @@ namespace Nullspace
 
         public void UpdateEndText(string newEndText, bool isFlushNow = false)
         {
-            EndText = newEndText;
+            mEndText = newEndText;
             if (isFlushNow)
             {
                 EndCountDown();
@@ -382,34 +381,34 @@ namespace Nullspace
             string hoursString = string.Empty;
             string minutesString = string.Empty;
             string secondsString = string.Empty;
-            if (Hours < 10)
+            if (mHours < 10)
             {
-                hoursString = string.Concat("0", Hours.ToString());
+                hoursString = string.Concat("0", mHours.ToString());
             }
             else
             {
-                hoursString = Hours.ToString();
+                hoursString = mHours.ToString();
             }
 
-            if (Minutes < 10)
+            if (mMinutes < 10)
             {
-                minutesString = string.Concat("0", Minutes.ToString());
+                minutesString = string.Concat("0", mMinutes.ToString());
             }
             else
             {
-                minutesString = Minutes.ToString();
+                minutesString = mMinutes.ToString();
             }
 
-            if (Seconds < 10)
+            if (mSeconds < 10)
             {
-                secondsString = string.Concat("0", Seconds.ToString());
+                secondsString = string.Concat("0", mSeconds.ToString());
             }
             else
             {
-                secondsString = Seconds.ToString();
+                secondsString = mSeconds.ToString();
             }
             StrBuilder.Length = 0;
-            switch (TimeType)
+            switch (mTimeType)
             {
                 case TimeStringType.Full:
                     return string.Empty;
@@ -418,21 +417,21 @@ namespace Nullspace
                     return string.Empty;
 
                 case TimeStringType.UpToDay:
-                    if (Days > 0)
+                    if (mDays > 0)
                     {
-                        StrBuilder.Append(CountingText).Append(Days).Append(DayHourSplitSign).Append(hoursString).Append(HourMinuteSplitSign).Append(minutesString).Append(MinuteSecondSplitSign).Append(secondsString).Append(SecondSign);
+                        StrBuilder.Append(mCountingText).Append(mDays).Append(mDayHourSplitSign).Append(hoursString).Append(mHourMinuteSplitSign).Append(minutesString).Append(mMinuteSecondSplitSign).Append(secondsString).Append(mSecondSign);
                     }
-                    else if (Hours > 0)
+                    else if (mHours > 0)
                     {
-                        StrBuilder.Append(CountingText).Append(hoursString).Append(HourMinuteSplitSign).Append(minutesString).Append(MinuteSecondSplitSign).Append(secondsString).Append(SecondSign);
+                        StrBuilder.Append(mCountingText).Append(hoursString).Append(mHourMinuteSplitSign).Append(minutesString).Append(mMinuteSecondSplitSign).Append(secondsString).Append(mSecondSign);
                     }
-                    else if (Minutes > 0)
+                    else if (mMinutes > 0)
                     {
-                        StrBuilder.Append(CountingText).Append(minutesString).Append(MinuteSecondSplitSign).Append(secondsString).Append(SecondSign);
+                        StrBuilder.Append(mCountingText).Append(minutesString).Append(mMinuteSecondSplitSign).Append(secondsString).Append(mSecondSign);
                     }
-                    else if (Seconds > 0)
+                    else if (mSeconds > 0)
                     {
-                        StrBuilder.Append(CountingText).Append(minutesString).Append(MinuteSecondSplitSign).Append(secondsString).Append(SecondSign);
+                        StrBuilder.Append(mCountingText).Append(minutesString).Append(mMinuteSecondSplitSign).Append(secondsString).Append(mSecondSign);
                     }
                     return StrBuilder.ToString();
 
@@ -440,25 +439,25 @@ namespace Nullspace
                     return string.Empty;
 
                 case TimeStringType.UpToHour:
-                    return StrBuilder.Append(CountingText).Append(hoursString).Append(HourMinuteSplitSign).Append(minutesString).Append(MinuteSecondSplitSign).Append(secondsString).ToString();
+                    return StrBuilder.Append(mCountingText).Append(hoursString).Append(mHourMinuteSplitSign).Append(minutesString).Append(mMinuteSecondSplitSign).Append(secondsString).ToString();
 
                 case TimeStringType.UpToMinutes:
-                    return StrBuilder.Append(CountingText).Append(minutesString).Append(MinuteSecondSplitSign).Append(secondsString).ToString();
+                    return StrBuilder.Append(mCountingText).Append(minutesString).Append(mMinuteSecondSplitSign).Append(secondsString).ToString();
 
                 case TimeStringType.UpToSecond:
-                    return StrBuilder.Append(Seconds).ToString();
+                    return StrBuilder.Append(mSeconds).ToString();
 
                 case TimeStringType.UpToDayHour:
                     {
-                        string formatTime = CountingText;
-                        if (Days > 0)
+                        string formatTime = mCountingText;
+                        if (mDays > 0)
                         {
-                            formatTime += string.Format("剩余{0}天{1}小时", Days, Hours + 1);
+                            formatTime += string.Format("剩余{0}天{1}小时", mDays, mHours + 1);
                             return formatTime;
                         }
                         else
                         {
-                            formatTime += string.Format("剩余{0}小时", Hours + 1);
+                            formatTime += string.Format("剩余{0}小时", mHours + 1);
                             return formatTime;
                         }
                     }
