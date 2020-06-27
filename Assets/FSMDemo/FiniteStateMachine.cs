@@ -28,10 +28,10 @@ namespace Nullspace
         {
             StateCtl = new StateController<AIState>();
             StateCtl.AddParameter(AIParameterName.Distance, StateParameterDataType.FLOAT, 6.0f);
-            StateCtl.AddState(AIState.IDLE).AsCurrent().Enter(IdleEnter).Process(IdleProcess).Exit(IdleExit).AddTransfer(AIState.FLEE).With(AIParameterName.Distance, StateConditionType.LESS, 4.0f);
-            StateCtl.AddState(AIState.FLEE).Enter(FleeEnter).Process(FleeProcess).Exit(FleeExit).AddTransfer(AIState.IDLE).With(AIParameterName.Distance, StateConditionType.GREATER_EQUAL, 4.0f);
-            StateCtl.AddState(AIState.FOLLOW).Enter(FollowEnter).Process(FollowProcess).Exit(FollowExit).AddTransfer(AIState.IDLE).With(AIParameterName.Distance, StateConditionType.LESS, 10.0f);
-            StateCtl.AddState(AIState.IDLE).AddTransfer(AIState.FOLLOW).With(AIParameterName.Distance, StateConditionType.GREATER_EQUAL, 10.0f);
+            StateCtl.AddState(AIState.IDLE).AsCurrent().Enter(IdleEnter).Process(IdleProcess).Exit(IdleExit).AddTransfer(AIState.FLEE).With(AIParameterName.Distance, ConditionOperationType.LESS, 4.0f);
+            StateCtl.AddState(AIState.FLEE).Enter(FleeEnter).Process(FleeProcess).Exit(FleeExit).AddTransfer(AIState.IDLE).With(AIParameterName.Distance, ConditionOperationType.GREATER_EQUAL, 4.0f);
+            StateCtl.AddState(AIState.FOLLOW).Enter(FollowEnter).Process(FollowProcess).Exit(FollowExit).AddTransfer(AIState.IDLE).With(AIParameterName.Distance, ConditionOperationType.LESS, 10.0f);
+            StateCtl.AddState(AIState.IDLE).AddTransfer(AIState.FOLLOW).With(AIParameterName.Distance, ConditionOperationType.GREATER_EQUAL, 10.0f);
         }
 
         private void Update()

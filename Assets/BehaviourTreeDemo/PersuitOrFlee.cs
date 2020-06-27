@@ -9,7 +9,7 @@ namespace Nullspace
     public class DistanceCondition : BTConditionSingleOperation<PersuitOrFlee>
     {
 
-        public DistanceCondition(BTConditionLogic logic, object targetValue, MethodInfo getter) : base(logic, BTConditionValueType.NUMBER, targetValue, getter)
+        public DistanceCondition(ConditionOperationType logic, object targetValue, MethodInfo getter) : base(logic, BTConditionValueType.NUMBER, targetValue, getter)
         {
 
         }
@@ -71,12 +71,12 @@ namespace Nullspace
 
             BTSequenceNode<PersuitOrFlee> lessSeq = new BTSequenceNode<PersuitOrFlee>();
             root.AddChild(lessSeq);
-            lessSeq.AddChild(new DistanceCondition(BTConditionLogic.LESS, 3.0f, GetDistanceMethod));
+            lessSeq.AddChild(new DistanceCondition(ConditionOperationType.LESS, 3.0f, GetDistanceMethod));
             lessSeq.AddChild(new DistanceLessAction());
 
             BTSequenceNode<PersuitOrFlee> greaterSeq = new BTSequenceNode<PersuitOrFlee>();
             root.AddChild(greaterSeq);
-            greaterSeq.AddChild(new DistanceCondition(BTConditionLogic.GREATER, 8.0f, GetDistanceMethod));
+            greaterSeq.AddChild(new DistanceCondition(ConditionOperationType.GREATER, 8.0f, GetDistanceMethod));
             greaterSeq.AddChild(new DistanceGreaterAction());
 
             root.AddChild(new DistanceStayAction());

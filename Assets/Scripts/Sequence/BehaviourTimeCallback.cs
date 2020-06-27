@@ -21,6 +21,7 @@ namespace Nullspace
         private AbstractCallback Callback;
         private float TimeElappsed;
         private ThreeState State;
+        private bool IsOneShot; // 只执行一次.起始时间等于结束时间
 
         public BehaviourTimeCallback(AbstractCallback behaviour)
         {
@@ -35,6 +36,7 @@ namespace Nullspace
             StartTime = startTime;
             Duration = duration;
             EndTime = StartTime + Duration;
+            IsOneShot = StartTime == EndTime;
         }
 
         public void Reset()
@@ -46,17 +48,24 @@ namespace Nullspace
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="time">step time</param>
+        /// <param name="timeLine">absolute time</param>
         /// <returns>执行结束，返回 false; 否之，返回 true</returns>
-        public bool Update(float time)
+        public bool Update(float timeLine)
         {
             if (State == ThreeState.Finished)
             {
                 return false;
             }
-            TimeElappsed += time;
+            // 这里是绝对时长
+            TimeElappsed = timeLine;
             if (TimeElappsed >= StartTime)
             {
+                if (IsOneShot)
+                {
+                    Process();
+                    State = ThreeState.Finished;
+                    return false;
+                }
                 if (State == ThreeState.Ready)
                 {
                     Begin();
@@ -87,10 +96,7 @@ namespace Nullspace
 
         public virtual void Begin()
         {
-            if (Callback != null)
-            {
-                Callback.Run();
-            }
+
         }
 
         public virtual void Process()
@@ -102,10 +108,7 @@ namespace Nullspace
         }
         public virtual void End()
         {
-            if (Callback != null)
-            {
-                Callback.Run();
-            }
+
         }
     }
 }

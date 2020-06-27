@@ -19,6 +19,8 @@ namespace Nullspace
         private List<BehaviourTimeCallback> Behaviours;
         private ThreeState State;
         private AbstractCallback OnCompletedCallback;
+        private float PrependTime;
+        private float MaxDuration;
 
         private SequenceBehaviour()
         {
@@ -26,6 +28,8 @@ namespace Nullspace
             State = ThreeState.Ready;
             Behaviours = new List<BehaviourTimeCallback>();
             OnCompletedCallback = null;
+            PrependTime = 0.0f;
+            MaxDuration = 0.0f;
         }
 
         public void Insert(float time, BehaviourTimeCallback callback, float duration)
@@ -34,12 +38,37 @@ namespace Nullspace
             {
                 callback.SetStartTime(time, duration);
                 Behaviours.Add(callback);
+                float target = time + duration;
+                MaxDuration = Math.Max(MaxDuration, target);
+            }
+        }
+
+        public void InsertCallback(float time, BehaviourTimeCallback callback)
+        {
+            if (State == ThreeState.Ready)
+            {
+                // 以当前最大结束时间作为开始时间点
+                Insert(time, callback, 0);
+            }
+        }
+
+        public void Append(BehaviourTimeCallback callback, float duration)
+        {
+            if (State == ThreeState.Ready)
+            {
+                // 以当前最大结束时间作为开始时间点
+                Insert(MaxDuration, callback, duration);
             }
         }
 
         public void OnComplete(AbstractCallback callback)
         {
             OnCompletedCallback = callback;
+        }
+
+        public void PrependInterval(float interval)
+        {
+            PrependTime = interval;
         }
 
         public bool IsPlaying { get { return State == ThreeState.Playing; } }
@@ -54,11 +83,16 @@ namespace Nullspace
             }
             if (IsPlaying)
             {
+                TimeLine += time;
+                if (TimeLine < PrependTime)
+                {
+                    return;
+                }
                 bool completed = true;
                 foreach (BehaviourTimeCallback beh in Behaviours)
                 {
                     // 只要有一个没执行完，就代表没结束
-                    if (beh.Update(time))
+                    if (beh.Update(TimeLine))
                     {
                         completed = false;
                     }
