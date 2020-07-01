@@ -248,6 +248,8 @@ namespace Nullspace
                 {
                     Pools.Remove(type);
                 }
+                // 这个可以屏蔽
+                // GC.Collect();
             }
         }
 
