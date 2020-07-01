@@ -10,10 +10,12 @@ namespace Nullspace
         public Vector3 size;
         public float zmin;
         public float zmax;
+
         public bbox()
         {
 
         }
+
         public void ToMidSize()
         {
             mid = (min + max) * 0.5f;
