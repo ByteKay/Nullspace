@@ -11,11 +11,15 @@ namespace Nullspace
         private Mesh mesh;
         private Material material;
         private int layer;
-
+        private bool isOpaque;
+        private Renderer render;
         private void Awake()
         {
             mesh = GetComponent<MeshFilter>().sharedMesh;
-            material = GetComponent<MeshRenderer>().material;
+            render = GetComponent<Renderer>();
+            material = render.material;
+            isOpaque = material.shader.renderQueue < 3000;
+            render.enabled = false;
         }
 
         public void DrawMesh()

@@ -29,7 +29,7 @@ namespace Nullspace
             }
         }
 
-        public void Update()
+        public void LateUpdate()
         {
             foreach (MannulDraw draw in DrawObjects.Values)
             {
