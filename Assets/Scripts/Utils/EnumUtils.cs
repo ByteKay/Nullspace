@@ -16,10 +16,16 @@ namespace Nullspace
             return (T)Enum.Parse(typeof(T), value);
         }
 
+        public static U EnumToBaseType<T, U>(T value)
+        {
+            return (U)(System.Object)value;
+        }
+
         public static int EnumToInt<T>(T value)
         {
-            return (int)(System.Object)value;
+            return EnumToBaseType<T, int>(value);
         }
+
         public static T IntToEnum<T>(int value)
         {
             return (T)Enum.ToObject(typeof(T), value);
