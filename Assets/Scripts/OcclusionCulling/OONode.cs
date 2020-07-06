@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 namespace Nullspace
 {
     public class OONode
@@ -155,25 +157,27 @@ namespace Nullspace
 
         private void Split()
         {
-            float dx, dy, dz;
             Left = new OONode();
             Right = new OONode();
             Right.Level = Left.Level = Level + 1;
             Left.Parent = Right.Parent = this;
-            dx = Box.Size[0];
-            dy = Box.Size[1];
-            dz = Box.Size[2];
-            if ((dx > dy) && (dx > dz))
-                SplitAxis = AXIS_X;
-            else if (dy > dz)
-                SplitAxis = AXIS_Y;
-            else
-                SplitAxis = AXIS_Z;
+            SplitAxis = GetSplitAxis(ref Box.Size);
             mSplitValue = Box.Mid[SplitAxis];
             Left.Box = Right.Box = Box;
-            Left.Box.Size[SplitAxis] = Right.Box.Size[SplitAxis] = 0.5f * Box.Size[SplitAxis];
-            Left.Box.Mid[SplitAxis] = Box.Mid[SplitAxis] - Box.Size[SplitAxis] * 0.5f;
-            Right.Box.Mid[SplitAxis] = Box.Mid[SplitAxis] + Box.Size[SplitAxis] * 0.5f;
+            float half = 0.5f * Box.Size[SplitAxis];
+            Left.Box.Size[SplitAxis] = Right.Box.Size[SplitAxis] = half;
+            Left.Box.Mid[SplitAxis] = Box.Mid[SplitAxis] - half;
+            Right.Box.Mid[SplitAxis] = Box.Mid[SplitAxis] + half;
+        }
+
+        private int GetSplitAxis(ref Vector3 size)
+        {
+            if ((size[0] > size[1]) && (size[0] > size[2]))
+                return AXIS_X;
+            else if (size[1] > size[2])
+                return AXIS_Y;
+            else
+                return AXIS_Z;
         }
     }
 }

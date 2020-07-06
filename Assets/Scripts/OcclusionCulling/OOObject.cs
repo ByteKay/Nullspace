@@ -5,21 +5,29 @@ namespace Nullspace
 {
     public class OOObject
     {
-
-        public OOItem Tail;
         public Matrix4x4 Transform;
-        public int IsVisible;
         public OOModel Model;
-        public int Id;
-        public OOObject Next;
-        public int TouchId;
-        public int DoubleId;
-        public OOItem Head;
-        public int CanOcclude;
         public OOBox Box;
 
-        public OOObject()
+        public OOObject Next;
+        public OOItem Head;
+        public OOItem Tail;
+
+        public int TouchId;
+        public int DoubleId;
+        public int CanOcclude;
+        public int IsVisible;
+
+        private MannulDraw Drawer;
+        private int Id;
+
+        public OOObject(MannulDraw drawer)
         {
+            Drawer = drawer;
+            MeshFilter mf = drawer.gameObject.GetComponent<MeshFilter>();
+            Model = new OOModel(mf);
+            SetTransform(drawer.transform.localToWorldMatrix);
+
             Head = new OOItem();
             Tail = new OOItem();
             Tail.CNext = null;
@@ -27,15 +35,27 @@ namespace Nullspace
             Head.CNext = Tail;
             Tail.CPrev = Head;
             CanOcclude = 1;
-            Model = null;
         }
 
-        public void UseModel(OOModel md)
+        public void SetObjectId(int id)
         {
-            Model = md;
+            Id = id;
         }
 
-        public void SetTransform(ref Matrix4x4 m)
+        public int GetObjectId()
+        {
+            return Id;
+        }
+
+        public void Draw()
+        {
+            if (Drawer != null)
+            {
+                Drawer.DrawMesh();
+            }
+        }
+
+        public void SetTransform(Matrix4x4 m)
         {
             Transform = m;
             Box.Mid = m * Model.Box.Mid;
@@ -66,21 +86,5 @@ namespace Nullspace
             Tail.CPrev = Head;
         }
 
-        public void SetID(int ident)
-        {
-            Id = ident;
-        }
-        public int GetID()
-        {
-            return Id;
-        }
-        public int GetModelID()
-        {
-            return Model.Id;
-        }
-        public void GetTransform(ref Matrix4x4 m)
-        {
-            m = Transform;
-        }
     }
 }

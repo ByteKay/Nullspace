@@ -61,7 +61,11 @@ namespace Nullspace
         public const int OOCE_OCCLUSION_CULLING = 1;
         public const int OOCE_OCCLUSION_CULLING_OLD = 2;
 
+        private Camera MainCamera;
+
         private OOFrustum mFrustum;
+        private OOClipper mClip;
+
         private OOObject mVisible;
         private OOObject mTail;
         private OOObject mTemp;
@@ -73,7 +77,6 @@ namespace Nullspace
         private PriorityQueue<float, object, float> mMaxQueue;
         private Vector3 mLook;
         private Vector3 mAbsLook;
-        private OOClipper mClip;
         private float mSafeDistance;
         private int mMaxItems;
         private int mMaxLevel;
@@ -97,15 +100,22 @@ namespace Nullspace
         {
             Tree.Init(ref min, ref max);
         }
-        public void Camera(ref Matrix4x4 modelview, ref Matrix4x4 projection, ref Vector3 pos)
+
+        public void Camera(Camera camera)
         {
-            mMTR = modelview * projection;
-            mModelView = modelview;
-            mProject = projection;
-            mPosition = pos;
-            mLook = modelview.GetColumn(2);
+            MainCamera = camera;
+            UpdateCameraMatrix();
+        }
+
+        private void UpdateCameraMatrix()
+        {
+            mMTR = MainCamera.previousViewProjectionMatrix;
+            mModelView = MainCamera.worldToCameraMatrix;
+            mProject = MainCamera.projectionMatrix;
+            mPosition = MainCamera.transform.position;
+            mLook = mModelView.GetColumn(2);
             mAbsLook = mLook.Abs();
-            mFrustum.Set(ref mMTR, ref pos);
+            mFrustum.Set(ref mMTR, ref mPosition);
         }
 
         public void SetResolution(int x, int y)
@@ -124,12 +134,6 @@ namespace Nullspace
         public void Add(OOObject obj)
         {
             Tree.Add(obj);
-        }
-
-        public void Set(OOObject obj, ref Matrix4x4 m)
-        {
-            obj.SetTransform(ref m);
-            Tree.Refresh(obj);
         }
 
         public void Remove(OOObject obj)
@@ -177,12 +181,7 @@ namespace Nullspace
 
         public int GetObjectID()
         {
-            return mTemp.Id;
-        }
-
-        public int GetModelID()
-        {
-            return mTemp.Model.Id; 
+            return mTemp.GetObjectId();
         }
 
         public int GetFirstObject()
@@ -496,7 +495,7 @@ namespace Nullspace
             OOModel mdl = obj.Model;
             Matrix4x4 mcb = mModelView * obj.Transform;
 
-            for (int i = 0; i < mdl.NVertices; i++)
+            for (int i = 0; i < mdl.NumVert; i++)
             {
                 mdl.CVertices[i] = mcb * mdl.Vertices[i];
                 mdl.TVertices[i] = mProject * mdl.CVertices[i];
@@ -505,7 +504,7 @@ namespace Nullspace
             int xmax = 0;
             int ymin = 100000;
             int ymax = 0;
-            for (int i = 0; i < mdl.NFaces; i++)
+            for (int i = 0; i < mdl.NumFace; i++)
             {
                 int p1 = mdl.Faces[i][0];
                 int p2 = mdl.Faces[i][1];

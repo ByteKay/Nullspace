@@ -6,59 +6,46 @@ namespace Nullspace
 {
     public class OOModel
     {
-        public List<Vector3> Vertices;
-        public List<Vector3> CVertices;
-        public List<Vector4> TVertices;
-        public List<Vector3i> Faces;
-        public int NVertices;
         public int Id;
-        public int NFaces;
+        public MeshFilter MeshFilter;
+
+        public Vector3[] Vertices;
+        public Vector3i[] Faces;
+        public int NumVert;
+        public int NumFace;
         public OOBox Box;
+        public Vector3[] CVertices;
+        public Vector4[] TVertices;
 
-        public OOModel()
+        public OOModel(MeshFilter filter)
         {
-            Vertices = null;
-            Faces = null;
-            TVertices = null;
-            CVertices = null;
-            Box = new OOBox(Vector3.zero, Vector3.zero);
+            MeshFilter = filter;
+            MeshFilter.sharedMesh.RecalculateBounds();
+            Vertices = MeshFilter.sharedMesh.vertices;
+            Faces = ArrayToList(MeshFilter.sharedMesh.triangles);
+            NumVert = Vertices.Length;
+            NumFace = Faces.Length;
+            CVertices = new Vector3[NumVert];
+            TVertices = new Vector4[NumVert];
+            Bounds b = MeshFilter.sharedMesh.bounds;
+            Box = new OOBox(b.min, b.max);
         }
 
-        public void Define(List<Vector3> v, int nv, List<Vector3i> f, int nf)
+        private Vector3i[] ArrayToList(int[] triangles)
         {
-            int i;
-            NFaces = nf;
-            NVertices = nv;
-            Vertices = v;
-            Faces = f;
-            TVertices = new List<Vector4>(nv);
-            CVertices = new List<Vector3>(nv);
-
-            Box.Begin();
-            for (i = 0; i < nv; i++)
-                Box.Add(v[i]);
-            Box.ToMidSize();
-        }
-
-        public void SetBox(Vector3 min, Vector3 max)
-        {
-            Box = new OOBox(min, max);
-            Box.ToMidSize();
-        }
-
-        public void DefineBox(List<Vector3> v, int nv)
-        {
-            Box.Begin();
-            for (int i = 0; i < nv; i++)
+            int len = triangles.Length;
+            Vector3i[] faces = new Vector3i[len / 3];
+            
+            for (int i = 0; i < len; i += 3)
             {
-                Box.Add(v[i]);
+                faces[i] = new Vector3i(triangles[i], triangles[i + 1], triangles[i + 2]);
             }
-            Box.ToMidSize();
+            return faces;
         }
-
-        public void SetID(int setid)
+        
+        public void SetId(int id)
         {
-            Id = setid;
+            Id = id;
         }
     }
 }
