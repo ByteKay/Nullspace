@@ -9,7 +9,7 @@ namespace Nullspace
         public const int AXIS_Y = 0;
         public const int AXIS_Z = 0;
         public const int LEAF = 0;
-        private static int DOUBLE_COUNTER = 0;
+        private static int DoubleCounter = 0;
 
         public int ItemCount;
         public int Level;
@@ -28,6 +28,7 @@ namespace Nullspace
             Left = null;
             Right = null;
             Parent = null;
+            Box = new OOBox();
             SplitAxis = LEAF;
             Visible = 0;
             ItemCount = 0;
@@ -49,29 +50,29 @@ namespace Nullspace
 
         public void Distribute(int max_level, int max_items)
         {
-            OOItem i1;
-            OOItem i2;
-            float mid;
-            float size;
-
             if (Level < max_level && (SplitAxis != LEAF || ItemCount > max_items))
             {
                 if (SplitAxis == LEAF)
+                {
                     Split();
+                }
                 while (Head.Next != Tail)
                 {
-                    i1 = Head.Next;
+                    OOItem i1 = Head.Next;
                     i1.Detach();
-                    mid = i1.Obj.Box.Mid[SplitAxis];
-                    size = i1.Obj.Box.Size[SplitAxis];
+                    float mid = i1.Obj.Box.Mid[SplitAxis];
+                    float size = i1.Obj.Box.Size[SplitAxis];
                     if (mid + size < mSplitValue)
+                    {
                         i1.Attach(Left);
-                    else
-                    if (mid - size > mSplitValue)
+                    }
+                    else if (mid - size > mSplitValue)
+                    {
                         i1.Attach(Right);
+                    }
                     else
                     {
-                        i2 = i1.Split();
+                        OOItem i2 = i1.Split();
                         i1.Attach(Left);
                         i2.Attach(Right);
                     }
@@ -82,29 +83,29 @@ namespace Nullspace
 
         public void FullDistribute(int max_level, int max_items)
         {
-            OOItem i1;
-            OOItem i2;
-            float mid;
-            float size;
-
             if (Level < max_level && (SplitAxis != LEAF || ItemCount > max_items))
             {
                 if (SplitAxis == LEAF)
+                {
                     Split();
+                }
                 while (Head.Next != Tail)
                 {
-                    i1 = Head.Next;
+                    OOItem i1 = Head.Next;
                     i1.Detach();
-                    mid = i1.Obj.Box.Mid[SplitAxis];
-                    size = i1.Obj.Box.Size[SplitAxis];
+                    float mid = i1.Obj.Box.Mid[SplitAxis];
+                    float size = i1.Obj.Box.Size[SplitAxis];
                     if (mid + size < mSplitValue)
+                    {
                         i1.Attach(Left);
-                    else
-                    if (mid - size > mSplitValue)
+                    }
+                    else if (mid - size > mSplitValue)
+                    {
                         i1.Attach(Right);
+                    }
                     else
                     {
-                        i2 = i1.Split();
+                        OOItem i2 = i1.Split();
                         i1.Attach(Left);
                         i2.Attach(Right);
                     }
@@ -116,10 +117,9 @@ namespace Nullspace
 
         public void DeleteItems()
         {
-            OOItem i1;
             while (Head.Next != Tail)
             {
-                i1 = Head.Next;
+                OOItem i1 = Head.Next;
                 i1.Detach();
                 i1.Unlink();
             }
@@ -127,27 +127,37 @@ namespace Nullspace
 
         private void Merge(int max_items)
         {
-            OOItem i1;
-            if (SplitAxis == LEAF) return;
+            if (SplitAxis == LEAF)
+            {
+                return;
+            }
             if (Left.SplitAxis != LEAF || Right.SplitAxis != LEAF)
+            {
                 return;
+            }
             if (Left.ItemCount + Right.ItemCount >= max_items)
+            {
                 return;
-            DOUBLE_COUNTER++;
+            }
+            DoubleCounter++;
+            OOItem i1;
             while (Left.Head.Next != Left.Tail)
             {
                 i1 = Left.Head.Next;
                 i1.Detach();
                 i1.Attach(this);
-                i1.Obj.DoubleId = DOUBLE_COUNTER;
+                i1.Obj.DoubleId = DoubleCounter;
             }
             while (Right.Head.Next != Right.Tail)
             {
                 i1 = Right.Head.Next;
                 i1.Detach();
-                if (i1.Obj.DoubleId != DOUBLE_COUNTER)
+                if (i1.Obj.DoubleId != DoubleCounter)
+                {
                     i1.Attach(this);
-                else {
+                }
+                else
+                {
                     i1.Unlink();
                 }
             }
@@ -173,11 +183,17 @@ namespace Nullspace
         private int GetSplitAxis(ref Vector3 size)
         {
             if ((size[0] > size[1]) && (size[0] > size[2]))
+            {
                 return AXIS_X;
+            }
             else if (size[1] > size[2])
+            {
                 return AXIS_Y;
+            }
             else
+            {
                 return AXIS_Z;
+            }
         }
     }
 }

@@ -31,9 +31,13 @@ namespace Nullspace
             Vector3 absV = (obj.Box.Mid - nd.Box.Mid).Abs();
             Vector3 sizeV = nd.Box.Size - obj.Box.Size;
             if (absV.Less(sizeV))
+            {
                 return;
-            while (nd.Parent != null && absV.AnyGreater(sizeV)) 
+            }
+            while (nd.Parent != null && absV.AnyGreater(sizeV))
+            {
                 nd = nd.Parent;
+            }
             obj.Detach();
             nd.AddObject(obj);
         }

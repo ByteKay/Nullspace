@@ -6,9 +6,7 @@ namespace Nullspace
 {
     public class OOModel
     {
-        public int Id;
         public MeshFilter MeshFilter;
-
         public Vector3[] Vertices;
         public Vector3i[] Faces;
         public int NumVert;
@@ -35,17 +33,12 @@ namespace Nullspace
         {
             int len = triangles.Length;
             Vector3i[] faces = new Vector3i[len / 3];
-            
+            int idx = 0;
             for (int i = 0; i < len; i += 3)
             {
-                faces[i] = new Vector3i(triangles[i], triangles[i + 1], triangles[i + 2]);
+                faces[idx++] = new Vector3i(triangles[i], triangles[i + 1], triangles[i + 2]);
             }
             return faces;
-        }
-        
-        public void SetId(int id)
-        {
-            Id = id;
         }
     }
 }

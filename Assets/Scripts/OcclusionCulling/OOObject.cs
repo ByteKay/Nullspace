@@ -26,6 +26,7 @@ namespace Nullspace
             Drawer = drawer;
             MeshFilter mf = drawer.gameObject.GetComponent<MeshFilter>();
             Model = new OOModel(mf);
+            Box = new OOBox();
             SetTransform(drawer.transform.localToWorldMatrix);
 
             Head = new OOItem();
@@ -67,6 +68,8 @@ namespace Nullspace
             Box.Size[0] = Mathf.Abs(va[0]) + Mathf.Abs(vb[0]) + Mathf.Abs(vc[0]);
             Box.Size[1] = Mathf.Abs(va[1]) + Mathf.Abs(vb[1]) + Mathf.Abs(vc[1]);
             Box.Size[2] = Mathf.Abs(va[2]) + Mathf.Abs(vb[2]) + Mathf.Abs(vc[2]);
+
+            Box.ToMinMax();
         }
 
         public void Detach()

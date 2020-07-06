@@ -87,11 +87,14 @@ namespace Nullspace
 
         public OOCE()
         {
-            Stat = new long[10];
+            Map = new OOMap();
+            Tree = new OOKDTree();
+            mClip = new OOClipper();
+            mFrustum = new OOFrustum();
+            Stat = new long[2] { 0, 0 };
             mSafeDistance = 1;
             mMaxItems = 8;
             mMaxLevel = 32;
-            Tree = new OOKDTree();
             mMinQueue = new PriorityQueue<float, object, float>();
             mMaxQueue = new PriorityQueue<float, object, float>();
         }
@@ -279,7 +282,9 @@ namespace Nullspace
                     {
                         nd.Visible = 0;
                         if (nd.Parent != null)
+                        {
                             nd.Parent.Visible = 0;
+                        }
                     }
                 }
                 else
@@ -290,7 +295,7 @@ namespace Nullspace
                         while (itm != nd.Tail)
                         {
                             if (itm.Obj.TouchId != Tree.TouchCounter) 
-						{
+						    {
                                 itm.Obj.TouchId = Tree.TouchCounter;
                                 OOObject obj = itm.Obj;
                                 MinMax(obj.Box, ref obj.Box.Zmin, ref obj.Box.Zmax);
@@ -313,15 +318,15 @@ namespace Nullspace
                         }
                     }
                     if (nd.Parent != null)
+                    {
                         nd.Parent.Visible = 0;
+                    }
                 }
             }
         }
 
         private void OcclusionCullOld()
         {
-            float dis, d;
-
             Stat[0] = Stat[1] = 0;
             Map.Clear();
             mMinQueue.Clear();
@@ -343,7 +348,9 @@ namespace Nullspace
                     {
                         nd.Visible = 0;
                         if (nd.Parent != null)
+                        {
                             nd.Parent.Visible = 0;
+                        }
                     }
                 }
                 else
@@ -356,14 +363,13 @@ namespace Nullspace
                             if (itm.Obj.TouchId != Tree.TouchCounter) {
                                 itm.Obj.TouchId = Tree.TouchCounter;
                                 OOObject obj = itm.Obj;
-                                dis = -Vector3.Dot(obj.Box.Mid, mLook);
-                                d = Vector3.Dot(mAbsLook, obj.Box.Size);
+                                float dis = -Vector3.Dot(obj.Box.Mid, mLook);
+                                float d = Vector3.Dot(mAbsLook, obj.Box.Size);
                                 obj.Box.Zmin = dis - d;
                                 obj.Box.Zmax = dis + d;
 
                                 if (IsVisible(0, obj.Box, 0) != 0)
                                 {
-
                                     mMaxQueue.Enqueue(obj.Box.Zmax, obj, obj.Box.Zmax);
                                     obj.Next = null;
                                     if (mVisible == null)
@@ -381,18 +387,22 @@ namespace Nullspace
                         }
                     }
                     if (nd.Parent != null)
+                    {
                         nd.Parent.Visible = 0;
+                    }
                 }
             }
         }
 
         private void FlushOccluders(float distance)
         {
-            while (mMaxQueue.Size > 0 && ((OOObject)mMaxQueue.Dequeue()).Box.Zmax <= distance)
+            while (mMaxQueue.Size > 0 && ((OOObject)mMaxQueue.Peek()).Box.Zmax <= distance)
             {
                 OOObject obj = (OOObject)mMaxQueue.Dequeue();
                 if (obj.CanOcclude == 0)
+                {
                     continue;
+                }
                 DrawOccluder(obj);
             }
         }
@@ -404,11 +414,17 @@ namespace Nullspace
             q.Size = b.Size + Vector3.one * mSafeDistance;
             int visible = mFrustum.Test(q);
             if (visible == 0)
+            {
                 return 0;
+            }
             if (visible == 2)
+            {
                 return 1;
+            }
             if (flush != 0)
+            {
                 FlushOccluders(dist);
+            }
             return QueryBox(b);
         }
 
@@ -431,13 +447,19 @@ namespace Nullspace
                 float s = Mathf.Abs(mPosition[i] - b.Mid[i]);
                 float d1 = s - b.Size[i];
                 if (d1 > min)
+                {
                     min = d1;
+                }
                 float d2 = s + b.Size[i];
                 if (d2 > max)
+                {
                     max = d2;
+                }
             }
             if (min < 0)
+            {
                 min = 0;
+            }
         }
 
         private void PushBox2(object obj, OOBox b)
@@ -454,25 +476,35 @@ namespace Nullspace
             Vector3 max = x.Mid + x.Size;
             int cd = 0;
             if (mPosition[0] < min[0])
+            {
                 cd |= 1;
+            }
             if (mPosition[0] > max[0])
+            {
                 cd |= 2;
+            }
             if (mPosition[1] < min[1])
+            {
                 cd |= 4;
+            }
             if (mPosition[1] > max[1])
+            {
                 cd |= 8;
+            }
             if (mPosition[2] < min[2])
+            {
                 cd |= 16;
+            }
             if (mPosition[2] > max[2])
+            {
                 cd |= 32;
-
+            }
             vxt[0][0] = vxt[2][0] = vxt[4][0] = vxt[6][0] = min[0];
             vxt[1][0] = vxt[3][0] = vxt[5][0] = vxt[7][0] = max[0];
             vxt[0][1] = vxt[1][1] = vxt[4][1] = vxt[5][1] = min[1];
             vxt[2][1] = vxt[3][1] = vxt[6][1] = vxt[7][1] = max[1];
             vxt[0][2] = vxt[1][2] = vxt[2][2] = vxt[3][2] = min[2];
             vxt[4][2] = vxt[5][2] = vxt[6][2] = vxt[7][2] = max[2];
-
             int[] stt = STAB[cd];
             int vp = stt[0];
             for (int i = 0; i < vp; i++)
@@ -482,9 +514,10 @@ namespace Nullspace
             }
             vp = mClip.ClipAndProject(vp);
             if (vp < 3)
+            {
                 return 0;
+            }
             int res = Map.QueryOPolygon(mClip.Vs, vp);
-
             return res;
         }
 
@@ -494,7 +527,6 @@ namespace Nullspace
             int j, nv;
             OOModel mdl = obj.Model;
             Matrix4x4 mcb = mModelView * obj.Transform;
-
             for (int i = 0; i < mdl.NumVert; i++)
             {
                 mdl.CVertices[i] = mcb * mdl.Vertices[i];
@@ -522,12 +554,22 @@ namespace Nullspace
                     {
                         for (j = 0; j < nv; j++)
                         {
-                            if (mClip.Vs[j][0] < xmin) xmin = mClip.Vs[j][0];
+                            if (mClip.Vs[j][0] < xmin)
+                            {
+                                xmin = mClip.Vs[j][0];
+                            }
                             else
+                            {
                                 if (mClip.Vs[j][0] > xmax) xmax = mClip.Vs[j][0];
-                            if (mClip.Vs[j][1] < ymin) ymin = mClip.Vs[j][1];
-                            else
-                                if (mClip.Vs[j][1] > ymax) ymax = mClip.Vs[j][1];
+                            }
+                            if (mClip.Vs[j][1] < ymin)
+                            {
+                                ymin = mClip.Vs[j][1];
+                            }
+                            else if (mClip.Vs[j][1] > ymax)
+                            {
+                                ymax = mClip.Vs[j][1];
+                            }
                         }
                         Map.DrawOPolygon(mClip.Vs, nv);
                     }

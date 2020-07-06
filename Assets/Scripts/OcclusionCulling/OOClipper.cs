@@ -45,17 +45,29 @@ namespace Nullspace
             {
                 uint clipmask = 0;
                 if (Vi[i][0] < -Vi[i][3])
+                {
                     clipmask |= 1;
+                }
                 if (Vi[i][0] > Vi[i][3])
+                {
                     clipmask |= 2;
+                }
                 if (Vi[i][1] < -Vi[i][3])
+                {
                     clipmask |= 4;
+                }
                 if (Vi[i][1] > Vi[i][3])
+                {
                     clipmask |= 8;
+                }
                 if (Vi[i][2] < -Vi[i][3])
+                {
                     clipmask |= 16;
+                }
                 if (Vi[i][2] > Vi[i][3])
+                {
                     clipmask |= 32;
+                }
                 clipor |= clipmask;
                 clipand &= clipmask;
             }
@@ -71,48 +83,74 @@ namespace Nullspace
                 if ((clipor & 1) > 0)
                 {
                     for (int i = 0; i < mVp; i++)
+                    {
                         mDd[i] = Vi[i][3] + Vi[i][0];
+                    }
                     Clip();
                     if (mVp < 3)
+                    {
                         return 0;
+                    }
                 }
                 if ((clipor & 2) > 0)
                 {
                     for (int i = 0; i < mVp; i++)
+                    {
                         mDd[i] = Vi[i][3] - Vi[i][0];
+                    }
                     Clip();
-                    if (mVp < 3) return 0;
+                    if (mVp < 3)
+                    {
+                        return 0;
+                    }
                 }
                 if ((clipor & 4) > 0)
                 {
                     for (int i = 0; i < mVp; i++)
+                    {
                         mDd[i] = Vi[i][3] + Vi[i][1];
-                    Clip(); if (mVp < 3)
+                    }
+                    Clip();
+                    if (mVp < 3)
+                    {
                         return 0;
+                    }
                 }
                 if ((clipor & 8) > 0)
                 {
                     for (int i = 0; i < mVp; i++)
+                    {
                         mDd[i] = Vi[i][3] - Vi[i][1];
+                    }
                     Clip();
                     if (mVp < 3)
+                    {
                         return 0;
+                    }
                 }
                 if ((clipor & 16) > 0)
                 {
                     for (int i = 0; i < mVp; i++)
+                    {
                         mDd[i] = Vi[i][3] + Vi[i][2];
+                    }
                     Clip();
                     if (mVp < 3)
+                    {
                         return 0;
+                    }
                 }
                 if ((clipor & 32) > 0)
                 {
                     for (int i = 0; i < mVp; i++)
+                    {
                         mDd[i] = Vi[i][3] - Vi[i][2];
+                    }
                     Clip();
                     if (mVp < 3)
+                    {
                         return 0;
+                    }
                 }
             }
 
@@ -135,7 +173,9 @@ namespace Nullspace
             {
                 j = i + 1;
                 if (j == mVp)
+                {
                     j = 0;
+                }
                 if (mDd[i] >= 0)
                 {
                     if (mDd[j] < 0)

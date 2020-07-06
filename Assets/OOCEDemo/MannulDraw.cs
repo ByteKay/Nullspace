@@ -10,7 +10,6 @@ namespace Nullspace
         // DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int layer);
         private Mesh mesh;
         private Material material;
-        private int layer;
         private bool isOpaque;
         private Renderer render;
         private void Awake()
@@ -33,11 +32,6 @@ namespace Nullspace
         }
 
         private void OnDisable()
-        {
-            MannulDrawManager.Instance.RemoveObject(this);
-        }
-
-        private void OnDestroy()
         {
             MannulDrawManager.Instance.RemoveObject(this);
         }

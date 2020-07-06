@@ -5,30 +5,22 @@ using UnityEngine;
 namespace Nullspace
 {
 
-    public class MannulDrawManager :  Singleton<MannulDrawManager>
+    public class MannulDrawManager : Singleton<MannulDrawManager>
     {
         private Dictionary<int, OOObject> DrawObjects;
-
         private OOCE Culler;
 
-        protected virtual void Awake()
+        private void Awake()
         {
             DrawObjects = new Dictionary<int, OOObject>();
-            Culler = new OOCE();
             InitializeCuller();
         }
 
         private void InitializeCuller()
         {
             Culler = new OOCE();
-            Vector3 min = new Vector3();
-            Vector3 max = new Vector3();
-            min[0] = -150;
-            min[1] = -150;
-            min[2] = -150;
-            max[0] = 256 * 60 * 5 + 150;
-            max[1] = 10000;
-            max[2] = 256 * 60 * 5 + 150;
+            Vector3 min = new Vector3(-150, -150, -150);
+            Vector3 max = new Vector3(256 * 60 * 5 + 150, 10000, 256 * 60 * 5 + 150);
             Culler.Init(ref min, ref max);
             Culler.SetResolution(Screen.width, Screen.height);
             Culler.MaxDepth(32);
@@ -76,11 +68,11 @@ namespace Nullspace
             }
         }
 
-        protected override void OnDestroy()
-        {
-            DrawObjects.Clear();
-            Culler = null;
-        }
+        //protected override void OnDestroy()
+        //{
+        //    DrawObjects.Clear();
+        //    Culler = null;
+        //}
     }
 }
 

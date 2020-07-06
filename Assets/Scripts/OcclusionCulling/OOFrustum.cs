@@ -56,12 +56,12 @@ namespace Nullspace
 
         private void GetPlanes()
         {
-            pln_add(0, 0);
-            pln_sub(1, 0);
-            pln_add(2, 1);
-            pln_sub(3, 1);
-            pln_add(4, 2);
-            pln_sub(5, 2);
+            PlaneAdd(0, 0);
+            PlaneSub(1, 0);
+            PlaneAdd(2, 1);
+            PlaneSub(3, 1);
+            PlaneAdd(4, 2);
+            PlaneSub(5, 2);
             PlaneNormalize(0);
             PlaneNormalize(1);
             PlaneNormalize(2);
@@ -70,7 +70,7 @@ namespace Nullspace
             PlaneNormalize(5);
         }
 
-        public void pln_add(int n, int m)
+        public void PlaneAdd(int n, int m)
         {
             mPlanes[n][0] = mMtr[0, 3] + mMtr[0, m];
             mPlanes[n][1] = mMtr[1, 3] + mMtr[1, m];
@@ -78,7 +78,7 @@ namespace Nullspace
             mPlanes[n][3] = mMtr[3, 3] + mMtr[3, m];
         }
 
-        public void pln_sub(int n, int m)
+        public void PlaneSub(int n, int m)
         {
             mPlanes[n][0] = mMtr[0, 3] - mMtr[0, m];
             mPlanes[n][1] = mMtr[1, 3] - mMtr[1, m];
