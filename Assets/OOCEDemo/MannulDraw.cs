@@ -28,12 +28,18 @@ namespace Nullspace
 
         private void OnEnable()
         {
-            MannulDrawManager.Instance.AddObject(this);
+            if (!MannulDrawManager.IsDestroy())
+            {
+                MannulDrawManager.Instance.AddObject(this);
+            }
         }
 
         private void OnDisable()
         {
-            MannulDrawManager.Instance.RemoveObject(this);
+            if (!MannulDrawManager.IsDestroy())
+            {
+                MannulDrawManager.Instance.RemoveObject(this);
+            }
         }
     }
 

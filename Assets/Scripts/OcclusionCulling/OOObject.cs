@@ -27,8 +27,7 @@ namespace Nullspace
             MeshFilter mf = drawer.gameObject.GetComponent<MeshFilter>();
             Model = new OOModel(mf);
             Box = new OOBox();
-            SetTransform(drawer.transform.localToWorldMatrix);
-
+            UpdateTransform();
             Head = new OOItem();
             Tail = new OOItem();
             Tail.CNext = null;
@@ -56,14 +55,14 @@ namespace Nullspace
             }
         }
 
-        public void SetTransform(Matrix4x4 m)
+        public void UpdateTransform()
         {
-            Transform = m;
-            Box.Mid = m * Model.Box.Mid;
+            Transform = Drawer.transform.localToWorldMatrix;
+            Box.Mid = Transform * Model.Box.Mid;
 
-            Vector3 va = Vector3.Scale(m.GetColumn(0), Model.Box.Size);
-            Vector3 vb = Vector3.Scale(m.GetColumn(1), Model.Box.Size);
-            Vector3 vc = Vector3.Scale(m.GetColumn(2), Model.Box.Size);
+            Vector3 va = Vector3.Scale(Transform.GetColumn(0), Model.Box.Size);
+            Vector3 vb = Vector3.Scale(Transform.GetColumn(1), Model.Box.Size);
+            Vector3 vc = Vector3.Scale(Transform.GetColumn(2), Model.Box.Size);
 
             Box.Size[0] = Mathf.Abs(va[0]) + Mathf.Abs(vb[0]) + Mathf.Abs(vc[0]);
             Box.Size[1] = Mathf.Abs(va[1]) + Mathf.Abs(vb[1]) + Mathf.Abs(vc[1]);

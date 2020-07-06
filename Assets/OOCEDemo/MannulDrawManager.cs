@@ -54,6 +54,10 @@ namespace Nullspace
         {
             if (Culler != null)
             {
+                foreach (OOObject obj in DrawObjects.Values)
+                {
+                    obj.UpdateTransform();
+                }
                 Culler.FindVisible(OOCE.OOCE_OCCLUSION_CULLING);
                 int visible = Culler.GetFirstObject();
                 while (visible == 1)
@@ -68,11 +72,12 @@ namespace Nullspace
             }
         }
 
-        //protected override void OnDestroy()
-        //{
-        //    DrawObjects.Clear();
-        //    Culler = null;
-        //}
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            DrawObjects.Clear();
+            Culler = null;
+        }
     }
 }
 
