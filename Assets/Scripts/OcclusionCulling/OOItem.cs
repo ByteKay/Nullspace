@@ -32,8 +32,8 @@ namespace Nullspace
         {
             Next = nd.Head.Next;
             nd.Head.Next = this;
-            Prev = nd.Head;
             Next.Prev = this;
+            Prev = nd.Head;
             Node = nd;
             nd.ItemCount++;
         }

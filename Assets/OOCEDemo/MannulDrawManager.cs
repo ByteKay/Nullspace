@@ -25,6 +25,7 @@ namespace Nullspace
             Culler.SetResolution(Screen.width, Screen.height);
             Culler.MaxDepth(32);
             Culler.MaxItems(8);
+            Culler.SafeDistance(Mathf.Sqrt(0.32f * 0.32f + 0.24f * 0.24f + 0.30f * 0.30f));
             Culler.Camera(Camera.main);
         }
 
@@ -58,7 +59,7 @@ namespace Nullspace
                 {
                     obj.UpdateTransform();
                 }
-                Culler.FindVisible(OOCE.OOCE_OCCLUSION_CULLING);
+                Culler.FindVisible(OOCE.OOCE_FRUSTUM_CULLING);
                 int visible = Culler.GetFirstObject();
                 while (visible == 1)
                 {

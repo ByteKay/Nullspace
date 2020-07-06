@@ -208,7 +208,9 @@ namespace Nullspace
         private void DeleteNodes(OONode nd)
         {
             if (nd == null)
+            {
                 return;
+            }
             nd.DeleteItems();
             DeleteNodes(nd.Left);
             DeleteNodes(nd.Right);
@@ -216,22 +218,18 @@ namespace Nullspace
 
         private void FrustumCull()
         {
-            OOItem itm;
-            OOObject obj;
-            OONode nd;
-
             mMinQueue.Clear();
-            PushBox(Tree.Root, Tree.Root.Box);
+            PushBox(Tree.Root, ref Tree.Root.Box);
             while (mMinQueue.Size > 0)
             {
-                nd = (OONode)mMinQueue.Dequeue();
+                OONode nd = (OONode)mMinQueue.Dequeue();
                 if (mFrustum.Test(nd.Box) > 0)
                 {
                     nd.Distribute(mMaxLevel, mMaxItems);
-                    itm = nd.Head.Next;
+                    OOItem itm = nd.Head.Next;
                     while (itm != nd.Tail)
                     {
-                        obj = itm.Obj;
+                        OOObject obj = itm.Obj;
                         if (obj.TouchId != Tree.TouchCounter)
                         {
                             obj.TouchId = Tree.TouchCounter;
@@ -253,8 +251,8 @@ namespace Nullspace
                     }
                     if (nd.SplitAxis != OONode.LEAF)
                     {
-                        PushBox(nd.Left, nd.Left.Box);
-                        PushBox(nd.Right, nd.Right.Box);
+                        PushBox(nd.Left, ref nd.Left.Box);
+                        PushBox(nd.Right, ref nd.Right.Box);
                     }
                 }
             }
@@ -265,21 +263,27 @@ namespace Nullspace
             Map.Clear();
             mMinQueue.Clear();
             mMaxQueue.Clear();
-            PushBox2(Tree.Root, Tree.Root.Box);
+            PushBox2(Tree.Root, ref Tree.Root.Box);
             while (mMinQueue.Size > 0)
             {
                 OONode nd = (OONode)mMinQueue.Dequeue();
                 nd.Distribute(mMaxLevel, mMaxItems);
-                if (nd.SplitAxis != OONode.LEAF)
+                MinMax(ref nd.Box, ref nd.Box.Zmin, ref nd.Box.Zmax);
+                if (nd.SplitAxis != OONode.LEAF) // 非叶节点
                 {
-                    if ((nd.Visible != 0) || IsVisible(1, nd.Box, nd.Box.Zmin) != 0)
+                    // 该节点存在两个子节点
+                    // 如果 该节点 Visible 为可见 ,则不需要进一步计算
+                    // 如果 该结点 Visible 为不可见,则进一步计算判断可见性
+                    if ((nd.Visible != 0) || IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
+                        // 标记为可见
                         nd.Visible = 1;
-                        PushBox2(nd.Left, nd.Left.Box);
-                        PushBox2(nd.Right, nd.Right.Box);
+                        PushBox2(nd.Left, ref nd.Left.Box);
+                        PushBox2(nd.Right, ref nd.Right.Box);
                     }
                     else
                     {
+                        // 标记为不可见
                         nd.Visible = 0;
                         if (nd.Parent != null)
                         {
@@ -287,19 +291,20 @@ namespace Nullspace
                         }
                     }
                 }
-                else
+                else // 叶节点
                 {
-                    if (IsVisible(1, nd.Box, nd.Box.Zmin) != 0)
+                    
+                    if (IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
                         OOItem itm = nd.Head.Next;
                         while (itm != nd.Tail)
                         {
-                            if (itm.Obj.TouchId != Tree.TouchCounter) 
+                            if (itm.Obj.TouchId != Tree.TouchCounter)
 						    {
                                 itm.Obj.TouchId = Tree.TouchCounter;
                                 OOObject obj = itm.Obj;
-                                MinMax(obj.Box, ref obj.Box.Zmin, ref obj.Box.Zmax);
-                                if (IsVisible(0, obj.Box, 0) != 0)
+                                MinMax(ref obj.Box, ref obj.Box.Zmin, ref obj.Box.Zmax);
+                                if (IsVisible(0, ref obj.Box, 0) != 0)
                                 {
                                     mMaxQueue.Enqueue(obj.Box.Zmax, obj, obj.Box.Zmax);
                                     obj.Next = null;
@@ -331,18 +336,19 @@ namespace Nullspace
             Map.Clear();
             mMinQueue.Clear();
             mMaxQueue.Clear();
-            PushBox(Tree.Root, Tree.Root.Box);
+            PushBox(Tree.Root, ref Tree.Root.Box);
             while (mMinQueue.Size > 0)
             {
                 OONode nd = (OONode)mMinQueue.Dequeue();
                 nd.Distribute(mMaxLevel, mMaxItems);
+                MinMax(ref nd.Box, ref nd.Box.Zmin, ref nd.Box.Zmax);
                 if (nd.SplitAxis != OONode.LEAF)
                 {
-                    if (nd.Visible != 0 || IsVisible(1, nd.Box, nd.Box.Zmin) != 0)
+                    if (nd.Visible != 0 || IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
                         nd.Visible = 1;
-                        PushBox(nd.Left, nd.Left.Box);
-                        PushBox(nd.Right, nd.Right.Box);
+                        PushBox(nd.Left, ref nd.Left.Box);
+                        PushBox(nd.Right, ref nd.Right.Box);
                     }
                     else
                     {
@@ -355,7 +361,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    if (IsVisible(1, nd.Box, nd.Box.Zmin) != 0)
+                    if (IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
                         OOItem itm = nd.Head.Next;
                         while (itm != nd.Tail)
@@ -368,7 +374,7 @@ namespace Nullspace
                                 obj.Box.Zmin = dis - d;
                                 obj.Box.Zmax = dis + d;
 
-                                if (IsVisible(0, obj.Box, 0) != 0)
+                                if (IsVisible(0, ref obj.Box, 0) != 0)
                                 {
                                     mMaxQueue.Enqueue(obj.Box.Zmax, obj, obj.Box.Zmax);
                                     obj.Next = null;
@@ -407,10 +413,9 @@ namespace Nullspace
             }
         }
 
-        private int IsVisible(int flush, OOBox b, float dist)
+        private int IsVisible(int flush, ref OOBox b, float dist)
         {
-            OOBox q = new OOBox();
-            q.Mid = b.Mid;
+            OOBox q = b;
             q.Size = b.Size + Vector3.one * mSafeDistance;
             int visible = mFrustum.Test(q);
             if (visible == 0)
@@ -425,32 +430,24 @@ namespace Nullspace
             {
                 FlushOccluders(dist);
             }
-            return QueryBox(b);
+            return QueryBox(ref b);
         }
 
-        private void PushBox(object obj, OOBox b)
-        {
-            float dis, d;
-            dis = -Vector3.Dot(b.Mid, mLook);
-            d = Vector3.Dot(mAbsLook, b.Size);
-            b.Zmin = dis - d;
-            b.Zmax = dis + d;
-            mMinQueue.Enqueue(b.Zmin, obj, b.Zmin);
-        }
 
-        private void MinMax(OOBox b, ref float min, ref float max)
+        private void MinMax(ref OOBox b, ref float min, ref float max)
         {
             min = 0;
             max = float.MinValue;
+            Vector3 diff = (mPosition - b.Mid).Abs();
+
             for (int i = 0; i < 3; i++)
             {
-                float s = Mathf.Abs(mPosition[i] - b.Mid[i]);
-                float d1 = s - b.Size[i];
+                float d1 = diff[i] - b.Size[i];
                 if (d1 > min)
                 {
                     min = d1;
                 }
-                float d2 = s + b.Size[i];
+                float d2 = diff[i] + b.Size[i];
                 if (d2 > max)
                 {
                     max = d2;
@@ -462,14 +459,24 @@ namespace Nullspace
             }
         }
 
-        private void PushBox2(object obj, OOBox b)
+        private void PushBox(object obj, ref OOBox b)
         {
-            MinMax(b, ref b.Zmin, ref b.Zmax);
+            float dis, d;
+            dis = -Vector3.Dot(b.Mid, mLook);
+            d = Vector3.Dot(mAbsLook, b.Size);
+            b.Zmin = dis - d;
+            b.Zmax = dis + d;
+            mMinQueue.Enqueue(b.Zmin, obj, b.Zmin);
+        }
+
+        private void PushBox2(object obj, ref OOBox b)
+        {
+            MinMax(ref b, ref b.Zmin, ref b.Zmax);
             mMinQueue.Enqueue(b.Zmin, obj, b.Zmin);
             return;
         }
 
-        private int QueryBox(OOBox x)
+        private int QueryBox(ref OOBox x)
         {
             Vector3[] vxt = new Vector3[8];
             Vector3 min = x.Mid - x.Size;

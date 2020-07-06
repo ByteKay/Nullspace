@@ -26,7 +26,7 @@ namespace Nullspace
             Drawer = drawer;
             MeshFilter mf = drawer.gameObject.GetComponent<MeshFilter>();
             Model = new OOModel(mf);
-            Box = new OOBox();
+            Box = new OOBox(Vector3.one * float.MaxValue, Vector3.one * float.MinValue);
             UpdateTransform();
             Head = new OOItem();
             Tail = new OOItem();
