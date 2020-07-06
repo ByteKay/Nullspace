@@ -35,6 +35,7 @@ namespace Nullspace
             Head.CNext = Tail;
             Tail.CPrev = Head;
             CanOcclude = 1;
+            GeoDebugDrawUtils.DrawAABB(Box.Min, Box.Max);
         }
 
         public void SetObjectId(int id)
@@ -60,9 +61,9 @@ namespace Nullspace
             Transform = Drawer.transform.localToWorldMatrix;
             Box.Mid = Transform * Model.Box.Mid;
 
-            Vector3 va = Vector3.Scale(Transform.GetColumn(0), Model.Box.Size);
-            Vector3 vb = Vector3.Scale(Transform.GetColumn(1), Model.Box.Size);
-            Vector3 vc = Vector3.Scale(Transform.GetColumn(2), Model.Box.Size);
+            Vector3 va = Vector3.Scale(Transform.GetRow(0), Model.Box.Size);
+            Vector3 vb = Vector3.Scale(Transform.GetRow(1), Model.Box.Size);
+            Vector3 vc = Vector3.Scale(Transform.GetRow(2), Model.Box.Size);
 
             Box.Size[0] = Mathf.Abs(va[0]) + Mathf.Abs(vb[0]) + Mathf.Abs(vc[0]);
             Box.Size[1] = Mathf.Abs(va[1]) + Mathf.Abs(vb[1]) + Mathf.Abs(vc[1]);
