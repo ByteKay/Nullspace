@@ -69,8 +69,8 @@ namespace Nullspace
         private OOObject mVisible;
         private OOObject mTail;
         private OOObject mTemp;
-        private Matrix4x4 mMTR;
-        private Matrix4x4 mModelView;
+        private Matrix4x4 mPV;
+        private Matrix4x4 mView;
         private Matrix4x4 mProject;
         private Vector3 mPosition;
         private PriorityQueue<float, object, float> mMinQueue;
@@ -99,6 +99,17 @@ namespace Nullspace
             mMaxQueue = new PriorityQueue<float, object, float>();
         }
 
+        private static bool DrawPlanes = false;
+        public void DrawFrustumPlanes()
+        {
+            if (!DrawPlanes)
+            {
+                DrawPlanes = true;
+                mFrustum.DrawPlanes();
+            }
+            
+        }
+
         public void Init(ref Vector3 min, ref Vector3 max)
         {
             Tree.Init(ref min, ref max);
@@ -110,15 +121,15 @@ namespace Nullspace
             UpdateCameraMatrix();
         }
 
-        private void UpdateCameraMatrix()
+        public void UpdateCameraMatrix()
         {
-            mMTR = MainCamera.previousViewProjectionMatrix;
-            mModelView = MainCamera.worldToCameraMatrix;
+            mView = MainCamera.worldToCameraMatrix;
             mProject = MainCamera.projectionMatrix;
+            mPV = mProject * mView;
             mPosition = MainCamera.transform.position;
-            mLook = mModelView.GetColumn(2);
+            mLook = MainCamera.transform.forward;
             mAbsLook = mLook.Abs();
-            mFrustum.Set(ref mMTR, ref mPosition);
+            mFrustum.Set(ref mPV, ref mPosition);
         }
 
         public void SetResolution(int x, int y)
@@ -223,7 +234,7 @@ namespace Nullspace
             while (mMinQueue.Size > 0)
             {
                 OONode nd = (OONode)mMinQueue.Dequeue();
-                if (mFrustum.Test(nd.Box) > 0)
+                if (mFrustum.Test(ref nd.Box) > 0)
                 {
                     nd.Distribute(mMaxLevel, mMaxItems);
                     OOItem itm = nd.Head.Next;
@@ -233,7 +244,7 @@ namespace Nullspace
                         if (obj.TouchId != Tree.TouchCounter)
                         {
                             obj.TouchId = Tree.TouchCounter;
-                            if (mFrustum.Test(obj.Box) > 0)
+                            if (mFrustum.Test(ref obj.Box) > 0)
                             {
                                 obj.Next = null;
                                 if (mVisible == null)
@@ -417,7 +428,7 @@ namespace Nullspace
         {
             OOBox q = b;
             q.Size = b.Size + Vector3.one * mSafeDistance;
-            int visible = mFrustum.Test(q);
+            int visible = mFrustum.Test(ref q);
             if (visible == 0)
             {
                 return 0;
@@ -517,7 +528,7 @@ namespace Nullspace
             for (int i = 0; i < vp; i++)
             {
                 int j = stt[i + 1];
-                mClip.Vi[i] = mMTR * vxt[j];
+                mClip.Vi[i] = mPV * vxt[j];
             }
             vp = mClip.ClipAndProject(vp);
             if (vp < 3)
@@ -533,7 +544,7 @@ namespace Nullspace
             
             int j, nv;
             OOModel mdl = obj.Model;
-            Matrix4x4 mcb = mModelView * obj.Transform;
+            Matrix4x4 mcb = mView * obj.Transform;
             for (int i = 0; i < mdl.NumVert; i++)
             {
                 mdl.CVertices[i] = mcb * mdl.Vertices[i];

@@ -55,6 +55,9 @@ namespace Nullspace
         {
             if (Culler != null)
             {
+                // 如果相机存在变化,需要打开
+                // Culler.UpdateCameraMatrix();
+                Culler.DrawFrustumPlanes();
                 foreach (OOObject obj in DrawObjects.Values)
                 {
                     obj.UpdateTransform();
