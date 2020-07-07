@@ -1,100 +1,0 @@
-
-õ
-PreProcessorData.protoconstructor_data"-
-
-CDVector3f	
-x (	
-y (	
-z (""
-
-CDVector2i	
-x (	
-y ("A
-CDVertexList1
-mVertexList (2.constructor_data.CDVector3f"!
-CDIndexList
-
-mIndexList ("I
-CDRegionInnerBorder2
-mInnerIndex (2.constructor_data.CDIndexList"I
-CDRegionOuterBorder2
-mOuterIndex (2.constructor_data.CDIndexList"G
-CDRegionHullBorder1
-
-mHullIndex (2.constructor_data.CDIndexList"W
-CDRegionExternalHalfBorder9
-mEaternalHalfIndex (2.constructor_data.CDIndexList"O
-CDRegionExternalBorder5
-mExternalIndex (2.constructor_data.CDIndexList">
-
-CDFreeMesh0
-	mFreeMesh (2.constructor_data.CDIndexList">
-
-CDWallMesh0
-	mWallMesh (2.constructor_data.CDIndexList"@
-CDInnerMesh1
-
-mInnerMesh (2.constructor_data.CDIndexList"N
-CDExternalHalfMesh8
-mExternalHalfMesh (2.constructor_data.CDIndexList"F
-CDExternalMesh4
-mExternalMesh (2.constructor_data.CDIndexList"A
-CDSkeletonPath/
-	mSkeleton (2.constructor_data.CDVector2i"å
-AllInOne
-mName (	3
-mVertexList (2.constructor_data.CDVertexList3
-	mSkeleton (2 .constructor_data.CDSkeletonPath?
-mInnerBorderList (2%.constructor_data.CDRegionInnerBorder9
-mHullBorder (2$.constructor_data.CDRegionHullBorder;
-mOuterBorder (2%.constructor_data.CDRegionOuterBorderA
-mExternalBorder (2(.constructor_data.CDRegionExternalBorder/
-	mFreeMesh (2.constructor_data.CDFreeMesh/
-	mWallMesh	 (2.constructor_data.CDWallMesh1
-
-mInnerMesh
- (2.constructor_data.CDInnerMesh?
-mExternalHalfMesh (2$.constructor_data.CDExternalHalfMesh7
-mExternalMesh (2 .constructor_data.CDExternalMeshI
-mExternalHalfBorder (2,.constructor_data.CDRegionExternalHalfBorder
-
-mY (BH
-û
-FillProcessorData.protoconstructor_dataPreProcessorData.proto"/
-CDRectangle
-p1Index (
-p2Index ("X
-CDInnerMaxRectIndexList=
-mInnerMaxRectIndexList (2.constructor_data.CDRectangle"V
-CDHalfMaxRectIndexList<
-mHalfMaxRectIndexList (2.constructor_data.CDRectangle"V
-CDHalfMinRectIndexList<
-mHalfMinRectIndexList (2.constructor_data.CDRectangle"^
-CDExternalMaxRectIndexList@
-mExternalMaxRectIndexList (2.constructor_data.CDRectangle"^
-CDExternalMinRectIndexList@
-mExternalMinRectIndexList (2.constructor_data.CDRectangle""
-
-CDVector2f	
-x (	
-y ("A
-	CDPolygon4
-mPolygonPoints (2.constructor_data.CDVector2f"G
-CDInnerPolygon5
-mInnerConvexList (2.constructor_data.CDPolygon"E
-CDHalfPolygon4
-mHalfConvexList (2.constructor_data.CDPolygon"M
-CDExternalPolygon8
-mExternalConvexList (2.constructor_data.CDPolygon"ð
-CDRectangleManager
-mName (	3
-mVertexList (2.constructor_data.CDVertexListD
-mInnerMaxRectList (2).constructor_data.CDInnerMaxRectIndexListB
-mHalfMaxRectList (2(.constructor_data.CDHalfMaxRectIndexListB
-mHalfMinRectList (2(.constructor_data.CDHalfMinRectIndexListJ
-mExternalMaxRectList (2,.constructor_data.CDExternalMaxRectIndexListJ
-mExternalMinRectList (2,.constructor_data.CDExternalMinRectIndexList8
-mInnerPolygons (2 .constructor_data.CDInnerPolygon6
-mHalfPolygons	 (2.constructor_data.CDHalfPolygon>
-mExternalPolygons
- (2#.constructor_data.CDExternalPolygonBH

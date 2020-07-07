@@ -1,1 +1,0 @@
-protoccpp.exe -I=. --cpp_out=. ./PreProcessorData.proto
