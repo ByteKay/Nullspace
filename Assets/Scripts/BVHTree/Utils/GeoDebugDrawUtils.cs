@@ -55,7 +55,7 @@ namespace Nullspace
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "cube";
             go.transform.position = (min + max) * 0.5f;
-            go.transform.localScale = (max - min) * 0.5f;
+            go.transform.localScale = (max - min);
         }
 
         public static void DrawAABB(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, Color clr)

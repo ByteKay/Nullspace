@@ -5,7 +5,7 @@ namespace Nullspace
 {
     public class OOObject
     {
-        public Matrix4x4 Transform;
+        public Matrix4x4 ModelWorldMatrix;
         public OOModel Model;
         public OOBox Box;
 
@@ -35,7 +35,7 @@ namespace Nullspace
             Head.CNext = Tail;
             Tail.CPrev = Head;
             CanOcclude = 1;
-            GeoDebugDrawUtils.DrawAABB(Box.Min, Box.Max);
+            // GeoDebugDrawUtils.DrawAABB(Box.Min, Box.Max);
         }
 
         public void SetObjectId(int id)
@@ -56,20 +56,29 @@ namespace Nullspace
             }
         }
 
+        /// <summary>
+        /// min(ax + by + cz + d) = min(ax) + min(by) + min(cz) + min(d)
+        /// max(ax + by + cz + d) = max(ax) + max(by) + max(cz) + max(d)
+        /// 
+        /// Prev_Box = [min, max] = [c - r, c + r] = [min(cx +- rx, cy +- ry, cz +- rz), max(cx +- rx, cy +- ry, cz +- rz)]
+        /// Post_Box = [M(c-r), M(c+r)] = [min(M(cx +- rx, cy +- ry, cz +- rz, 1)), max(M(cx +- rx, cy +- ry, cz +- rz, 1))] 
+        /// =[min(M0(cx +- rx) + M1(cy +- ry) + M2(cz +- rz) + M3), max(M0(cx +- rx)+ M1(cy +- ry)+ M2(cz +- rz)+M3)] 
+        /// =[min(M0(cx +- rx)) + min(M1(cy +- ry)) + min(M2(cz +- rz)) + M3, max(M0(cx +- rx)) + max(M1(cy +- ry)) + max(M2(cz +- rz)) + M3]
+        /// </summary>
         public void UpdateTransform()
         {
-            Transform = Drawer.transform.localToWorldMatrix;
-            Box.Mid = Transform * Model.Box.Mid;
-
-            Vector3 va = Vector3.Scale(Transform.GetRow(0), Model.Box.Size);
-            Vector3 vb = Vector3.Scale(Transform.GetRow(1), Model.Box.Size);
-            Vector3 vc = Vector3.Scale(Transform.GetRow(2), Model.Box.Size);
-
-            Box.Size[0] = Mathf.Abs(va[0]) + Mathf.Abs(vb[0]) + Mathf.Abs(vc[0]);
-            Box.Size[1] = Mathf.Abs(va[1]) + Mathf.Abs(vb[1]) + Mathf.Abs(vc[1]);
-            Box.Size[2] = Mathf.Abs(va[2]) + Mathf.Abs(vb[2]) + Mathf.Abs(vc[2]);
-
-            Box.ToMinMax();
+            ModelWorldMatrix = Drawer.transform.localToWorldMatrix;
+            Vector3 xa = ModelWorldMatrix.GetColumn(0) * Model.Box.Min.x;
+            Vector3 xb = ModelWorldMatrix.GetColumn(0) * Model.Box.Max.x;
+            Vector3 ya = ModelWorldMatrix.GetColumn(1) * Model.Box.Min.y;
+            Vector3 yb = ModelWorldMatrix.GetColumn(1) * Model.Box.Max.y;
+            Vector3 za = ModelWorldMatrix.GetColumn(2) * Model.Box.Min.z;
+            Vector3 zb = ModelWorldMatrix.GetColumn(2) * Model.Box.Max.z;
+            Vector3 last = ModelWorldMatrix.GetColumn(3);
+            float w = 1.0f / ModelWorldMatrix[3, 3];
+            Box.Min = w * (Vector3.Min(xa, xb) + Vector3.Min(ya, yb) + Vector3.Min(za, zb) + last);
+            Box.Max = w * (Vector3.Max(xa, xb) + Vector3.Max(ya, yb) + Vector3.Max(za, zb) + last);
+            Box.ToMidSize();
         }
 
         public void Detach()

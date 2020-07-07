@@ -212,7 +212,7 @@ namespace Nullspace
 
         public int GetObjectTransform(ref Matrix4x4 m)
         {
-            m = mTemp.Transform;
+            m = mTemp.ModelWorldMatrix;
             return 1;
         }
 
@@ -544,7 +544,7 @@ namespace Nullspace
             
             int j, nv;
             OOModel mdl = obj.Model;
-            Matrix4x4 mcb = mView * obj.Transform;
+            Matrix4x4 mcb = mView * obj.ModelWorldMatrix;
             for (int i = 0; i < mdl.NumVert; i++)
             {
                 mdl.CVertices[i] = mcb * mdl.Vertices[i];

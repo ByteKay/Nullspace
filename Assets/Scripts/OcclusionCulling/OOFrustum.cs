@@ -85,8 +85,13 @@ namespace Nullspace
 
         private void PlaneNormalize(int idx)
         {
+            // 对法向单位化即可
             Vector3 p = mPlanes[idx];
-            mPlanes[idx] = mPlanes[idx] / p.magnitude;
+            // 此处取负号
+            mPlanes[idx] = -mPlanes[idx] / p.magnitude;
+            //检测截头体内部的一点, 是否都是负值
+            //float m = Vector3.Dot(new Vector3(0.4995904f, 2.559696f, 0.763446f), mPlanes[idx]) + mPlanes[idx][3];
+            //DebugUtils.Info("PlaneNormalize", string.Format("{0} {1}", idx, m));
         }
 
         private void GetPlanes()
@@ -125,6 +130,8 @@ namespace Nullspace
 
         public void DrawPlanes()
         {
+            // 对比计算值与unity的API是否一致
+            // 不过, 这里需要取反方向
             Plane[] planes = GeometryUtility.CalculateFrustumPlanes(Camera.main);
             DebugUtils.Info("planes[0]", string.Format("u:({0},{1},{2},{3}), m:({4},{5},{6},{7})", planes[0].normal[0], planes[0].normal[1], planes[0].normal[2], planes[0].distance, mPlanes[0][0], mPlanes[0][1], mPlanes[0][2], mPlanes[0][3]));
             DebugUtils.Info("planes[1]", string.Format("u:({0},{1},{2},{3}), m:({4},{5},{6},{7})", planes[1].normal[0], planes[1].normal[1], planes[1].normal[2], planes[1].distance, mPlanes[1][0], mPlanes[1][1], mPlanes[1][2], mPlanes[1][3]));
@@ -132,38 +139,6 @@ namespace Nullspace
             DebugUtils.Info("planes[3]", string.Format("u:({0},{1},{2},{3}), m:({4},{5},{6},{7})", planes[3].normal[0], planes[3].normal[1], planes[3].normal[2], planes[3].distance, mPlanes[3][0], mPlanes[3][1], mPlanes[3][2], mPlanes[3][3]));
             DebugUtils.Info("planes[4]", string.Format("u:({0},{1},{2},{3}), m:({4},{5},{6},{7})", planes[4].normal[0], planes[4].normal[1], planes[4].normal[2], planes[4].distance, mPlanes[4][0], mPlanes[4][1], mPlanes[4][2], mPlanes[4][3]));
             DebugUtils.Info("planes[5]", string.Format("u:({0},{1},{2},{3}), m:({4},{5},{6},{7})", planes[5].normal[0], planes[5].normal[1], planes[5].normal[2], planes[5].distance, mPlanes[5][0], mPlanes[5][1], mPlanes[5][2], mPlanes[5][3]));
-            //GameObject left = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            //left.name = "left";
-            //left.transform.up = mPlanes[0];
-            //Debug.DrawRay(left.transform.position, mPlanes[0], Color.red, 1000000);
-
-            //GameObject right = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            //right.name = "right";
-            //right.transform.up = mPlanes[1];
-            //Debug.DrawRay(right.transform.position, mPlanes[1], Color.red, 1000000);
-
-
-            //GameObject bottom = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            //bottom.name = "bottom";
-            //bottom.transform.up = mPlanes[2];
-            //Debug.DrawRay(bottom.transform.position, mPlanes[2], Color.red, 1000000);
-
-
-            //GameObject top = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            //top.name = "top";
-            //top.transform.up = mPlanes[3];
-            //Debug.DrawRay(top.transform.position, mPlanes[3], Color.red, 1000000);
-
-            //GameObject near = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            //near.name = "near";
-            //near.transform.up = mPlanes[4];
-            //Debug.DrawRay(top.transform.position, mPlanes[4], Color.red, 1000000);
-
-
-            //GameObject far = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            //far.name = "far";
-            //far.transform.up = mPlanes[5];
-            //Debug.DrawRay(top.transform.position, mPlanes[5], Color.red, 1000000);
         }
     }
 }
