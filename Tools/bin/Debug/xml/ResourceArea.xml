@@ -1,0 +1,27 @@
+<root>
+  <ResourceArea>
+    <id>1</id>
+    <name>内部</name>
+    <des></des>
+  </ResourceArea>
+  <ResourceArea>
+    <id>2</id>
+    <name>行走</name>
+    <des></des>
+  </ResourceArea>
+  <ResourceArea>
+    <id>3</id>
+    <name>视距</name>
+    <des></des>
+  </ResourceArea>
+  <ResourceArea>
+    <id>4</id>
+    <name>外部</name>
+    <des></des>
+  </ResourceArea>
+  <ResourceArea>
+    <id>5</id>
+    <name>路径</name>
+    <des></des>
+  </ResourceArea>
+</root>
