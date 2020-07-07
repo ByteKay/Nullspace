@@ -221,6 +221,9 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>C:/Unity201848/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="Google.ProtocolBuffers">
+      <HintPath>Assets/Plugins/Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing">
       <HintPath>Assets/Plugins/x86_64/System.Drawing.dll</HintPath>
     </Reference>
@@ -235,6 +238,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\BehaviourTreeDemo\PersuitOrFlee.cs" />
     <Compile Include="Assets\BVHDemo\BVH.cs" />
     <Compile Include="Assets\BVHDemo\BVHAabbObject.cs" />
     <Compile Include="Assets\BVHDemo\BVHBox.cs" />
@@ -244,13 +248,26 @@
     <Compile Include="Assets\BVHDemo\BVHSphereObject.cs" />
     <Compile Include="Assets\BVHDemo\BVHTriangleObject.cs" />
     <Compile Include="Assets\BVHDemo\RayTracerTest.cs" />
+    <Compile Include="Assets\CameraFollowDemo\CameraFollower.cs" />
     <Compile Include="Assets\CameraFollowDemo\ThirdPersonCharacter.cs" />
+    <Compile Include="Assets\EventDemo\EventTest.cs" />
+    <Compile Include="Assets\FixedPathMovableDemo\FixedPathMoableTest.cs" />
+    <Compile Include="Assets\FSMDemo\FiniteStateMachine.cs" />
     <Compile Include="Assets\JoystickDemo\JoystickTarget.cs" />
+    <Compile Include="Assets\LuaTableDemo\LuaTableTest.cs" />
+    <Compile Include="Assets\MoveDemo\MovableObjectTest.cs" />
+    <Compile Include="Assets\NetworkDemo\NetworkTest.cs" />
+    <Compile Include="Assets\ObjectPoolsDemo\TestObjectPools.cs" />
+    <Compile Include="Assets\OOCEDemo\MannulDraw.cs" />
+    <Compile Include="Assets\OOCEDemo\MannulDrawManager.cs" />
     <Compile Include="Assets\PhysXDemo\BallMaker.cs" />
     <Compile Include="Assets\PhysXDemo\StickMaker.cs" />
     <Compile Include="Assets\PhysXDemo\StickOnCollision.cs" />
     <Compile Include="Assets\PhysXDemo\Vector3Ext.cs" />
     <Compile Include="Assets\PhysXDemo\WorldController.cs" />
+    <Compile Include="Assets\ResourceCacheDemo\EffectBehaviour.cs" />
+    <Compile Include="Assets\ResourceCacheDemo\FlyBehaviour.cs" />
+    <Compile Include="Assets\ResourceCacheDemo\ResourceCacheTest.cs" />
     <Compile Include="Assets\Scripts\Algorithm\2DConvexPolygonDeompose.cs" />
     <Compile Include="Assets\Scripts\Algorithm\2DEarClipping.cs" />
     <Compile Include="Assets\Scripts\Algorithm\2DHMWaypoint.cs" />
@@ -318,15 +335,29 @@
     <Compile Include="Assets\Scripts\BVHTree\Utils\Matrix2x2.cs" />
     <Compile Include="Assets\Scripts\BVHTree\Utils\MatrixUtils.cs" />
     <Compile Include="Assets\Scripts\BVHTree\Utils\Vector2i.cs" />
+    <Compile Include="Assets\Scripts\BVHTree\Utils\Vector3i.cs" />
+    <Compile Include="Assets\Scripts\Common\AbstractCallback.cs" />
+    <Compile Include="Assets\Scripts\Common\ConditionOperationType.cs" />
+    <Compile Include="Assets\Scripts\Common\CountDown.cs" />
+    <Compile Include="Assets\Scripts\Common\Crypto.cs" />
+    <Compile Include="Assets\Scripts\Common\IEventManager.cs" />
+    <Compile Include="Assets\Scripts\Common\LuaTable.cs" />
+    <Compile Include="Assets\Scripts\Common\MD5Hash.cs" />
+    <Compile Include="Assets\Scripts\Common\ThreeState.cs" />
     <Compile Include="Assets\Scripts\Config\LoggerConfig.cs" />
     <Compile Include="Assets\Scripts\Config\NetworkConfig.cs" />
     <Compile Include="Assets\Scripts\Config\XmlDataConfig.cs" />
     <Compile Include="Assets\Scripts\DataStructure\DoubleCircleLinkedList.cs" />
     <Compile Include="Assets\Scripts\DataStructure\PriorityQueue.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\EnumEventDispatcher.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\EnumEventType.cs" />
     <Compile Include="Assets\Scripts\EventDispatcher\EventDispatcher.cs" />
     <Compile Include="Assets\Scripts\EventDispatcher\EventException.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\IntEventDefines.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\IntEventDispatcher.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\StringEventDefines.cs" />
+    <Compile Include="Assets\Scripts\EventDispatcher\StringEventDispatcher.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateCondition.cs" />
-    <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateConditionType.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateController.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateEntity.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\ConditionTransfer\StateParameterDataType.cs" />
@@ -369,34 +400,50 @@
     <Compile Include="Assets\Scripts\GestureRecognizer\TouchPoint.cs" />
     <Compile Include="Assets\Scripts\GestureRecognizer\TouchQueue.cs" />
     <Compile Include="Assets\Scripts\Joystick\JoystickControl.cs" />
+    <Compile Include="Assets\Scripts\Movable\FixedPathController.cs" />
     <Compile Include="Assets\Scripts\Movable\MovableObject.cs" />
-    <Compile Include="Assets\Scripts\Movable\MovableObjectTest.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\AbstractNavPath.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\NavCurvePath.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\NavLinePath.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\NavLinePosAngleSpeedPath.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\NavLinePosCurveTangentPath.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\NavPathData.cs" />
+    <Compile Include="Assets\Scripts\Movable\NavPath\NavCurvePosCurveDir.cs" />
+    <Compile Include="Assets\Scripts\Movable\NavPath\NavLinePosCurveDir.cs" />
+    <Compile Include="Assets\Scripts\Movable\NavPath\NavLinePosLineAngle.cs" />
+    <Compile Include="Assets\Scripts\Movable\NavPath\NavLinePosLineDir.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\NavPathPoint.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\NavPathType.cs" />
+    <Compile Include="Assets\Scripts\Movable\NavPath\NavPathUtils.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\IPathTrigger.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTrigger.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTriggerData.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTriggerEnd.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTriggerEvent.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTriggerIndex.cs" />
-    <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTriggerSort.cs" />
     <Compile Include="Assets\Scripts\Movable\NavPath\PathTrigger\PathTriggerStart.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkClient.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkCommand.cs" />
+    <Compile Include="Assets\Scripts\Network\AbstractNetworkClient.cs" />
+    <Compile Include="Assets\Scripts\Network\CommandClassFactory\NetworkCommand.cs" />
+    <Compile Include="Assets\Scripts\Network\CommandClassFactory\NetworkCommandFactory.cs" />
+    <Compile Include="Assets\Scripts\Network\CommandClassFactory\NetworkCommandHandler.cs" />
+    <Compile Include="Assets\Scripts\Network\CommandClassFactory\NetworkCommandType.cs" />
+    <Compile Include="Assets\Scripts\Network\CommandEventFactory\NetworkEventHandler.cs" />
+    <Compile Include="Assets\Scripts\Network\CommandEventFactory\NetworkEventHandlerDefine.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCommandType.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkConnectState.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkCppClient.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkCSharpClient.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkHeadFormat.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkMessage.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkPacket.cs" />
-    <Compile Include="Assets\Scripts\Network\NetworkSynClient.cs" />
     <Compile Include="Assets\Scripts\Network\Test\NetCommand.cs" />
     <Compile Include="Assets\Scripts\Network\Test\TestNetwork.cs" />
     <Compile Include="Assets\Scripts\NullspaceRoot.cs" />
+    <Compile Include="Assets\Scripts\ObjectPool\ObjectPools.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOBox.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOCE.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOClipper.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOFrustum.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOItem.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOKDTree.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOMap.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOModel.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OONode.cs" />
+    <Compile Include="Assets\Scripts\OcclusionCulling\OOObject.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\ResourceCacheBehaviour.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\ResourceCacheBindParent.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\ResourceCacheConfig.cs" />
@@ -408,12 +455,22 @@
     <Compile Include="Assets\Scripts\ResourceCache\Strategy\StrategyFixedForce.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\Strategy\StrategyFixedIgnore.cs" />
     <Compile Include="Assets\Scripts\ResourceCache\Strategy\StrategyInfinteCached.cs" />
+    <Compile Include="Assets\Scripts\Sequence\BehaviourSecondTimeCallback.cs" />
+    <Compile Include="Assets\Scripts\Sequence\BehaviourTimeCallback.cs" />
+    <Compile Include="Assets\Scripts\Sequence\IUpdate.cs" />
+    <Compile Include="Assets\Scripts\Sequence\ParallelSequenceBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Sequence\SequenceBehaviourManager.cs" />
+    <Compile Include="Assets\Scripts\Sequence\SequenceBehaviourUtils.cs" />
+    <Compile Include="Assets\Scripts\Sequence\SingleBehaviourTimeCallback.cs" />
+    <Compile Include="Assets\Scripts\Sequence\SingleSequenceBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Sequence\SingleSequenceBehaviourTree.cs" />
     <Compile Include="Assets\Scripts\Singleton.cs" />
-    <Compile Include="Assets\Scripts\Timer\TimerCallback.cs" />
-    <Compile Include="Assets\Scripts\Timer\TimerProcess\AutoCountTimer.cs" />
-    <Compile Include="Assets\Scripts\Timer\TimerProcess\TestFireTimer.cs" />
+    <Compile Include="Assets\Scripts\SkeletonAnimation\SkeletonAnimation.cs" />
+    <Compile Include="Assets\Scripts\Timer\ClientServerTime.cs" />
+    <Compile Include="Assets\Scripts\Timer\FrameTimerTaskHeap.cs" />
     <Compile Include="Assets\Scripts\Timer\TimerProcess\TimerCount.cs" />
     <Compile Include="Assets\Scripts\Timer\TimerProcess\TimerProcess.cs" />
+    <Compile Include="Assets\Scripts\Timer\TimerTask.cs" />
     <Compile Include="Assets\Scripts\Timer\TimerTaskQueue.cs" />
     <Compile Include="Assets\Scripts\Utils\DebugUtils.cs" />
     <Compile Include="Assets\Scripts\Utils\EnumUtils.cs" />
@@ -427,6 +484,19 @@
     <Compile Include="Assets\Scripts\Xml\SmallXmlParser.cs" />
     <Compile Include="Assets\Scripts\Xml\XmlData.cs" />
     <Compile Include="Assets\Scripts\Xml\XmlDataLoader.cs" />
+    <Compile Include="Assets\SequenceBehaviourDemo\SequenceBehaviourTest.cs" />
+    <Compile Include="Assets\TimerDemo\AutoCountTimer.cs" />
+    <Compile Include="Assets\TimerDemo\TestFireTimer.cs" />
+    <Compile Include="Assets\XmlDataDefine\EffectConfig.cs" />
+    <Compile Include="Assets\XmlDataDefine\NavPathData.cs" />
+    <Compile Include="Assets\XmlDataDefine\PathTriggerData.cs" />
+    <Compile Include="Assets\XmlDataDefine\TestXmlData.cs" />
+    <Compile Include="Assets\XmlDataDefine\XmlFileNameDefine.cs" />
+    <Compile Include="Assets\XmlDemo\XmlDataTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\XmlData\ResourceCache19500.xml" />
+    <None Include="Assets\XmlData\test_person19500.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
