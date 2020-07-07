@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#define TEST_DRAW
+
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Nullspace
 {
@@ -112,28 +115,29 @@ namespace Nullspace
             mMaxQueue = new PriorityQueue<float, object, float>();
         }
 
-        private static bool DrawPlanes = false;
-        public void DrawFrustumPlanes()
-        {
-            if (!DrawPlanes)
-            {
-                DrawPlanes = true;
-                mFrustum.DrawPlanes();
-            }
-            
-        }
-
+        /// <summary>
+        /// 初始化 KDTree的最大范围
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         public void Init(ref Vector3 min, ref Vector3 max)
         {
             Tree.Init(ref min, ref max);
         }
 
+        /// <summary>
+        /// 设置相机数据
+        /// </summary>
+        /// <param name="camera"></param>
         public void Camera(Camera camera)
         {
             MainCamera = camera;
             UpdateCameraMatrix();
         }
 
+        /// <summary>
+        /// 相机若变动,需要更新
+        /// </summary>
         public void UpdateCameraMatrix()
         {
             mView = MainCamera.worldToCameraMatrix;
@@ -145,12 +149,20 @@ namespace Nullspace
             mFrustum.Set(ref mPV, ref mPosition);
         }
 
-        public void SetResolution(int x, int y)
+        /// <summary>
+        /// 设置分辨率
+        /// </summary>
+        /// <param name="width">宽</param>
+        /// <param name="height">高</param>
+        public void SetResolution(int width, int height)
         {
-            Map.SetResolution(x, y);
-            mClip.SetResolution(x, y);
+            Map.SetResolution(width, height);
+            mClip.SetResolution(width, height);
         }
 
+        /// <summary>
+        /// 释放KDTree
+        /// </summary>
         public void Delete()
         {
             DeleteNodes(Tree.Root);
@@ -158,16 +170,28 @@ namespace Nullspace
             Tree.Root.Level = 0;
         }
 
+        /// <summary>
+        /// 添加物体到KDTree
+        /// </summary>
+        /// <param name="obj">待添加物体</param>
         public void Add(OOObject obj)
         {
             Tree.Add(obj);
         }
 
+        /// <summary>
+        /// 删除KDTree中指定的Object
+        /// </summary>
+        /// <param name="obj">待删除物体</param>
         public void Remove(OOObject obj)
         {
             Tree.Delete(obj);
         }
 
+        /// <summary>
+        /// 根据指定的算法运行
+        /// </summary>
+        /// <param name="mode">运行模式</param>
         public void FindVisible(int mode)
         {
             mVisible = mTail = null;
@@ -186,49 +210,85 @@ namespace Nullspace
             }
         }
 
+        /// <summary>
+        /// KDTree递归划分所有结点
+        /// </summary>
         public void InitTree()
         {
             Tree.Root.FullDistribute(mMaxLevel, mMaxItems);
         }
 
+        /// <summary>
+        /// 物体AABB做计算时,放大一点点.容错性处理
+        /// </summary>
+        /// <param name="dist">放大容错距离</param>
         public void SafeDistance(float dist)
         {
             mSafeDistance = dist;
         }
 
+        /// <summary>
+        /// 设置KDTree的Node中存储的最大物体数量
+        /// </summary>
+        /// <param name="n">最大数量值</param>
         public void MaxItems(int n)
         {
             mMaxItems = n;
         }
 
+        /// <summary>
+        /// 设置KDTree最大深度
+        /// </summary>
+        /// <param name="n">最大深度值</param>
         public void MaxDepth(int n)
         {
             mMaxLevel = n;
         }
 
+        /// <summary>
+        /// 获得当前可见物体的
+        /// </summary>
+        /// <returns></returns>
         public int GetObjectID()
         {
             return mTemp.GetObjectId();
         }
 
+        /// <summary>
+        /// 获得当前第一个可见物体
+        /// </summary>
+        /// <returns></returns>
         public int GetFirstObject()
         {
             mTemp = mVisible;
             return mTemp != null ? 1 : 0;
         }
 
+        /// <summary>
+        /// 重置下一个可见物体为当前物体
+        /// </summary>
+        /// <returns></returns>
         public int GetNextObject()
         {
             mTemp = mTemp.Next;
             return mTemp != null ? 1 : 0;
         }
 
+        /// <summary>
+        /// 获取当前物体的 世界变换矩阵
+        /// </summary>
+        /// <param name="m">物体的世界变换矩阵</param>
+        /// <returns></returns>
         public int GetObjectTransform(ref Matrix4x4 m)
         {
             m = mTemp.ModelWorldMatrix;
             return 1;
         }
 
+        /// <summary>
+        /// 删除指定结点
+        /// </summary>
+        /// <param name="nd">待删除结点</param>
         private void DeleteNodes(OONode nd)
         {
             if (nd == null)
@@ -240,6 +300,9 @@ namespace Nullspace
             DeleteNodes(nd.Right);
         }
 
+        /// <summary>
+        /// 截头体剔除算法入口
+        /// </summary>
         private void FrustumCull()
         {
             mMinQueue.Clear();
@@ -281,6 +344,10 @@ namespace Nullspace
                 }
             }
         }
+
+        /// <summary>
+        /// 遮挡剔除 算法入口
+        /// </summary>
         private void OcclusionCull()
         {
             Stat[0] = Stat[1] = 0;
@@ -288,6 +355,7 @@ namespace Nullspace
             mMinQueue.Clear();
             mMaxQueue.Clear();
             PushBox2(Tree.Root, ref Tree.Root.Box);
+            // 按 负无穷范数(最小值) 作为优先权中 遍历
             while (mMinQueue.Size > 0)
             {
                 OONode nd = (OONode)mMinQueue.Dequeue();
@@ -302,6 +370,7 @@ namespace Nullspace
                     {
                         // 标记为可见
                         nd.Visible = 1;
+                        // 父节点可见,接下来判断左右孩子结点的可见性
                         PushBox2(nd.Left, ref nd.Left.Box);
                         PushBox2(nd.Right, ref nd.Right.Box);
                     }
@@ -354,6 +423,9 @@ namespace Nullspace
             }
         }
 
+        /// <summary>
+        /// 老旧的遮挡剔除算法入口
+        /// </summary>
         private void OcclusionCullOld()
         {
             Stat[0] = Stat[1] = 0;
@@ -424,6 +496,10 @@ namespace Nullspace
             }
         }
 
+        /// <summary>
+        /// 将全部落入 distance 的AABB对应的 Item 物体 绘制到缓冲区
+        /// </summary>
+        /// <param name="distance">刷新距离值</param>
         private void FlushOccluders(float distance)
         {
             while (mMaxQueue.Size > 0 && ((OOObject)mMaxQueue.Peek()).Box.Zmax <= distance)
@@ -437,67 +513,96 @@ namespace Nullspace
             }
         }
 
-        private int IsVisible(int flush, ref OOBox b, float dist)
+        /// <summary>
+        /// 判断 Box 的可见性
+        /// </summary>
+        /// <param name="flush">Node结点的Box 为 1, 需要将缓存的遮挡物先绘制再查询; Node中的Item为0.</param>
+        /// <param name="box">AABB数据</param>
+        /// <param name="dist">最近距离( 负无穷范数 )</param>
+        /// <returns></returns>
+        private int IsVisible(int flush, ref OOBox box, float dist)
         {
-            OOBox q = b;
-            q.Size = b.Size + Vector3.one * mSafeDistance;
+            // Box放大一点点
+            OOBox q = box;
+            q.Size = box.Size + Vector3.one * mSafeDistance;
+            // 截头体测试
             int visible = mFrustum.Test(ref q);
             if (visible == 0)
             {
                 return 0;
             }
+            // 相机在Box内部
             if (visible == 2)
             {
                 return 1;
             }
             if (flush != 0)
             {
+                // 绘制Box最远距离 小于 dist的物体
                 FlushOccluders(dist);
             }
-            return QueryBox(ref b);
+            return QueryBox(ref box);
         }
 
-
-        private void MinMax(ref OOBox b, ref float min, ref float max)
+        /// <summary>
+        /// 相机位置到物体Box的最大最小值距离( 无穷范数 )
+        /// </summary>
+        /// <param name="box">AABB数据</param>
+        /// <param name="min">AABB距相机距离最近值</param>
+        /// <param name="max">AABB距相机距离最远值</param>
+        private void MinMax(ref OOBox box, ref float min, ref float max)
         {
             min = 0;
             max = float.MinValue;
-            Vector3 diff = (mPosition - b.Mid).Abs();
-
+            // 相机到Box中心的向量三维度的距离表示
+            Vector3 diff = (mPosition - box.Mid).Abs();
+            // 三维度距离与Box此寸比较,计算最大和最小距离值
             for (int i = 0; i < 3; i++)
             {
-                float d1 = diff[i] - b.Size[i];
+                float d1 = diff[i] - box.Size[i];
                 if (d1 > min)
                 {
                     min = d1;
                 }
-                float d2 = diff[i] + b.Size[i];
+                float d2 = diff[i] + box.Size[i];
                 if (d2 > max)
                 {
                     max = d2;
                 }
             }
+            // 不能小于0, 比如在内部
             if (min < 0)
             {
                 min = 0;
             }
         }
 
-        private void PushBox(object obj, ref OOBox b)
+        /// <summary>
+        /// 按照相机朝向计算距离值
+        /// </summary>
+        /// <param name="obj">待添加物体</param>
+        /// <param name="box">待添加物体的Box数据</param>
+        private void PushBox(object obj, ref OOBox box)
         {
             float dis, d;
-            dis = -Vector3.Dot(b.Mid, mLook);
-            d = Vector3.Dot(mAbsLook, b.Size);
-            b.Zmin = dis - d;
-            b.Zmax = dis + d;
-            mMinQueue.Enqueue(b.Zmin, obj, b.Zmin);
+            dis = -Vector3.Dot(box.Mid, mLook);
+            d = Vector3.Dot(mAbsLook, box.Size);
+            box.Zmin = dis - d;
+            box.Zmax = dis + d;
+            mMinQueue.Enqueue(box.Zmin, obj, box.Zmin);
         }
 
-        private void PushBox2(object obj, ref OOBox b)
+        /// <summary>
+        /// 将物体保存到 小根堆
+        /// </summary>
+        /// <param name="obj">待添加物体</param>
+        /// <param name="box">添加物体的Box的大小</param>
+        private void PushBox2(object obj, ref OOBox box)
         {
-            MinMax(ref b, ref b.Zmin, ref b.Zmax);
-            mMinQueue.Enqueue(b.Zmin, obj, b.Zmin);
-            return;
+            // 最近和最远平面距离计算
+            MinMax(ref box, ref box.Zmin, ref box.Zmax);
+            // 以最近距离为权重值,添加到优先队列
+            mMinQueue.Enqueue(box.Zmin, obj, box.Zmin);
         }
 
         /// <summary>
@@ -513,23 +618,25 @@ namespace Nullspace
         ///     0 --------- 1
         ///    min
         /// </summary>
-        /// <param name="box"></param>
+        /// <param name="box">查询Box的可见性</param>
         /// <returns></returns>
         private int QueryBox(ref OOBox box)
         {
             Vector3 min = box.Min;
             Vector3 max = box.Max;
+
+            // 8顶点索引和数据对应
             Vector4[] vxt = new Vector4[8];
             vxt[0] = new Vector4(min[0], min[1], min[2], 1);
             vxt[1] = new Vector4(max[0], min[1], min[2], 1);
             vxt[2] = new Vector4(min[0], max[1], min[2], 1);
             vxt[3] = new Vector4(max[0], max[1], min[2], 1);
-
             vxt[4] = new Vector4(min[0], min[1], max[2], 1);
             vxt[5] = new Vector4(max[0], min[1], max[2], 1);
             vxt[6] = new Vector4(min[0], max[1], max[2], 1);
             vxt[7] = new Vector4(max[0], max[1], max[2], 1);
 
+            // 区域码计算
             int cd = 0;
             if (mPosition[0] < min[0])
             {
@@ -567,6 +674,9 @@ namespace Nullspace
             int[] stt = STAB[cd];
             // 数组0索引表示能见到的顶点数量,后面的数组索引记录Box的顶点索引
             int vp = stt[0];
+#if TEST_DRAW
+            List<Vector3> polygon = new List<Vector3>();
+#endif
             // 遍历顶点
             for (int i = 0; i < vp; i++)
             {
@@ -574,20 +684,31 @@ namespace Nullspace
                 int j = stt[i + 1];
                 // 将顶点变换到裁剪空间
                 mClip.mClipSpaceVertices[i] = mPV * vxt[j];
+#if TEST_DRAW
+                polygon.Add(vxt[j]);
+#endif
             }
+#if TEST_DRAW
+            // 绘制可见多边形
+            GeoDebugDrawUtils.DrawPolygon(polygon, Color.red);
+#endif
+
+            // 对Box的轮廓进行裁剪计算,返回裁剪后的顶点数
             vp = mClip.ClipAndProject(vp);
             if (vp < 3)
             {
                 return 0;
             }
-            int res = Map.QueryOPolygon(mClip.mScreenSpaceVertices, vp);
+            int res = Map.QueryPolygon(mClip.mScreenSpaceVertices, vp);
             return res;
         }
 
+        /// <summary>
+        /// 绘制一个物体到缓冲区
+        /// </summary>
+        /// <param name="obj">待绘制物体</param>
         private void DrawOccluder(OOObject obj)
         {
-            
-            int j, nv;
             OOModel mdl = obj.Model;
             Matrix4x4 mcb = mView * obj.ModelWorldMatrix;
             for (int i = 0; i < mdl.NumVert; i++)
@@ -612,10 +733,10 @@ namespace Nullspace
                     mClip.mClipSpaceVertices[0] = mdl.TVertices[p1];
                     mClip.mClipSpaceVertices[1] = mdl.TVertices[p2];
                     mClip.mClipSpaceVertices[2] = mdl.TVertices[p3];
-                    nv = mClip.ClipAndProject(3);
+                    int nv = mClip.ClipAndProject(3);
                     if (nv > 2)
                     {
-                        for (j = 0; j < nv; j++)
+                        for (int j = 0; j < nv; j++)
                         {
                             if (mClip.mScreenSpaceVertices[j][0] < xmin)
                             {
@@ -634,7 +755,7 @@ namespace Nullspace
                                 ymax = mClip.mScreenSpaceVertices[j][1];
                             }
                         }
-                        Map.DrawOPolygon(mClip.mScreenSpaceVertices, nv);
+                        Map.DrawPolygon(mClip.mScreenSpaceVertices, nv);
                     }
                 }
             }

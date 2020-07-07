@@ -1,4 +1,6 @@
-﻿
+﻿#define TEST_DRAW
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nullspace
@@ -8,15 +10,15 @@ namespace Nullspace
         public Vector4[] mClipSpaceVertices;
         public Vector4[] mClipOutVertices;
         public Vector2i[] mScreenSpaceVertices;
-        private float[] mClipLerpFactor;
+        private float[] mLerpFactor;
         private int mClipVerticesNumber;
-        private float mScaleX;
-        private float mScaleY;
+        private float mHalfWidth;
+        private float mHalfHeight;
         public OOClipper()
         {
             mClipSpaceVertices = new Vector4[64];
             mClipOutVertices = new Vector4[64];
-            mClipLerpFactor = new float[64];
+            mLerpFactor = new float[64];
             mScreenSpaceVertices = new Vector2i[8]
                                     {
                                         new Vector2i(),
@@ -30,10 +32,15 @@ namespace Nullspace
                                     };
         }
 
-        public void SetResolution(int x, int y)
+        /// <summary>
+        /// 设置分辨率: 放大 32 倍
+        /// </summary>
+        /// <param name="width">宽</param>
+        /// <param name="height">高</param>
+        public void SetResolution(int width, int height)
         {
-            mScaleX = 32 * x / 2;
-            mScaleY = 32 * y / 2;
+            mHalfWidth = 32 * width / 2;
+            mHalfHeight = 32 * height / 2;
         }
 
         /// <summary>
@@ -48,11 +55,11 @@ namespace Nullspace
         /// w < 0, w <= x, y, z <= -w，
         /// 暂且认为 w = mClipSpaceVertices[i][3] > 0
         /// </summary>
-        /// <param name="n"></param>
+        /// <param name="number">顶点数</param>
         /// <returns></returns>
-        public int ClipAndProject(int n)
+        public int ClipAndProject(int number)
         {
-            mClipVerticesNumber = n;
+            mClipVerticesNumber = number;
             // 记录点所在的区域码
             uint clipOr = 0;
             // 所有点是否在裁剪区域外且为同一侧
@@ -102,93 +109,105 @@ namespace Nullspace
             // 不都在同一侧,即至少存在跨区域的两个点.需要做裁剪计算
             if (clipOr > 0)
             {
-                if ((clipOr & 1) > 0)
+                // 存在 左平面
+                if ((clipOr & 1) > 0 && !Clip(0, true))
                 {
-                    for (int i = 0; i < mClipVerticesNumber; i++)
-                    {
-                        mClipLerpFactor[i] = mClipSpaceVertices[i][3] + mClipSpaceVertices[i][0];
-                    }
-                    Clip();
-                    if (mClipVerticesNumber < 3)
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
-                if ((clipOr & 2) > 0)
+                // 存在 右平面
+                if ((clipOr & 2) > 0 && !Clip(0, false))
                 {
-                    for (int i = 0; i < mClipVerticesNumber; i++)
-                    {
-                        mClipLerpFactor[i] = mClipSpaceVertices[i][3] - mClipSpaceVertices[i][0];
-                    }
-                    Clip();
-                    if (mClipVerticesNumber < 3)
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
-                if ((clipOr & 4) > 0)
+                // 存在 底平面
+                if ((clipOr & 4) > 0 && !Clip(1, true))
                 {
-                    for (int i = 0; i < mClipVerticesNumber; i++)
-                    {
-                        mClipLerpFactor[i] = mClipSpaceVertices[i][3] + mClipSpaceVertices[i][1];
-                    }
-                    Clip();
-                    if (mClipVerticesNumber < 3)
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
-                if ((clipOr & 8) > 0)
+                // 存在 上平面
+                if ((clipOr & 8) > 0 && !Clip(1, false))
                 {
-                    for (int i = 0; i < mClipVerticesNumber; i++)
-                    {
-                        mClipLerpFactor[i] = mClipSpaceVertices[i][3] - mClipSpaceVertices[i][1];
-                    }
-                    Clip();
-                    if (mClipVerticesNumber < 3)
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
-                if ((clipOr & 16) > 0)
+                // 存在 近平面
+                if ((clipOr & 16) > 0 && !Clip(2, true))
                 {
-                    for (int i = 0; i < mClipVerticesNumber; i++)
-                    {
-                        mClipLerpFactor[i] = mClipSpaceVertices[i][3] + mClipSpaceVertices[i][2];
-                    }
-                    Clip();
-                    if (mClipVerticesNumber < 3)
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
-                if ((clipOr & 32) > 0)
+                // 存在 远平面
+                if ((clipOr & 32) > 0 && !Clip(2, false))
                 {
-                    for (int i = 0; i < mClipVerticesNumber; i++)
-                    {
-                        mClipLerpFactor[i] = mClipSpaceVertices[i][3] - mClipSpaceVertices[i][2];
-                    }
-                    Clip();
-                    if (mClipVerticesNumber < 3)
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
             }
+#if TEST_DRAW
+            List<Vector3> ndcPolygon = new List<Vector3>();
+#endif
+            // 视口变换
             for (int i = 0; i < mClipVerticesNumber; i++)
             {
                 // 透视除法
                 float invh = 1 / mClipSpaceVertices[i][3];
                 mClipSpaceVertices[i] = mClipSpaceVertices[i] * invh;
-                // 视口变换 屏幕:左下角为原点(0, 0)
-                mClipSpaceVertices[i][0] = (mClipSpaceVertices[i][0] + 1) * mScaleX;
-                mClipSpaceVertices[i][1] = (mClipSpaceVertices[i][1] + 1) * mScaleY;
+#if TEST_DRAW
+
+#endif
+                // 屏幕:左下角为原点(0, 0)
+                // unity 此处实际上还需要考虑相机的 viewport rect的参数
+                mClipSpaceVertices[i][0] = (mClipSpaceVertices[i][0] + 1) * mHalfWidth;
+                mClipSpaceVertices[i][1] = (mClipSpaceVertices[i][1] + 1) * mHalfHeight;
                 mScreenSpaceVertices[i][0] = ((int)(mClipSpaceVertices[i][0])) | 1;
                 mScreenSpaceVertices[i][1] = ((int)(mClipSpaceVertices[i][1])) | 1;
             }
             return mClipVerticesNumber;
         }
 
+#if TEST_DRAW
+        private void DrawNDCBox()
+        {
+            List<Vector3> ndcPolygon = new List<Vector3>();
+            
+            ndcPolygon.Add(new Vector3(-1, -1, -1));
+            ndcPolygon.Add(new Vector3(1, -1, -1));
+            ndcPolygon.Add(new Vector3(1, -1, -1));
+
+            GeoDebugDrawUtils.DrawPolygon(ndcPolygon, Color.yellow);
+        }
+#endif
+
+        /// <summary>
+        /// 裁剪
+        /// </summary>
+        /// <param name="idx">裁剪平面索引</param>
+        /// <param name="isMin">是否为此维度的最小裁剪平面</param>
+        /// <returns></returns>
+        private bool Clip(int idx, bool isMin)
+        {
+            // 插值系数获得
+            for (int i = 0; i < mClipVerticesNumber; i++)
+            {
+                if (isMin)
+                {
+                    mLerpFactor[i] = mClipSpaceVertices[i][3] + mClipSpaceVertices[i][idx];
+                }
+                else
+                {
+                    mLerpFactor[i] = mClipSpaceVertices[i][3] - mClipSpaceVertices[i][idx];
+                }
+            }
+            // 裁剪多边形
+            Clip();
+            // 裁剪后,若不构成封闭形状:至少有3个点, 返回 false
+            if (mClipVerticesNumber < 3)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        ///  裁剪多边形
+        /// </summary>
         private void Clip()
         {
             int j;
@@ -200,16 +219,16 @@ namespace Nullspace
                 {
                     j = 0;
                 }
-                if (mClipLerpFactor[i] >= 0)
+                if (mLerpFactor[i] >= 0)
                 {
-                    if (mClipLerpFactor[j] < 0)
+                    if (mLerpFactor[j] < 0)
                     {
-                        mClipOutVertices[k++] = Vector4.Lerp(mClipSpaceVertices[i], mClipSpaceVertices[j], mClipLerpFactor[i] / (mClipLerpFactor[i] - mClipLerpFactor[j]));
+                        mClipOutVertices[k++] = Vector4.Lerp(mClipSpaceVertices[i], mClipSpaceVertices[j], mLerpFactor[i] / (mLerpFactor[i] - mLerpFactor[j]));
                     }
                 }
-                else if (mClipLerpFactor[j] >= 0)
+                else if (mLerpFactor[j] >= 0)
                 {
-                    mClipOutVertices[k++] = Vector4.Lerp(mClipSpaceVertices[j], mClipSpaceVertices[i], mClipLerpFactor[j] / (mClipLerpFactor[j] - mClipLerpFactor[i]));
+                    mClipOutVertices[k++] = Vector4.Lerp(mClipSpaceVertices[j], mClipSpaceVertices[i], mLerpFactor[j] / (mLerpFactor[j] - mLerpFactor[i]));
                 }
             }
             mClipVerticesNumber = k;

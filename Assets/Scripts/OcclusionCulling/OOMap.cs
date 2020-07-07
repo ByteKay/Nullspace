@@ -62,7 +62,7 @@ namespace Nullspace
             Array.Clear(Blocks, 0, mMapXresb * mMapYresb - 1);
         }
 
-        public void DrawOPolygon(Vector2i[] vs, int vp)
+        public void DrawPolygon(Vector2i[] vs, int vp)
         {
             int i, j;
             for (i = 0; i < vp; i++)
@@ -343,7 +343,7 @@ namespace Nullspace
             return 0;
         }
 
-        public int QueryOPolygon(Vector2i[] vs, int vp)
+        public int QueryPolygon(Vector2i[] vs, int vp)
         {
             mYmin = 100000;
             mYmax = 0;
