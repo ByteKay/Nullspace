@@ -4,6 +4,19 @@ namespace Nullspace
 {
     public class OOCE
     {
+        /// <summary>
+        /// 根据相机位置,获得所在区域,然后获取Box可见面构造的轮廓
+        ///                    max
+        ///         6 --------- 7
+        ///       / |         / |
+        ///     2 --------- 3   |
+        ///     |   |       |   |
+        ///     |   |       |   |
+        ///     |   4 --------- 5
+        ///     | /         | /
+        ///     0 --------- 1
+        ///    min
+        /// </summary>
         private static int[][] STAB = new int[][]
         {
             new int[]{0,0,0,0,0,0,0},
@@ -487,55 +500,87 @@ namespace Nullspace
             return;
         }
 
-        private int QueryBox(ref OOBox x)
+        /// <summary>
+        /// 根据相机位置,获得所在区域,然后获取Box可见面构造的轮廓
+        ///                    max
+        ///         6 --------- 7
+        ///       / |         / |
+        ///     2 --------- 3   |
+        ///     |   |       |   |
+        ///     |   |       |   |
+        ///     |   4 --------- 5
+        ///     | /         | /
+        ///     0 --------- 1
+        ///    min
+        /// </summary>
+        /// <param name="box"></param>
+        /// <returns></returns>
+        private int QueryBox(ref OOBox box)
         {
-            Vector3[] vxt = new Vector3[8];
-            Vector3 min = x.Mid - x.Size;
-            Vector3 max = x.Mid + x.Size;
+            Vector3 min = box.Min;
+            Vector3 max = box.Max;
+            Vector4[] vxt = new Vector4[8];
+            vxt[0] = new Vector4(min[0], min[1], min[2], 1);
+            vxt[1] = new Vector4(max[0], min[1], min[2], 1);
+            vxt[2] = new Vector4(min[0], max[1], min[2], 1);
+            vxt[3] = new Vector4(max[0], max[1], min[2], 1);
+
+            vxt[4] = new Vector4(min[0], min[1], max[2], 1);
+            vxt[5] = new Vector4(max[0], min[1], max[2], 1);
+            vxt[6] = new Vector4(min[0], max[1], max[2], 1);
+            vxt[7] = new Vector4(max[0], max[1], max[2], 1);
+
             int cd = 0;
             if (mPosition[0] < min[0])
             {
+                // 左面之左
                 cd |= 1;
             }
             if (mPosition[0] > max[0])
             {
+                // 右面之右
                 cd |= 2;
             }
             if (mPosition[1] < min[1])
             {
+                // 下面之下
                 cd |= 4;
             }
             if (mPosition[1] > max[1])
             {
+                // 上面之上
                 cd |= 8;
             }
             if (mPosition[2] < min[2])
             {
+                // 进面之近
                 cd |= 16;
             }
             if (mPosition[2] > max[2])
             {
+                // 远面之远
                 cd |= 32;
             }
-            vxt[0][0] = vxt[2][0] = vxt[4][0] = vxt[6][0] = min[0];
-            vxt[1][0] = vxt[3][0] = vxt[5][0] = vxt[7][0] = max[0];
-            vxt[0][1] = vxt[1][1] = vxt[4][1] = vxt[5][1] = min[1];
-            vxt[2][1] = vxt[3][1] = vxt[6][1] = vxt[7][1] = max[1];
-            vxt[0][2] = vxt[1][2] = vxt[2][2] = vxt[3][2] = min[2];
-            vxt[4][2] = vxt[5][2] = vxt[6][2] = vxt[7][2] = max[2];
+
+            // 到这一步,已经过了截头体测试.物体均在相机视角内
+            // 索引相机能见到的顶点
             int[] stt = STAB[cd];
+            // 数组0索引表示能见到的顶点数量,后面的数组索引记录Box的顶点索引
             int vp = stt[0];
+            // 遍历顶点
             for (int i = 0; i < vp; i++)
             {
+                // 获得顶点索引
                 int j = stt[i + 1];
-                mClip.Vi[i] = mPV * vxt[j];
+                // 将顶点变换到裁剪空间
+                mClip.mClipSpaceVertices[i] = mPV * vxt[j];
             }
             vp = mClip.ClipAndProject(vp);
             if (vp < 3)
             {
                 return 0;
             }
-            int res = Map.QueryOPolygon(mClip.Vs, vp);
+            int res = Map.QueryOPolygon(mClip.mScreenSpaceVertices, vp);
             return res;
         }
 
@@ -564,32 +609,32 @@ namespace Nullspace
                 Vector3 n = Vector3.Cross(a, b);
                 if (Vector3.Dot(n, mdl.CVertices[p1]) < 0)
                 {
-                    mClip.Vi[0] = mdl.TVertices[p1];
-                    mClip.Vi[1] = mdl.TVertices[p2];
-                    mClip.Vi[2] = mdl.TVertices[p3];
+                    mClip.mClipSpaceVertices[0] = mdl.TVertices[p1];
+                    mClip.mClipSpaceVertices[1] = mdl.TVertices[p2];
+                    mClip.mClipSpaceVertices[2] = mdl.TVertices[p3];
                     nv = mClip.ClipAndProject(3);
                     if (nv > 2)
                     {
                         for (j = 0; j < nv; j++)
                         {
-                            if (mClip.Vs[j][0] < xmin)
+                            if (mClip.mScreenSpaceVertices[j][0] < xmin)
                             {
-                                xmin = mClip.Vs[j][0];
+                                xmin = mClip.mScreenSpaceVertices[j][0];
                             }
                             else
                             {
-                                if (mClip.Vs[j][0] > xmax) xmax = mClip.Vs[j][0];
+                                if (mClip.mScreenSpaceVertices[j][0] > xmax) xmax = mClip.mScreenSpaceVertices[j][0];
                             }
-                            if (mClip.Vs[j][1] < ymin)
+                            if (mClip.mScreenSpaceVertices[j][1] < ymin)
                             {
-                                ymin = mClip.Vs[j][1];
+                                ymin = mClip.mScreenSpaceVertices[j][1];
                             }
-                            else if (mClip.Vs[j][1] > ymax)
+                            else if (mClip.mScreenSpaceVertices[j][1] > ymax)
                             {
-                                ymax = mClip.Vs[j][1];
+                                ymax = mClip.mScreenSpaceVertices[j][1];
                             }
                         }
-                        Map.DrawOPolygon(mClip.Vs, nv);
+                        Map.DrawOPolygon(mClip.mScreenSpaceVertices, nv);
                     }
                 }
             }

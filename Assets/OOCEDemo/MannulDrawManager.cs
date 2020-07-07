@@ -62,7 +62,7 @@ namespace Nullspace
                 {
                     obj.UpdateTransform();
                 }
-                Culler.FindVisible(OOCE.OOCE_FRUSTUM_CULLING);
+                Culler.FindVisible(OOCE.OOCE_OCCLUSION_CULLING);
                 int visible = Culler.GetFirstObject();
                 while (visible == 1)
                 {
