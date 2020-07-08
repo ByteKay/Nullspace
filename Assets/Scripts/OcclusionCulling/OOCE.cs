@@ -676,6 +676,7 @@ namespace Nullspace
             int vp = stt[0];
 #if TEST_DRAW
             List<Vector3> polygon = new List<Vector3>();
+            List<Vector3> clipPolygon = new List<Vector3>();
 #endif
             // 遍历顶点
             for (int i = 0; i < vp; i++)
@@ -686,15 +687,30 @@ namespace Nullspace
                 mClip.mClipSpaceVertices[i] = mPV * vxt[j];
 #if TEST_DRAW
                 polygon.Add(vxt[j]);
+                // 裁剪前
+                clipPolygon.Add(mClip.mClipSpaceVertices[i] * (1 / mClip.mClipSpaceVertices[i][3]));
 #endif
             }
+
 #if TEST_DRAW
             // 绘制可见多边形
             GeoDebugDrawUtils.DrawPolygon(polygon, Color.red);
+            GeoDebugDrawUtils.DrawPolygon(clipPolygon, Color.red);
+            DrawNDCBox();
 #endif
-
             // 对Box的轮廓进行裁剪计算,返回裁剪后的顶点数
             vp = mClip.ClipAndProject(vp);
+#if TEST_DRAW
+            clipPolygon.Clear();
+            // z 方向上 偏移 0.01
+            Vector4 offset = new Vector4(0, 0, 0.01f, 0);
+            for (int i = 0; i < vp; ++i)
+            {
+                clipPolygon.Add(offset + mClip.mClipSpaceVertices[i]);
+            }
+            // 裁剪后
+            GeoDebugDrawUtils.DrawPolygon(clipPolygon, Color.blue);
+#endif
             if (vp < 3)
             {
                 return 0;
@@ -702,6 +718,26 @@ namespace Nullspace
             int res = Map.QueryPolygon(mClip.mScreenSpaceVertices, vp);
             return res;
         }
+
+
+#if TEST_DRAW
+
+        private static bool HasNDCDrawn = false;
+        /// <summary>
+        /// 测试,绘制BOX
+        /// </summary>
+        private void DrawNDCBox()
+        {
+            if (!HasNDCDrawn)
+            {
+                HasNDCDrawn = true;
+                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                obj.name = "ndc";
+                obj.transform.position = Vector3.zero;
+                obj.transform.localScale = Vector3.one * 2;
+            }
+        }
+#endif
 
         /// <summary>
         /// 绘制一个物体到缓冲区

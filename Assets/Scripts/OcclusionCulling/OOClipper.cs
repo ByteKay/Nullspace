@@ -140,40 +140,20 @@ namespace Nullspace
                     return 0;
                 }
             }
-#if TEST_DRAW
-            List<Vector3> ndcPolygon = new List<Vector3>();
-#endif
+
             // 视口变换
             for (int i = 0; i < mClipVerticesNumber; i++)
             {
                 // 透视除法
                 float invh = 1 / mClipSpaceVertices[i][3];
                 mClipSpaceVertices[i] = mClipSpaceVertices[i] * invh;
-#if TEST_DRAW
-
-#endif
                 // 屏幕:左下角为原点(0, 0)
                 // unity 此处实际上还需要考虑相机的 viewport rect的参数
-                mClipSpaceVertices[i][0] = (mClipSpaceVertices[i][0] + 1) * mHalfWidth;
-                mClipSpaceVertices[i][1] = (mClipSpaceVertices[i][1] + 1) * mHalfHeight;
-                mScreenSpaceVertices[i][0] = ((int)(mClipSpaceVertices[i][0])) | 1;
-                mScreenSpaceVertices[i][1] = ((int)(mClipSpaceVertices[i][1])) | 1;
+                mScreenSpaceVertices[i][0] = (int)((mClipSpaceVertices[i][0] + 1) * mHalfWidth) | 1;
+                mScreenSpaceVertices[i][1] = (int)((mClipSpaceVertices[i][1] + 1) * mHalfHeight) | 1;
             }
             return mClipVerticesNumber;
         }
-
-#if TEST_DRAW
-        private void DrawNDCBox()
-        {
-            List<Vector3> ndcPolygon = new List<Vector3>();
-            
-            ndcPolygon.Add(new Vector3(-1, -1, -1));
-            ndcPolygon.Add(new Vector3(1, -1, -1));
-            ndcPolygon.Add(new Vector3(1, -1, -1));
-
-            GeoDebugDrawUtils.DrawPolygon(ndcPolygon, Color.yellow);
-        }
-#endif
 
         /// <summary>
         /// 裁剪
@@ -221,6 +201,7 @@ namespace Nullspace
                 }
                 if (mLerpFactor[i] >= 0)
                 {
+                    mClipOutVertices[k++] = mClipSpaceVertices[i];
                     if (mLerpFactor[j] < 0)
                     {
                         mClipOutVertices[k++] = Vector4.Lerp(mClipSpaceVertices[i], mClipSpaceVertices[j], mLerpFactor[i] / (mLerpFactor[i] - mLerpFactor[j]));
