@@ -12,8 +12,8 @@ namespace Nullspace
         public int NumVert;
         public int NumFace;
         public OOBox Box;
-        public Vector3[] CVertices;
-        public Vector4[] TVertices;
+        public Vector3[] CameraSpaceVertices;
+        public Vector4[] ClipSpaceVertices;
 
         public OOModel(MeshFilter filter)
         {
@@ -23,8 +23,8 @@ namespace Nullspace
             Faces = ArrayToList(MeshFilter.sharedMesh.triangles);
             NumVert = Vertices.Length;
             NumFace = Faces.Length;
-            CVertices = new Vector3[NumVert];
-            TVertices = new Vector4[NumVert];
+            CameraSpaceVertices = new Vector3[NumVert];
+            ClipSpaceVertices = new Vector4[NumVert];
             Bounds b = MeshFilter.sharedMesh.bounds;
             Box = new OOBox(b.min, b.max);
         }

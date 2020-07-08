@@ -745,33 +745,45 @@ namespace Nullspace
         /// <param name="obj">待绘制物体</param>
         private void DrawOccluder(OOObject obj)
         {
+            // 获取物体的模型
             OOModel mdl = obj.Model;
-            Matrix4x4 mcb = mView * obj.ModelWorldMatrix;
+            // 计算 ModelView 矩阵.注意：这里需要相机的变换矩阵的逆矩阵
+            // 另一问题：左手系和右手系问题。
+            Matrix4x4 modelViewMatrix = mView.inverse * obj.ModelWorldMatrix;
+            // 变换mesh的顶点到 相机空间 和 裁剪空间
             for (int i = 0; i < mdl.NumVert; i++)
             {
-                mdl.CVertices[i] = mcb * mdl.Vertices[i];
-                mdl.TVertices[i] = mProject * mdl.CVertices[i];
+                mdl.CameraSpaceVertices[i] = modelViewMatrix * mdl.Vertices[i];
+                mdl.ClipSpaceVertices[i] = mProject * mdl.CameraSpaceVertices[i];
             }
             int xmin = 100000;
             int xmax = 0;
             int ymin = 100000;
             int ymax = 0;
+            // 遍历所有面
             for (int i = 0; i < mdl.NumFace; i++)
             {
+                // 面索引
                 int p1 = mdl.Faces[i][0];
                 int p2 = mdl.Faces[i][1];
                 int p3 = mdl.Faces[i][2];
-                Vector3 a = mdl.CVertices[p2] - mdl.CVertices[p1];
-                Vector3 b = mdl.CVertices[p3] - mdl.CVertices[p1];
+                // 计算法向量。此处可以优化成：初始化时计算，而后变换一下法向量即可。
+                Vector3 a = mdl.CameraSpaceVertices[p2] - mdl.CameraSpaceVertices[p1];
+                Vector3 b = mdl.CameraSpaceVertices[p3] - mdl.CameraSpaceVertices[p1];
                 Vector3 n = Vector3.Cross(a, b);
-                if (Vector3.Dot(n, mdl.CVertices[p1]) < 0)
+                // 背面剔除。可计算相机的朝向，然后与三角面的法线计算即可。
+
+                if (Vector3.Dot(n, mdl.CameraSpaceVertices[p1]) < 0)
                 {
-                    mClip.mClipSpaceVertices[0] = mdl.TVertices[p1];
-                    mClip.mClipSpaceVertices[1] = mdl.TVertices[p2];
-                    mClip.mClipSpaceVertices[2] = mdl.TVertices[p3];
+                    mClip.mClipSpaceVertices[0] = mdl.ClipSpaceVertices[p1];
+                    mClip.mClipSpaceVertices[1] = mdl.ClipSpaceVertices[p2];
+                    mClip.mClipSpaceVertices[2] = mdl.ClipSpaceVertices[p3];
+                    // 裁剪计算
                     int nv = mClip.ClipAndProject(3);
+                    // 裁剪判断
                     if (nv > 2)
                     {
+                        // 裁剪后，对应屏幕区域的AABB
                         for (int j = 0; j < nv; j++)
                         {
                             if (mClip.mScreenSpaceVertices[j][0] < xmin)
@@ -780,7 +792,10 @@ namespace Nullspace
                             }
                             else
                             {
-                                if (mClip.mScreenSpaceVertices[j][0] > xmax) xmax = mClip.mScreenSpaceVertices[j][0];
+                                if (mClip.mScreenSpaceVertices[j][0] > xmax)
+                                {
+                                    xmax = mClip.mScreenSpaceVertices[j][0];
+                                }
                             }
                             if (mClip.mScreenSpaceVertices[j][1] < ymin)
                             {
@@ -791,10 +806,12 @@ namespace Nullspace
                                 ymax = mClip.mScreenSpaceVertices[j][1];
                             }
                         }
+                        // 绘制多边形到缓冲
                         Map.DrawPolygon(mClip.mScreenSpaceVertices, nv);
                     }
                 }
             }
+            // 设置该区域内有被覆盖
             Map.SetDirtyRectangle(xmin, ymin, xmax, ymax);
         }
     }
