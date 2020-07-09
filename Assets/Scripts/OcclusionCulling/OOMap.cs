@@ -1,5 +1,8 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace Nullspace
@@ -514,36 +517,37 @@ namespace Nullspace
         /// <summary>
         /// 绘制map到图片
         /// </summary>
-        public void DrawMapImage()
+        public void DrawScreenShot()
         {
             int len = mBlockCountX * mBlockCountY * 32;
             Texture2D tex = new Texture2D(mBlockCountX * 32, mBlockCountY * 32, TextureFormat.ARGB32, false);
+            // 先按行遍历
             for (int i = 0; i < mBlockCountY * 32; ++i)
             {
                 int start = i * mBlockCountX;
+                List<Color> row = new List<Color>();
                 for (int j = 0; j < mBlockCountX; ++j)
                 {
                     uint mask = Map[start + j];
-                    int textStart = start + j * 32;
-                    for (int k = 0; k < 32; )
+                    string str = Convert.ToString(mask, 2).PadLeft(32, '0');
+                    char[] bits = str.ToCharArray();
+                    for (int k = 0; k < bits.Length; ++k)
                     {
-                        int idx = textStart + 31 - k;
-                        if (((mask >> k) & 1) == 1)
+                        if (bits[k] == '0')
                         {
-                            tex.SetPixel(idx, i, Color.red);
+                            row.Add(Color.black);
                         }
                         else
                         {
-                            tex.SetPixel(idx, i, Color.black);
+                            row.Add(Color.red);
                         }
-                        ++k;
                     }
                 }
+                tex.SetPixels(0, i, mBlockCountX * 32, 1, row.ToArray());
             }
             tex.Apply();
-            RenderTexture.active = null;
             byte[] img = tex.EncodeToPNG();
-            System.IO.File.WriteAllBytes("./img_shot.png", img);
+            File.WriteAllBytes("./img_shot.png", img);
         }
 
         /// <summary>

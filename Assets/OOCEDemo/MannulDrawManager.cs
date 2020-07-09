@@ -23,9 +23,9 @@ namespace Nullspace
             Vector3 max = new Vector3(256 * 60 * 5 + 150, 10000, 256 * 60 * 5 + 150);
             Culler.Init(ref min, ref max);
             Culler.SetResolution(Screen.width, Screen.height);
-            Culler.MaxDepth(2);
+            Culler.MaxDepth(16);
             // 每个Node放一个物体
-            Culler.MaxItems(1);
+            Culler.MaxItems(3);
             Culler.SafeDistance(Mathf.Sqrt(0.32f * 0.32f + 0.24f * 0.24f + 0.30f * 0.30f));
             Culler.Camera(Camera.main);
         }
@@ -65,6 +65,7 @@ namespace Nullspace
                 }
                 Culler.FindVisible(OOCE.OOCE_OCCLUSION_CULLING);
                 int visible = Culler.GetFirstObject();
+                int count = 0;
                 while (visible == 1)
                 {
                     int id = Culler.GetObjectID();
@@ -73,7 +74,9 @@ namespace Nullspace
                         DrawObjects[id].Draw();
                     }
                     visible = Culler.GetNextObject();
+                    count++;
                 }
+                DebugUtils.Info("MannulDrawManager", "LateUpdate ", count);
             }
         }
 

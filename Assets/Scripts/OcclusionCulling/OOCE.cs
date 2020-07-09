@@ -1,4 +1,4 @@
-﻿#define TEST_DRAW
+﻿// #define TEST_DRAW
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -429,7 +429,7 @@ namespace Nullspace
                 FlushOccluders(float.MaxValue);
                 DebugUtils.Info("OcclusionCull", "After Max Left: ", mMaxQueue.Size);
             }
-            Map.DrawMapImage();
+            Map.DrawScreenShot();
 #endif
         }
 
