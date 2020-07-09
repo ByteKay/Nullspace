@@ -366,6 +366,8 @@ namespace Nullspace
                     // 该节点存在两个子节点
                     // 如果 该节点 Visible 为可见 ,则不需要进一步计算
                     // 如果 该结点 Visible 为不可见,则进一步计算判断可见性
+                    // KDTree的Node不是每次重新分配，带有一定的缓存功能。所以， Visible 可以加速计算
+                    // 存在一个问题：如果所有的物体都分到了一个Node中，可能会不停的划分到最大深度。后期需要优化
                     if ((nd.Visible != 0) || IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
                         // 标记为可见
@@ -386,7 +388,6 @@ namespace Nullspace
                 }
                 else // 叶节点
                 {
-                    
                     if (IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
                         OOItem itm = nd.Head.Next;
@@ -421,6 +422,12 @@ namespace Nullspace
                     }
                 }
             }
+#if TEST_DRAW
+            DebugUtils.Info("OcclusionCull", "Before Max Left: ", mMaxQueue.Size);
+            FlushOccluders(float.MaxValue);
+            DebugUtils.Info("OcclusionCull", "After Max Left: ", mMaxQueue.Size);
+            Map.DrawMapImage();
+#endif
         }
 
         /// <summary>
@@ -749,12 +756,16 @@ namespace Nullspace
             OOModel mdl = obj.Model;
             // 计算 ModelView 矩阵.注意：这里需要相机的变换矩阵的逆矩阵
             // 另一问题：左手系和右手系问题。
-            Matrix4x4 modelViewMatrix = mView.inverse * obj.ModelWorldMatrix;
+            Matrix4x4 modelViewMatrix = mView * obj.ModelWorldMatrix;
             // 变换mesh的顶点到 相机空间 和 裁剪空间
             for (int i = 0; i < mdl.NumVert; i++)
             {
-                mdl.CameraSpaceVertices[i] = modelViewMatrix * mdl.Vertices[i];
-                mdl.ClipSpaceVertices[i] = mProject * mdl.CameraSpaceVertices[i];
+                Vector4 tmp = mdl.Vertices[i];
+                tmp.w = 1;
+                tmp = modelViewMatrix * tmp;
+                mdl.CameraSpaceVertices[i] = tmp;
+                tmp.w = 1;
+                mdl.ClipSpaceVertices[i] = mProject * tmp;
             }
             int xmin = 100000;
             int xmax = 0;
@@ -768,11 +779,12 @@ namespace Nullspace
                 int p2 = mdl.Faces[i][1];
                 int p3 = mdl.Faces[i][2];
                 // 计算法向量。此处可以优化成：初始化时计算，而后变换一下法向量即可。
+                // 构建右手坐标系 逆时针为正方向
                 Vector3 a = mdl.CameraSpaceVertices[p2] - mdl.CameraSpaceVertices[p1];
                 Vector3 b = mdl.CameraSpaceVertices[p3] - mdl.CameraSpaceVertices[p1];
                 Vector3 n = Vector3.Cross(a, b);
                 // 背面剔除。可计算相机的朝向，然后与三角面的法线计算即可。
-
+                // 此处实际上计算 Camera 空间 原点到平面的距离是否小于0
                 if (Vector3.Dot(n, mdl.CameraSpaceVertices[p1]) < 0)
                 {
                     mClip.mClipSpaceVertices[0] = mdl.ClipSpaceVertices[p1];
@@ -783,7 +795,7 @@ namespace Nullspace
                     // 裁剪判断
                     if (nv > 2)
                     {
-                        // 裁剪后，对应屏幕区域的AABB
+                        // 裁剪后，计算屏幕区域的AABB
                         for (int j = 0; j < nv; j++)
                         {
                             if (mClip.mScreenSpaceVertices[j][0] < xmin)

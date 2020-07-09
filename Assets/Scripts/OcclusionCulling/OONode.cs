@@ -6,9 +6,9 @@ namespace Nullspace
     public class OONode
     {
         public const int AXIS_X = 0;
-        public const int AXIS_Y = 0;
-        public const int AXIS_Z = 0;
-        public const int LEAF = 0;
+        public const int AXIS_Y = 1;
+        public const int AXIS_Z = 2;
+        public const int LEAF = 3;
         private static int DoubleCounter = 0;
 
 

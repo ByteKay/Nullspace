@@ -20,7 +20,9 @@ namespace Nullspace
             MeshFilter = filter;
             MeshFilter.sharedMesh.RecalculateBounds();
             Vertices = MeshFilter.sharedMesh.vertices;
-            Faces = ArrayToList(MeshFilter.sharedMesh.triangles);
+            // Faces = ArrayToList(MeshFilter.sharedMesh.triangles);
+            Vertices = new Vector3[] { new Vector3(1.14f, -0.7f, -5.94f), new Vector3(1.14f, 1.96f, -7.81f), new Vector3(7.28f, -0.7f, -5.94f) };
+            Faces = new Vector3i[] { new Vector3i(0, 1, 2) };
             NumVert = Vertices.Length;
             NumFace = Faces.Length;
             CameraSpaceVertices = new Vector3[NumVert];

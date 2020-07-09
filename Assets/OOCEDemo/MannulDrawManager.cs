@@ -23,8 +23,9 @@ namespace Nullspace
             Vector3 max = new Vector3(256 * 60 * 5 + 150, 10000, 256 * 60 * 5 + 150);
             Culler.Init(ref min, ref max);
             Culler.SetResolution(Screen.width, Screen.height);
-            Culler.MaxDepth(32);
-            Culler.MaxItems(8);
+            Culler.MaxDepth(2);
+            // 每个Node放一个物体
+            Culler.MaxItems(1);
             Culler.SafeDistance(Mathf.Sqrt(0.32f * 0.32f + 0.24f * 0.24f + 0.30f * 0.30f));
             Culler.Camera(Camera.main);
         }

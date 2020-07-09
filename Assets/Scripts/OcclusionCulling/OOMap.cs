@@ -1,5 +1,6 @@
 ﻿
 using System;
+using UnityEngine;
 
 namespace Nullspace
 {
@@ -217,7 +218,7 @@ namespace Nullspace
             else
             {
                 // 不同块处理
-                int pte = xr;
+                int pte = adr + xr;
                 // 合并左边覆盖值ml，区块前移一个单位
                 Map[ptr++] |= ml;
                 // 遍历区块，全部覆盖
@@ -508,6 +509,41 @@ namespace Nullspace
                 }
             }
             return 0;
+        }
+
+        /// <summary>
+        /// 绘制map到图片
+        /// </summary>
+        public void DrawMapImage()
+        {
+            int len = mBlockCountX * mBlockCountY * 32;
+            Texture2D tex = new Texture2D(mBlockCountX * 32, mBlockCountY * 32, TextureFormat.ARGB32, false);
+            
+            for (int i = 0; i < mBlockCountY * 32; ++i)
+            {
+                int start = i * mBlockCountX;
+                for (int j = 0; j < mBlockCountX; ++j)
+                {
+                    int mapIdx = start + j;
+                    int textStart = start + j * 32;
+                    for (int k = 31; k >= 0; )
+                    {
+                        if ((Map[mapIdx] & (1 << k)) == 1)
+                        {
+                            tex.SetPixel(textStart + 31 - k, i, Color.red);
+                        }
+                        //else
+                        //{
+                        //    tex.SetPixel();
+                        //}
+                        k--;
+                    }
+                }
+            }
+            tex.Apply();
+            RenderTexture.active = null;
+            byte[] img = tex.EncodeToPNG();
+            System.IO.File.WriteAllBytes("./img_shot.png", img);
         }
 
         /// <summary>
