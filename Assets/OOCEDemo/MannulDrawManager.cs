@@ -7,12 +7,12 @@ namespace Nullspace
 
     public class MannulDrawManager : Singleton<MannulDrawManager>
     {
-        private Dictionary<int, OOObject> DrawObjects;
+        private Dictionary<int, OOModel> DrawObjects;
         private OOCE Culler;
 
         private void Awake()
         {
-            DrawObjects = new Dictionary<int, OOObject>();
+            DrawObjects = new Dictionary<int, OOModel>();
             InitializeCuller();
         }
 
@@ -35,7 +35,7 @@ namespace Nullspace
             if (!DrawObjects.ContainsKey(obj.GetInstanceID()))
             {
                 // object
-                OOObject oobj = new OOObject(obj);
+                OOModel oobj = new OOModel(obj);
                 oobj.SetObjectId(obj.GetInstanceID());
                 // culler
                 Culler.Add(oobj);
@@ -59,7 +59,7 @@ namespace Nullspace
                 // 如果相机存在变化,需要打开
                 // Culler.UpdateCameraMatrix();
                 // Culler.DrawFrustumPlanes();
-                foreach (OOObject obj in DrawObjects.Values)
+                foreach (OOModel obj in DrawObjects.Values)
                 {
                     obj.UpdateTransform();
                 }

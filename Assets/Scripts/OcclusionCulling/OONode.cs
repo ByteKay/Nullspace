@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// KDTree 树节点
+    /// </summary>
     public class OONode
     {
         public const int AXIS_X = 0;
@@ -10,8 +13,7 @@ namespace Nullspace
         public const int AXIS_Z = 2;
         public const int LEAF = 3;
         private static int DoubleCounter = 0;
-
-
+        
         // Node内 item 双链表 结构
         public OOItem Head;     // 链表头
         public OOItem Tail;     // 链表尾
@@ -56,7 +58,7 @@ namespace Nullspace
         }
 
         // 在该Node 添加 一个 Object
-        public void AddObject(OOObject obj)
+        public void AddObject(OOModel obj)
         {
             // Node内存储的数据为 OOItem
             OOItem item = new OOItem();

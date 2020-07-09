@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 纹理图
+    /// </summary>
     public class OOMap
     {
         private const short OOCE_NULL = -32768;

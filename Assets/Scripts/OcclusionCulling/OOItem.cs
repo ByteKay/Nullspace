@@ -2,11 +2,14 @@
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 分割树节点存储的数据
+    /// </summary>
     public class OOItem
     {
         public OOItem Next;
         public OOItem Prev;
-        public OOObject Obj;
+        public OOModel Obj;
         public OONode Node;
         public OOItem CNext;
         public OOItem CPrev;

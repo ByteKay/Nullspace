@@ -35,6 +35,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 截头体测试数据
+    /// </summary>
     public class OOFrustum
     {
         private Matrix4x4 mPV;

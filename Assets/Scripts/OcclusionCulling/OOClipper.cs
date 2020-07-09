@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 裁剪类
+    /// </summary>
     public class OOClipper
     {
         public Vector4[] mClipSpaceVertices;

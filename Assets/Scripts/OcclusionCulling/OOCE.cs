@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 主入口
+    /// </summary>
     public class OOCE
     {
         /// <summary>
@@ -82,9 +85,9 @@ namespace Nullspace
         private OOFrustum mFrustum;
         private OOClipper mClip;
 
-        private OOObject mVisible;
-        private OOObject mTail;
-        private OOObject mTemp;
+        private OOModel mVisible;
+        private OOModel mTail;
+        private OOModel mTemp;
         private Matrix4x4 mPV;
         private Matrix4x4 mView;
         private Matrix4x4 mProject;
@@ -174,7 +177,7 @@ namespace Nullspace
         /// 添加物体到KDTree
         /// </summary>
         /// <param name="obj">待添加物体</param>
-        public void Add(OOObject obj)
+        public void Add(OOModel obj)
         {
             Tree.Add(obj);
         }
@@ -183,7 +186,7 @@ namespace Nullspace
         /// 删除KDTree中指定的Object
         /// </summary>
         /// <param name="obj">待删除物体</param>
-        public void Remove(OOObject obj)
+        public void Remove(OOModel obj)
         {
             Tree.Delete(obj);
         }
@@ -316,7 +319,7 @@ namespace Nullspace
                     OOItem itm = nd.Head.Next;
                     while (itm != nd.Tail)
                     {
-                        OOObject obj = itm.Obj;
+                        OOModel obj = itm.Obj;
                         if (obj.TouchId != Tree.TouchCounter)
                         {
                             obj.TouchId = Tree.TouchCounter;
@@ -398,7 +401,7 @@ namespace Nullspace
                             if (itm.Obj.TouchId != Tree.TouchCounter)
 						    {
                                 itm.Obj.TouchId = Tree.TouchCounter;
-                                OOObject obj = itm.Obj;
+                                OOModel obj = itm.Obj;
                                 MinMax(ref obj.Box, ref obj.Box.Zmin, ref obj.Box.Zmax);
                                 // 查询物体的Box是否可见
                                 if (IsVisible(0, ref obj.Box, 0) != 0)
@@ -493,7 +496,7 @@ namespace Nullspace
                         {
                             if (itm.Obj.TouchId != Tree.TouchCounter) {
                                 itm.Obj.TouchId = Tree.TouchCounter;
-                                OOObject obj = itm.Obj;
+                                OOModel obj = itm.Obj;
                                 float dis = -Vector3.Dot(obj.Box.Mid, mLook);
                                 float d = Vector3.Dot(mAbsLook, obj.Box.Size);
                                 obj.Box.Zmin = dis - d;
@@ -531,9 +534,9 @@ namespace Nullspace
         /// <param name="distance">刷新距离值</param>
         private void FlushOccluders(float distance)
         {
-            while (mMaxQueue.Size > 0 && ((OOObject)mMaxQueue.Peek()).Box.Zmax <= distance)
+            while (mMaxQueue.Size > 0 && ((OOModel)mMaxQueue.Peek()).Box.Zmax <= distance)
             {
-                OOObject obj = (OOObject)mMaxQueue.Dequeue();
+                OOModel obj = (OOModel)mMaxQueue.Dequeue();
                 if (obj.CanOcclude == 0)
                 {
                     continue;
@@ -772,7 +775,7 @@ namespace Nullspace
         /// 绘制一个物体到缓冲区
         /// </summary>
         /// <param name="obj">待绘制物体</param>
-        private void DrawOccluder(OOObject obj)
+        private void DrawOccluder(OOModel obj)
         {
             // 获取物体的模型
             OOMesh mdl = obj.Model;

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 空间分割树
+    /// </summary>
     public class OOKDTree
     {
         public int TouchCounter;
@@ -14,17 +17,17 @@ namespace Nullspace
             Root.Level = 0;
         }
 
-        public void Add(OOObject obj)
+        public void Add(OOModel obj)
         {
             Root.AddObject(obj);
         }
 
-        public void Delete(OOObject obj)
+        public void Delete(OOModel obj)
         {
             obj.Detach();
         }
 
-        public void Refresh(OOObject obj)
+        public void Refresh(OOModel obj)
         {
             OONode nd;
             nd = obj.Head.CNext.Node;
