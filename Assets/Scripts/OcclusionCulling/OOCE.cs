@@ -423,9 +423,12 @@ namespace Nullspace
                 }
             }
 #if TEST_DRAW
-            DebugUtils.Info("OcclusionCull", "Before Max Left: ", mMaxQueue.Size);
-            FlushOccluders(float.MaxValue);
-            DebugUtils.Info("OcclusionCull", "After Max Left: ", mMaxQueue.Size);
+            if (mMaxQueue.Size > 0)
+            {
+                DebugUtils.Info("OcclusionCull", "Before Max Left: ", mMaxQueue.Size);
+                FlushOccluders(float.MaxValue);
+                DebugUtils.Info("OcclusionCull", "After Max Left: ", mMaxQueue.Size);
+            }
             Map.DrawMapImage();
 #endif
         }
@@ -760,9 +763,8 @@ namespace Nullspace
             // 变换mesh的顶点到 相机空间 和 裁剪空间
             for (int i = 0; i < mdl.NumVert; i++)
             {
-                Vector4 tmp = mdl.Vertices[i];
-                tmp.w = 1;
-                tmp = modelViewMatrix * tmp;
+                // Vector3 p = obj.ModelWorldMatrix.MultiplyPoint3x4(mdl.Vertices[i]);
+                Vector4 tmp = modelViewMatrix.MultiplyPoint3x4(mdl.Vertices[i]);
                 mdl.CameraSpaceVertices[i] = tmp;
                 tmp.w = 1;
                 mdl.ClipSpaceVertices[i] = mProject * tmp;
@@ -792,6 +794,11 @@ namespace Nullspace
                     mClip.mClipSpaceVertices[2] = mdl.ClipSpaceVertices[p3];
                     // 裁剪计算
                     int nv = mClip.ClipAndProject(3);
+#if TEST_DRAW_ONE
+                    DebugUtils.Info("ClipAndProject", string.Format("world1({0}, {1})", mClip.mScreenSpaceVertices[0][0], mClip.mScreenSpaceVertices[0][1]));
+                    DebugUtils.Info("ClipAndProject", string.Format("world2({0}, {1})", mClip.mScreenSpaceVertices[1][0], mClip.mScreenSpaceVertices[1][1]));
+                    DebugUtils.Info("ClipAndProject", string.Format("world3({0}, {1})", mClip.mScreenSpaceVertices[2][0], mClip.mScreenSpaceVertices[2][1]));
+#endif
                     // 裁剪判断
                     if (nv > 2)
                     {

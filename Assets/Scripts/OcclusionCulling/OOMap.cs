@@ -518,25 +518,25 @@ namespace Nullspace
         {
             int len = mBlockCountX * mBlockCountY * 32;
             Texture2D tex = new Texture2D(mBlockCountX * 32, mBlockCountY * 32, TextureFormat.ARGB32, false);
-            
             for (int i = 0; i < mBlockCountY * 32; ++i)
             {
                 int start = i * mBlockCountX;
                 for (int j = 0; j < mBlockCountX; ++j)
                 {
-                    int mapIdx = start + j;
+                    uint mask = Map[start + j];
                     int textStart = start + j * 32;
-                    for (int k = 31; k >= 0; )
+                    for (int k = 0; k < 32; )
                     {
-                        if ((Map[mapIdx] & (1 << k)) == 1)
+                        int idx = textStart + 31 - k;
+                        if (((mask >> k) & 1) == 1)
                         {
-                            tex.SetPixel(textStart + 31 - k, i, Color.red);
+                            tex.SetPixel(idx, i, Color.red);
                         }
-                        //else
-                        //{
-                        //    tex.SetPixel();
-                        //}
-                        k--;
+                        else
+                        {
+                            tex.SetPixel(idx, i, Color.black);
+                        }
+                        ++k;
                     }
                 }
             }

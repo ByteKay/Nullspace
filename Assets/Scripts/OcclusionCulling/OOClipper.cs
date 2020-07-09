@@ -147,10 +147,13 @@ namespace Nullspace
                 // 透视除法
                 float invh = 1 / mClipSpaceVertices[i][3];
                 mClipSpaceVertices[i] = mClipSpaceVertices[i] * invh;
+
+                mClipSpaceVertices[i][0] = (mClipSpaceVertices[i][0] + 1) * mHalfWidth;
+                mClipSpaceVertices[i][1] = (mClipSpaceVertices[i][1] + 1) * mHalfHeight;
                 // 屏幕:左下角为原点(0, 0)
                 // unity 此处实际上还需要考虑相机的 viewport rect的参数
-                mScreenSpaceVertices[i][0] = (int)((mClipSpaceVertices[i][0] + 1) * mHalfWidth) | 1;
-                mScreenSpaceVertices[i][1] = (int)((mClipSpaceVertices[i][1] + 1) * mHalfHeight) | 1;
+                mScreenSpaceVertices[i][0] = (int)(mClipSpaceVertices[i][0]) | 1;
+                mScreenSpaceVertices[i][1] = (int)(mClipSpaceVertices[i][1]) | 1;
             }
             return mClipVerticesNumber;
         }

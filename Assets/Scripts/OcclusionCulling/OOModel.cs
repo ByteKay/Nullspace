@@ -1,5 +1,4 @@
 ﻿
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nullspace
@@ -19,10 +18,28 @@ namespace Nullspace
         {
             MeshFilter = filter;
             MeshFilter.sharedMesh.RecalculateBounds();
-            Vertices = MeshFilter.sharedMesh.vertices;
-            // Faces = ArrayToList(MeshFilter.sharedMesh.triangles);
-            Vertices = new Vector3[] { new Vector3(1.14f, -0.7f, -5.94f), new Vector3(1.14f, 1.96f, -7.81f), new Vector3(7.28f, -0.7f, -5.94f) };
+
+#if TEST_DRAW_ONE
+            Vector3 world1 = new Vector3(1.14f, -0.7f, -5.94f);
+            Vector3 world2 = new Vector3(1.14f, 1.96f, -7.81f);
+            Vector3 world3 = new Vector3(7.28f, -0.7f, -5.94f);
+            Vertices = new Vector3[]
+            {
+                filter.transform.worldToLocalMatrix.MultiplyPoint3x4(world1),
+                filter.transform.worldToLocalMatrix.MultiplyPoint3x4(world2),
+                filter.transform.worldToLocalMatrix.MultiplyPoint3x4(world3)
+            };
+            world1 = Camera.main.WorldToScreenPoint(world1) * 32;
+            world2 = Camera.main.WorldToScreenPoint(world2) * 32;
+            world3 = Camera.main.WorldToScreenPoint(world3) * 32;
+            DebugUtils.Info("OOModel", string.Format("world1({0}, {1})", world1.x, world1.y));
+            DebugUtils.Info("OOModel", string.Format("world2({0}, {1})", world2.x, world2.y));
+            DebugUtils.Info("OOModel", string.Format("world3({0}, {1})", world3.x, world3.y));
             Faces = new Vector3i[] { new Vector3i(0, 1, 2) };
+#else
+            Vertices = MeshFilter.sharedMesh.vertices;
+            Faces = ArrayToList(MeshFilter.sharedMesh.triangles);
+#endif
             NumVert = Vertices.Length;
             NumFace = Faces.Length;
             CameraSpaceVertices = new Vector3[NumVert];
