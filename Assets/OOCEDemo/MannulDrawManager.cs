@@ -19,13 +19,13 @@ namespace Nullspace
         private void InitializeCuller()
         {
             Culler = new OOCE();
-            Vector3 min = new Vector3(-150, -150, -150);
-            Vector3 max = new Vector3(256 * 60 * 5 + 150, 10000, 256 * 60 * 5 + 150);
+            Vector3 min = new Vector3(-15, -15, -15);
+            Vector3 max = new Vector3(15, 15, 15);
             Culler.Init(ref min, ref max);
             Culler.SetResolution(Screen.width, Screen.height);
-            Culler.MaxDepth(16);
+            Culler.MaxDepth(32);
             // 每个Node放一个物体
-            Culler.MaxItems(3);
+            Culler.MaxItems(2);
             Culler.SafeDistance(Mathf.Sqrt(0.32f * 0.32f + 0.24f * 0.24f + 0.30f * 0.30f));
             Culler.Camera(Camera.main);
         }

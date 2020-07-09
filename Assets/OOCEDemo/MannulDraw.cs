@@ -18,7 +18,6 @@ namespace Nullspace
             render = GetComponent<Renderer>();
             material = render.material;
             isOpaque = material.shader.renderQueue < 3000;
-            render.enabled = false;
         }
 
         public void DrawMesh()

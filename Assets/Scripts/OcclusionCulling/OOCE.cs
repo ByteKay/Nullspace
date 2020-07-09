@@ -388,9 +388,11 @@ namespace Nullspace
                 }
                 else // 叶节点
                 {
+                    // 叶节点的Box测试
                     if (IsVisible(1, ref nd.Box, nd.Box.Zmin) != 0)
                     {
                         OOItem itm = nd.Head.Next;
+                        // 保存需要绘制的物体，以 Zmax 为优先级排序
                         while (itm != nd.Tail)
                         {
                             if (itm.Obj.TouchId != Tree.TouchCounter)
@@ -398,8 +400,10 @@ namespace Nullspace
                                 itm.Obj.TouchId = Tree.TouchCounter;
                                 OOObject obj = itm.Obj;
                                 MinMax(ref obj.Box, ref obj.Box.Zmin, ref obj.Box.Zmax);
+                                // 查询物体的Box是否可见
                                 if (IsVisible(0, ref obj.Box, 0) != 0)
                                 {
+                                    // 如果一个物体的Box可见，则为待绘制的物体
                                     mMaxQueue.Enqueue(obj.Box.Zmax, obj, obj.Box.Zmax);
                                     obj.Next = null;
                                     if (mVisible == null)
@@ -422,7 +426,9 @@ namespace Nullspace
                     }
                 }
             }
+
 #if TEST_DRAW
+            VisualKDTree(Tree.Root);
             if (mMaxQueue.Size > 0)
             {
                 DebugUtils.Info("OcclusionCull", "Before Max Left: ", mMaxQueue.Size);
@@ -431,6 +437,19 @@ namespace Nullspace
             }
             Map.DrawScreenShot();
 #endif
+        }
+
+        private void VisualKDTree(OONode node)
+        {
+            node.DrawAABB();
+            if (node.Left != null)
+            {
+                VisualKDTree(node.Left);
+            }
+            if (node.Right != null)
+            {
+                VisualKDTree(node.Right);
+            }
         }
 
         /// <summary>
@@ -756,7 +775,7 @@ namespace Nullspace
         private void DrawOccluder(OOObject obj)
         {
             // 获取物体的模型
-            OOModel mdl = obj.Model;
+            OOMesh mdl = obj.Model;
             // 计算 ModelView 矩阵.注意：这里需要相机的变换矩阵的逆矩阵
             // 另一问题：左手系和右手系问题。
             Matrix4x4 modelViewMatrix = mView * obj.ModelWorldMatrix;

@@ -3,10 +3,15 @@ using UnityEngine;
 
 namespace Nullspace
 {
+    /// <summary>
+    /// 封装 Mesh，这里包含 WorldTransform
+    /// 可以将 Mesh的本地数据变换到世界系
+    /// </summary>
     public class OOObject
     {
+        // 物体的世界变换矩阵
         public Matrix4x4 ModelWorldMatrix;
-        public OOModel Model;
+        public OOMesh Model;
         public OOBox Box;
 
         public OOObject Next;
@@ -15,6 +20,7 @@ namespace Nullspace
 
         public int TouchId;
         public int DoubleId;
+        // 不透明 或 透明 的标识
         public int CanOcclude;
         public int IsVisible;
 
@@ -25,7 +31,7 @@ namespace Nullspace
         {
             Drawer = drawer;
             MeshFilter mf = drawer.gameObject.GetComponent<MeshFilter>();
-            Model = new OOModel(mf);
+            Model = new OOMesh(mf);
             Box = new OOBox(Vector3.one * float.MaxValue, Vector3.one * float.MinValue);
             UpdateTransform();
             Head = new OOItem();

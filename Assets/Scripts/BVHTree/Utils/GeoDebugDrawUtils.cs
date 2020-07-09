@@ -84,6 +84,84 @@ namespace Nullspace
             }
         }
 
+
+        private static Color[] Colors = new Color[] { Color.red, Color.green, Color.blue, Color.white };
+        /// <summary>
+        ///                    max
+        ///         6 --------- 7
+        ///       / |         / |
+        ///     2 --------- 3   |
+        ///     |   |       |   |
+        ///     |   |       |   |
+        ///     |   4 --------- 5
+        ///     | /         | /
+        ///     0 --------- 1
+        ///    min
+        /// </summary>
+        public static void DrawAABB(Vector3 Min, Vector3 Max, int level)
+        {
+            int idx = level % Colors.Length;
+            // 6个面
+            // 8顶点索引和数据对应
+            Vector3[] vxt = new Vector3[8];
+            vxt[0] = new Vector3(Min[0], Min[1], Min[2]);
+            vxt[1] = new Vector3(Max[0], Min[1], Min[2]);
+            vxt[2] = new Vector3(Min[0], Max[1], Min[2]);
+            vxt[3] = new Vector3(Max[0], Max[1], Min[2]);
+            vxt[4] = new Vector3(Min[0], Min[1], Max[2]);
+            vxt[5] = new Vector3(Max[0], Min[1], Max[2]);
+            vxt[6] = new Vector3(Min[0], Max[1], Max[2]);
+            vxt[7] = new Vector3(Max[0], Max[1], Max[2]);
+
+            List<Vector3> polygon = new List<Vector3>();
+            // 近
+            polygon.Add(vxt[0]);
+            polygon.Add(vxt[1]);
+            polygon.Add(vxt[3]);
+            polygon.Add(vxt[2]);
+            GeoDebugDrawUtils.DrawPolygon(polygon, Colors[idx]);
+
+            // 左
+            polygon.Clear();
+            polygon.Add(vxt[0]);
+            polygon.Add(vxt[4]);
+            polygon.Add(vxt[6]);
+            polygon.Add(vxt[2]);
+            GeoDebugDrawUtils.DrawPolygon(polygon, Colors[idx]);
+
+            // 底
+            polygon.Clear();
+            polygon.Add(vxt[0]);
+            polygon.Add(vxt[1]);
+            polygon.Add(vxt[5]);
+            polygon.Add(vxt[4]);
+            GeoDebugDrawUtils.DrawPolygon(polygon, Colors[idx]);
+
+            // 右
+            polygon.Clear();
+            polygon.Add(vxt[1]);
+            polygon.Add(vxt[5]);
+            polygon.Add(vxt[7]);
+            polygon.Add(vxt[3]);
+            GeoDebugDrawUtils.DrawPolygon(polygon, Colors[idx]);
+
+            // 远
+            polygon.Clear();
+            polygon.Add(vxt[4]);
+            polygon.Add(vxt[5]);
+            polygon.Add(vxt[7]);
+            polygon.Add(vxt[6]);
+            GeoDebugDrawUtils.DrawPolygon(polygon, Colors[idx]);
+
+            // 上
+            polygon.Clear();
+            polygon.Add(vxt[2]);
+            polygon.Add(vxt[3]);
+            polygon.Add(vxt[7]);
+            polygon.Add(vxt[6]);
+            GeoDebugDrawUtils.DrawPolygon(polygon, Colors[idx]);
+        }
+
         public static void DrawAABB(GeoAABB2 aabb, Color clr)
         {
             Vector2 min = aabb.mMin;

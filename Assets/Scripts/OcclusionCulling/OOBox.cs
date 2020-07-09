@@ -1,8 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Nullspace
 {
-
+    /// <summary>
+    /// 使用 Min-Max 表示
+    /// 使用 Mid-Size 表示
+    /// </summary>
     public struct OOBox
     {
         // 最大最小点表示

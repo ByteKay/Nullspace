@@ -50,6 +50,11 @@ namespace Nullspace
             Tail.Prev = Head;
         }
 
+        public void DrawAABB()
+        {
+            GeoDebugDrawUtils.DrawAABB(Box.Min, Box.Max, Level);
+        }
+
         // 在该Node 添加 一个 Object
         public void AddObject(OOObject obj)
         {
@@ -214,6 +219,8 @@ namespace Nullspace
             // 在分割轴上, 加减 size,得到新的 中心点
             Left.Box.Mid[SplitAxis] = Box.Mid[SplitAxis] - half;
             Right.Box.Mid[SplitAxis] = Box.Mid[SplitAxis] + half;
+            Right.Box.ToMinMax();
+            Left.Box.ToMinMax();
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class OOModel
+    public class OOMesh
     {
         public MeshFilter MeshFilter;
         public Vector3[] Vertices;
@@ -14,7 +14,7 @@ namespace Nullspace
         public Vector3[] CameraSpaceVertices;
         public Vector4[] ClipSpaceVertices;
 
-        public OOModel(MeshFilter filter)
+        public OOMesh(MeshFilter filter)
         {
             MeshFilter = filter;
             MeshFilter.sharedMesh.RecalculateBounds();
