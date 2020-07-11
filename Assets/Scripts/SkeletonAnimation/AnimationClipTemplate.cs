@@ -57,7 +57,61 @@ namespace Animation
         {
             protected List<Listener> mBeginListeners;
             protected List<Listener> mEndListeners;
-            protected List<Listener> mListeners;
+            protected List<ListenerEvent> mListeners;
+
+            public List<ListenerEvent> GetListeners() { return mListeners; }
+            public List<Listener> GetBeginListeners() { return mBeginListeners; }
+            public List<Listener> GetEndListeners() { return mEndListeners; }
+
+            public void AddBeginListener(Listener listener)
+            {
+
+            }
+
+            public void RemoveBeginListener(Listener listener)
+            {
+
+            }
+
+            public bool HasBeginListener(Listener listener)
+            {
+                return false;
+            }
+
+            public void AddEndListener(Listener listener)
+            {
+
+            }
+
+            public void RemoveEndListener(Listener listener)
+            {
+
+            }
+
+            public bool HasEndListener(Listener listener)
+            {
+                return false;
+            }
+
+            public void AddListener(Listener listener, uint eventTime)
+            {
+
+            }
+
+            public void RemoveListener(Listener listener, uint eventTime)
+            {
+
+            }
+
+            public void RemoveListener(Listener listener)
+            {
+
+            }
+
+            public bool HasListener(Listener listener, uint eventTime)
+            {
+                return false;
+            }
         }
         
     }
