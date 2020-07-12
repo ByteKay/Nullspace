@@ -581,5 +581,6 @@ namespace MeshFile
             q = ReadQuaternion();
             pos = ReadVector3();
         }
+
     }
 }
