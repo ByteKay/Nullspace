@@ -7,8 +7,8 @@ namespace MeshFile
 {
     public class HexMeshFile
     {
-        protected byte m_workingMode;
         protected ushort m_version;
+        protected byte m_workingMode;
         protected uint m_blockSize;
         //base mesh
         protected HexMeshObjects m_meshObjectList;
