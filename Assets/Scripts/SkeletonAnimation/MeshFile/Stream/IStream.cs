@@ -7,7 +7,7 @@ namespace MeshFile
 {
     public interface IStream
     {
-        uint SaveToStream(SimpleMemoryStream stream);
+        int SaveToStream(SimpleMemoryStream stream);
         bool LoadFromStream(SimpleMemoryStream stream);
     }
 }

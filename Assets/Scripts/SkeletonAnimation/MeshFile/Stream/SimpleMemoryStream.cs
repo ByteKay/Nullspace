@@ -76,521 +76,875 @@ namespace MeshFile
             return mStream.Length - mStream.Position <= size;
         }
 
-        public byte[] ReadBytes(int count)
+        private byte[] ReadBytes(int count)
         {
-            System.Diagnostics.Debug.Assert(CanRead(count));
-            byte[] bytes = CacheBytes;
-            if (CacheLen > count)
+            if (CanRead(count))
             {
-                bytes = new byte[count];
+                byte[] bytes = CacheBytes;
+                if (CacheLen > count)
+                {
+                    bytes = new byte[count];
+                }
+                int size = mStream.Read(bytes, 0, count);
+                return bytes;
             }
-            int size = mStream.Read(bytes, 0, count);
-            System.Diagnostics.Debug.Assert(size == count);
-            return bytes;
+            return null;
         }
 
-        public byte ReadByte()
+        public bool ReadByte(ref byte v)
         {
             byte[] bytes = ReadBytes(sizeof(byte));
-            return bytes[0];
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = bytes[0];
+            return true;
         }
 
-        public bool ReadBool()
+        public bool ReadBool(ref bool v)
         {
             byte[] bytes = ReadBytes(sizeof(bool));
-            return BitConverter.ToBoolean(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToBoolean(bytes, 0);
+            return true;
         }
 
-        public float ReadFloat()
+        public bool ReadFloat(ref float v)
         {
             byte[] bytes = ReadBytes(sizeof(float));
-            return BitConverter.ToSingle(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToSingle(bytes, 0);
+            return true;
         }
 
-        public short ReadShort()
+        public bool ReadShort(ref short v)
         {
             byte[] bytes = ReadBytes(sizeof(short));
-            return BitConverter.ToInt16(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToInt16(bytes, 0);
+            return true;
         }
 
-        public int ReadInt()
+        public bool ReadInt(ref int v)
         {
             byte[] bytes = ReadBytes(sizeof(int));
-            return BitConverter.ToInt32(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToInt32(bytes, 0);
+            return true;
         }
 
-        public long ReadInt64()
+        public bool ReadInt64(ref long v)
         {
             byte[] bytes = ReadBytes(sizeof(long));
-            return BitConverter.ToInt64(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToInt64(bytes, 0);
+            return true;
         }
-        public ushort ReadUShort()
+        public bool ReadUShort(ref ushort v)
         {
             byte[] bytes = ReadBytes(sizeof(ushort));
-            return BitConverter.ToUInt16(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToUInt16(bytes, 0);
+            return true;
         }
 
-        public uint ReadUInt()
+        public bool ReadUInt(ref uint v)
         {
             byte[] bytes = ReadBytes(sizeof(uint));
-            return BitConverter.ToUInt32(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToUInt32(bytes, 0);
+            return true;
         }
 
-        public ulong ReadUInt64()
+        public bool ReadUInt64(ref ulong v)
         {
             byte[] bytes = ReadBytes(sizeof(ulong));
-            return BitConverter.ToUInt64(bytes, 0);
+            if (bytes == null)
+            {
+                return false;
+            }
+            v = BitConverter.ToUInt64(bytes, 0);
+            return true;
         }
 
-        public string ReadString()
+        public bool ReadString(ref string v)
         {
-            ushort len = ReadUShort();
-            byte[] bytes = ReadBytes(len);
-            return Encoding.UTF8.GetString(bytes, 0, len);
+            ushort len = 0;
+            if (ReadUShort(ref len))
+            {
+                byte[] bytes = ReadBytes(len);
+                if (bytes == null)
+                {
+                    return false;
+                }
+                v = Encoding.UTF8.GetString(bytes, 0, len);
+            }
+            return false;
         }
 
-        public void WriteString(string str)
+        public int WriteString(string str)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(str);
             ushort len = (ushort)bytes.Length;
-            WriteUShort(len);
-            WriteBytes(bytes, len);
+            int size = WriteUShort(len);
+            size += WriteBytes(bytes, len);
+            return size;
         }
 
-        public void WriteBytes(byte[] bytes, int count)
+        public int WriteBytes(byte[] bytes, int count)
         {
             mStream.Write(bytes, 0, count);
+            return bytes.Length;
         }
 
-        public void WriteByte(byte value)
+        public int WriteByte(byte value)
         {
             mStream.WriteByte(value);
+            return sizeof(byte);
         }
 
-        public void WriteBool(bool value)
+        public int WriteBool(bool value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteFloat(float value)
+        public int WriteFloat(float value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteShort(short value)
+        public int WriteShort(short value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteInt(int value)
+        public int WriteInt(int value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteInt64(long value)
+        public int WriteInt64(long value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteUShort(ushort value)
+        public int WriteUShort(ushort value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteUInt(uint value)
+        public int WriteUInt(uint value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-        public void WriteUInt64(ulong value)
+        public int WriteUInt64(ulong value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            WriteBytes(bytes, bytes.Length);
+            return WriteBytes(bytes, bytes.Length);
         }
 
-
-        public List<bool> ReadBoolLst()
+        public bool ReadBoolLst(ref List<bool> v)
         {
-            int count = ReadInt();
-            List<bool> values = new List<bool>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadBool());
+                v.Capacity = count;
+                bool b = false;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadBool(ref b))
+                    {
+                        v.Add(b);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
-            return values;
+            return false;
         }
 
-        public void WriteBoolLst(List<bool> values)
+        public int WriteBoolLst(ref List<bool> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteBool(values[i]);
+                size += WriteBool(values[i]);
             }
+            return size;
         }
 
-        public List<byte> ReadByteLst()
+        public bool ReadByteLst(ref List<byte> v)
         {
-            int count = ReadInt();
-            List<byte> values = new List<byte>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadByte());
+                v.Capacity = count;
+                byte b = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadByte(ref b))
+                    {
+                        v.Add(b);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    
+                }
+                return true;
             }
-            return values;
+            return false;
         }
 
-        public void WriteByteLst(List<byte> values)
+        public int WriteByteLst(List<byte> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteByte(values[i]);
+                size += WriteByte(values[i]);
             }
+            return size;
         }
 
-        public List<short> ReadShortLst()
+        public bool ReadShortLst(ref List<short> v)
         {
-            int count = ReadInt();
-            List<short> values = new List<short>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadShort());
+                v.Capacity = count;
+                short s = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadShort(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteShortLst(List<short> values)
+        public int WriteShortLst(List<short> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteShort(values[i]);
+                size += WriteShort(values[i]);
             }
+            return size;
         }
 
-        public List<ushort> ReadUShortLst()
+        public bool ReadUShortLst(ref List<ushort> v)
         {
-            int count = ReadInt();
-            List<ushort> values = new List<ushort>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadUShort());
+                v.Capacity = count;
+                ushort s = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadUShort(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteShortLst(List<ushort> values)
+        public int WriteShortLst(List<ushort> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteUShort(values[i]);
+                size += WriteUShort(values[i]);
             }
+            return size;
         }
 
-        public List<int> ReadIntLst()
+        public bool ReadIntLst(ref List<int> v)
         {
-            int count = ReadInt();
-            List<int> values = new List<int>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadInt());
+                v.Capacity = count;
+                int s = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadInt(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteIntLst(List<int> values)
+        public int WriteIntLst(List<int> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteInt(values[i]);
+                size += WriteInt(values[i]);
             }
+            return size;
         }
 
-        public List<uint> ReadUIntLst()
+        public bool ReadUIntLst(ref List<uint> v)
         {
-            int count = ReadInt();
-            List<uint> values = new List<uint>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadUInt());
+                v.Capacity = count;
+                uint s = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadUInt(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteUIntLst(List<uint> values)
+        public int WriteUIntLst(List<uint> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteUInt(values[i]);
+                size += WriteUInt(values[i]);
             }
+            return size;
         }
 
-        public List<ulong> ReadUInt64Lst()
+        public bool ReadUInt64Lst(ref List<ulong> v)
         {
-            int count = ReadInt();
-            List<ulong> values = new List<ulong>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadUInt64());
+                v.Capacity = count;
+                ulong s = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadUInt64(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteUInt64Lst(List<ulong> values)
+        public int WriteUInt64Lst(List<ulong> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteUInt64(values[i]);
+                size += WriteUInt64(values[i]);
             }
+            return size;
         }
 
-        public List<float> ReadFloatLst()
+        public bool ReadFloatLst(ref List<float> v)
         {
-            int count = ReadInt();
-            List<float> values = new List<float>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadFloat());
+                v.Capacity = count;
+                float s = 0;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadFloat(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteFloatLst(List<float> values)
+        public int WriteFloatLst(List<float> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteFloat(values[i]);
+                size += WriteFloat(values[i]);
             }
+            return size;
         }
-        public List<string> ReadStringLst()
+        public bool ReadStringLst(ref List<string> v)
         {
-            int count = ReadInt();
-            List<string> values = new List<string>(count);
-            for (int i = 0; i < count; ++i)
+            int count = 0;
+            if (ReadInt(ref count))
             {
-                values.Add(ReadString());
+                v.Capacity = count;
+                string s = null;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadString(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
-            return values;
+            return false;
         }
 
-        public void WriteStringLst(List<string> values)
+        public int WriteStringLst(List<string> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteString(values[i]);
+                size += WriteString(values[i]);
             }
+            return size;
         }
 
-        public void WriteVector2(Vector2 value)
+        public int WriteVector2(Vector2 value)
         {
-            WriteFloat(value.x);
-            WriteFloat(value.y);
+            int size = WriteFloat(value.x);
+            size += WriteFloat(value.y);
+            return size;
         }
 
-        public Vector2 ReadVector2()
+        public bool ReadVector2(ref Vector2 v)
         {
-            return new Vector2(ReadFloat(), ReadFloat());
+            float x = 0, y = 0;
+            if (ReadFloat(ref x) && ReadFloat(ref y))
+            {
+                v = new Vector2(x, y);
+                return true;
+            }
+            return false;
         }
 
-        public void WriteVector3(Vector3 value)
+        public int WriteVector3(Vector3 value)
         {
-            WriteFloat(value.x);
-            WriteFloat(value.y);
-            WriteFloat(value.z);
+            int size = WriteFloat(value.x);
+            size += WriteFloat(value.y);
+            size += WriteFloat(value.z);
+            return size;
         }
 
-        public Vector3 ReadVector3()
+        public bool ReadVector3(ref Vector3 v)
         {
-            return new Vector3(ReadFloat(), ReadFloat(), ReadFloat());
+            float x = 0, y = 0, z = 0;
+            if (ReadFloat(ref x) && ReadFloat(ref y) && ReadFloat(ref z))
+            {
+                v = new Vector3(x, y, z);
+                return true;
+            }
+            return false;
         }
 
-        public void WriteVector4(Vector4 value)
+        public int WriteVector4(Vector4 value)
         {
-            WriteFloat(value.x);
-            WriteFloat(value.y);
-            WriteFloat(value.z);
-            WriteFloat(value.w);
+            int size = WriteFloat(value.x);
+            size += WriteFloat(value.y);
+            size += WriteFloat(value.z);
+            size += WriteFloat(value.w);
+            return size;
         }
 
-        public Vector4 ReadVector4()
+        public bool ReadVector4(ref Vector4 v)
         {
-            return new Vector4(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
+            float x = 0, y = 0, z = 0, w = 0;
+            if (ReadFloat(ref x) && ReadFloat(ref y) && ReadFloat(ref z) && ReadFloat(ref w))
+            {
+                v = new Vector4(x, y, z, w);
+                return true;
+            }
+            return false;
         }
 
-        public void WriteQuaternion(Quaternion value)
+        public int WriteQuaternion(Quaternion value)
         {
-            WriteFloat(value.x);
-            WriteFloat(value.y);
-            WriteFloat(value.z);
-            WriteFloat(value.w);
+            int size = WriteFloat(value.x);
+            size += WriteFloat(value.y);
+            size += WriteFloat(value.z);
+            size += WriteFloat(value.w);
+            return size;
         }
 
-        public Quaternion ReadQuaternion()
+        public bool ReadQuaternion(ref Quaternion v)
         {
-            return new Quaternion(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
+            float x = 0, y = 0, z = 0, w = 0;
+            if (ReadFloat(ref x) && ReadFloat(ref y) && ReadFloat(ref z) && ReadFloat(ref w))
+            {
+                v = new Quaternion(x, y, z, w);
+                return true;
+            }
+            return false;
         }
 
-        public void WriteColor(Color value)
+        public int WriteColor(Color value)
         {
-            WriteFloat(value.r);
-            WriteFloat(value.g);
-            WriteFloat(value.b);
-            WriteFloat(value.a);
+            int size = WriteFloat(value.r);
+            size += WriteFloat(value.g);
+            size += WriteFloat(value.b);
+            size += WriteFloat(value.a);
+            return size;
         }
 
-        public Color ReadColor()
+        public bool ReadColor(ref Color v)
         {
-            return new Color(ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat());
+            float r = 0, g = 0, b = 0, a = 0;
+            if (ReadFloat(ref r) && ReadFloat(ref g) && ReadFloat(ref b) && ReadFloat(ref a))
+            {
+                v = new Color(r, g, b, a);
+                return true;
+            }
+            return false;
         }
 
-        public void WriteMatrix4x4(Matrix4x4 value)
+        public int WriteMatrix4x4(Matrix4x4 value)
         {
-            WriteVector4(value.GetColumn(0));
-            WriteVector4(value.GetColumn(1));
-            WriteVector4(value.GetColumn(2));
-            WriteVector4(value.GetColumn(3));
+            int size = WriteVector4(value.GetColumn(0));
+            size += WriteVector4(value.GetColumn(1));
+            size += WriteVector4(value.GetColumn(2));
+            size += WriteVector4(value.GetColumn(3));
+            return size;
         }
 
-        public Matrix4x4 ReadMatrix4x4()
+        public bool ReadMatrix4x4(ref Matrix4x4 m)
         {
-            Vector4 col0 = ReadVector4();
-            Vector4 col1 = ReadVector4();
-            Vector4 col2 = ReadVector4();
-            Vector4 col3 = ReadVector4();
-            Matrix4x4 m = new Matrix4x4();
-            m.SetColumn(0, col0);
-            m.SetColumn(1, col1);
-            m.SetColumn(2, col2);
-            m.SetColumn(3, col3);
-            return m;
+            Vector4 col0 = Vector4.zero;
+            Vector4 col1 = Vector4.zero;
+            Vector4 col2 = Vector4.zero;
+            Vector4 col3 = Vector4.zero;
+            if (ReadVector4(ref col0) && ReadVector4(ref col1) && ReadVector4(ref col2) && ReadVector4(ref col3))
+            {
+                m.SetColumn(0, col0);
+                m.SetColumn(1, col1);
+                m.SetColumn(2, col2);
+                m.SetColumn(3, col3);
+                return true;
+            }
+
+            return false;
         }
 
-        public void WriteColorLst(List<Color> values)
+        public int WriteColorLst(List<Color> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteColor(values[i]);
+                size += WriteColor(values[i]);
             }
+            return size;
         }
 
 
-        public void WriteQuaternionLst(List<Quaternion> values)
+        public int WriteQuaternionLst(List<Quaternion> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteQuaternion(values[i]);
+                size += WriteQuaternion(values[i]);
             }
+            return size;
         }
 
-        public void WriteVector4Lst(List<Vector4> values)
+        public int WriteVector4Lst(List<Vector4> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteVector4(values[i]);
+                size += WriteVector4(values[i]);
             }
+            return size;
         }
 
-        public void WriteVector3Lst(List<Vector3> values)
+        public int WriteVector3Lst(List<Vector3> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteVector3(values[i]);
+                size += WriteVector3(values[i]);
             }
+            return size;
         }
 
-        public void WriteVector2Lst(List<Vector2> values)
+        public int WriteVector2Lst(List<Vector2> values)
         {
-            WriteInt(values.Count);
+            int size = WriteInt(values.Count);
             for (int i = 0; i < values.Count; ++i)
             {
-                WriteVector2(values[i]);
+                size += WriteVector2(values[i]);
             }
+            return size;
         }
 
-        public List<Color> ReadColorLst()
+        public int WriteVector3Int(Vector3Int value)
         {
-            int count = ReadInt();
-            List<Color> colors = new List<Color>(count);
+            int size = WriteInt(value.x);
+            size += WriteInt(value.y);
+            size += WriteInt(value.z);
+            return size;
+        }
+
+        public bool ReadVector3Int(ref Vector3Int v)
+        {
+            int x = 0, y = 0, z = 0;
+            if (ReadInt(ref x) && ReadInt(ref y) && ReadInt(ref z))
+            {
+                v.x = x;
+                v.y = y;
+                v.z = z;
+                return true;
+            }
+            return false;
+        }
+
+
+        public int WriteVector3IntLst(List<Vector3Int> values)
+        {
+            int size = WriteInt(values.Count);
+            for (int i = 0; i < values.Count; ++i)
+            {
+                size += WriteVector3Int(values[i]);
+            }
+            return size;
+        }
+
+        public bool ReadVector3IntLst(ref List<Vector3Int> v)
+        {
+            int count = 0;
+            if (ReadInt(ref count))
+            {
+                v.Capacity = count;
+                Vector3Int s = Vector3Int.zero;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadVector3Int(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool ReadColorLst(ref List<Color> v)
+        {
+            int count = 0;
+            if (ReadInt(ref count))
+            {
+                v.Capacity = count;
+                Color s = Color.black;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadColor(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool ReadQuaternionLst(ref List<Quaternion> v)
+        {
+            int count = 0;
+            if (ReadInt(ref count))
+            {
+                v.Capacity = count;
+                Quaternion s = Quaternion.identity;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadQuaternion(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool ReadVector4Lst(ref List<Vector4> v)
+        {
+            int count = 0;
+            if (ReadInt(ref count))
+            {
+                v.Capacity = count;
+                Vector4 s = Vector4.zero;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadVector4(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+        public bool ReadVector3Lst(ref List<Vector3> v)
+        {
+            int count = 0;
+            if (ReadInt(ref count))
+            {
+                v.Capacity = count;
+                Vector3 s = Vector3.zero;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadVector3(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool ReadVector2Lst(ref List<Vector2> v)
+        {
+            int count = 0;
+            if (ReadInt(ref count))
+            {
+                v.Capacity = count;
+                Vector2 s = Vector2.zero;
+                for (int i = 0; i < count; ++i)
+                {
+                    if (ReadVector2(ref s))
+                    {
+                        v.Add(s);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public int WriteQuaternionPosition(Quaternion q, Vector3 pos)
+        {
+            int size = WriteQuaternion(q);
+            size += WriteVector3(pos);
+            return size;
+        }
+
+        public bool ReadQuaternionPosition(ref Quaternion q, ref Vector3 pos)
+        {
+            if (ReadQuaternion(ref q) && ReadVector3(ref pos))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public int WriteQuaternionPositionLst(List<Quaternion> qs, List<Vector3> poses)
+        {
+            int count = qs.Count;
+            int size = WriteInt(count);
             for (int i = 0; i < count; ++i)
             {
-                colors.Add(ReadColor());
+                size += WriteQuaternion(qs[i]);
+                size += WriteVector3(poses[i]);
             }
-            return colors;
+            return size;
         }
 
-        public List<Quaternion> ReadQuaternionLst()
+        public bool ReadQuaternionPositionLst(List<Quaternion> qs, List<Vector3> poses)
         {
-            int count = ReadInt();
-            List<Quaternion> values = new List<Quaternion>(count);
-            for (int i = 0; i < count; ++i)
+            Quaternion q = Quaternion.identity;
+            Vector3 pos = Vector3.zero;
+            int cnt = 0;
+            bool res = ReadInt(ref cnt);
+            for (int i = 0; i < cnt; ++i)
             {
-                values.Add(ReadQuaternion());
+                ReadQuaternion(ref q);
+                ReadVector3(ref pos);
+                qs.Add(q);
+                poses.Add(pos);
             }
-            return values;
+            return false;
         }
-
-        public List<Vector4> ReadVector4Lst()
-        {
-            int count = ReadInt();
-            List<Vector4> values = new List<Vector4>(count);
-            for (int i = 0; i < count; ++i)
-            {
-                values.Add(ReadVector4());
-            }
-            return values;
-        }
-        public List<Vector3> ReadVector3Lst()
-        {
-            int count = ReadInt();
-            List<Vector3> values = new List<Vector3>(count);
-            for (int i = 0; i < count; ++i)
-            {
-                values.Add(ReadVector3());
-            }
-            return values;
-        }
-
-        public List<Vector2> ReadVector2Lst()
-        {
-            int count = ReadInt();
-            List<Vector2> values = new List<Vector2>(count);
-            for (int i = 0; i < count; ++i)
-            {
-                values.Add(ReadVector2());
-            }
-            return values;
-        }
-
-
-        public void WriteQuaternionPosition(Quaternion q, Vector3 pos)
-        {
-            WriteQuaternion(q);
-            WriteVector3(pos);
-        }
-
-        public void ReadQuaternionPosition(ref Quaternion q, ref Vector3 pos)
-        {
-            q = ReadQuaternion();
-            pos = ReadVector3();
-        }
-
     }
 }
