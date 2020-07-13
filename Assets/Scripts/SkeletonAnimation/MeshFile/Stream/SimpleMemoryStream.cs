@@ -8,10 +8,26 @@ using UnityEngine;
 
 namespace MeshFile
 {
+    /// <summary>
+    /// 待完善
+    /// 
+    /// float -> ushort (65536)
+    /// 1. normal 压缩
+    /// 2. uv 压缩
+    /// 3. quaternion 压缩
+    /// 
+    /// int -> ushort
+    /// 1. < 65536
+    /// 
+    /// bool list -> byte array
+    /// 1. bool -> 1bit
+    /// 
+    /// </summary>
     public class SimpleMemoryStream : IDisposable
     {
         private const int CacheLen = 1024 * 1024;
         private static byte[] CacheBytes = new byte[CacheLen];
+
         public static SimpleMemoryStream ReadFromFile(string path)
         {
             FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -73,12 +89,6 @@ namespace MeshFile
             return bytes;
         }
 
-        public sbyte ReadSByte()
-        {
-            byte[] bytes = ReadBytes(sizeof(sbyte));
-            return (sbyte)bytes[0];
-        }
-
         public byte ReadByte()
         {
             byte[] bytes = ReadBytes(sizeof(byte));
@@ -105,7 +115,7 @@ namespace MeshFile
 
         public int ReadInt()
         {
-            byte[] bytes = ReadBytes(sizeof(short));
+            byte[] bytes = ReadBytes(sizeof(int));
             return BitConverter.ToInt32(bytes, 0);
         }
 
@@ -537,7 +547,7 @@ namespace MeshFile
             return values;
         }
 
-        public List<Vector4> WriteVector4Lst()
+        public List<Vector4> ReadVector4Lst()
         {
             int count = ReadInt();
             List<Vector4> values = new List<Vector4>(count);
@@ -547,7 +557,7 @@ namespace MeshFile
             }
             return values;
         }
-        public List<Vector3> WriteVector3Lst()
+        public List<Vector3> ReadVector3Lst()
         {
             int count = ReadInt();
             List<Vector3> values = new List<Vector3>(count);
@@ -558,7 +568,7 @@ namespace MeshFile
             return values;
         }
 
-        public List<Vector2> WriteVector2Lst()
+        public List<Vector2> ReadVector2Lst()
         {
             int count = ReadInt();
             List<Vector2> values = new List<Vector2>(count);
