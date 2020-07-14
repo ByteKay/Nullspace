@@ -7,12 +7,12 @@ namespace NullMesh
 {
     public class NullMaterialFile
     {
-        private ushort m_version;
-        private uint m_blockSize;
-        private uint m_reserved;
-        private uint m_reserved2;
-        private uint m_reserved3;
-        private uint m_reserved4;
-        private NullMaterials m_materialArray;
+        private ushort Version;
+        private uint BlockSize;
+        private uint Reserved;
+        private uint Reserved2;
+        private uint Reserved3;
+        private uint Reserved4;
+        private NullMaterials MaterialArray;
     }
 }

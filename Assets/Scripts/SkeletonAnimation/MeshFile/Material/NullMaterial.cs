@@ -7,24 +7,24 @@ namespace NullMesh
 {
     public class NullMaterial
     {
-        protected uint m_ambientColor;
-        protected uint m_diffuseColor;
-        protected uint m_specularColor;
-        protected uint m_emissiveColor;
-        protected byte m_shinStrength;
-        protected byte m_shininess;                              // Value affecting the size of specular highlights
+        protected uint AmbientColor;
+        protected uint DiffuseColor;
+        protected uint SpecularColor;
+        protected uint EmissiveColor;
+        protected byte ShinStrength;
+        protected byte Shininess;                             
 
-        protected NullTextures m_textureArray;
+        protected NullTextures TextureArray;
 
-        protected string m_materialName;
-        protected ushort m_materialId;                         //unique id to identify the material.
-        protected string m_libraryName;
+        protected string MaterialName;
+        protected ushort MaterialId;
+        protected string LibraryName;
     }
 
     public class NullMaterials
     {
-        protected byte m_materialCount;
-        protected List<NullMaterial> m_materialArray;
+        protected byte MaterialCount;
+        protected List<NullMaterial> MaterialArray;
     }
 
 }

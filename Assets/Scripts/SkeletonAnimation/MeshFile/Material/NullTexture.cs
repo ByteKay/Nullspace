@@ -8,18 +8,18 @@ namespace NullMesh
     public class NullTexture
     {
         // Texture Clamp Mode
-        protected byte m_wrapMode;                          
-        protected byte m_textureMode;
-        protected byte m_alphaChannel;
-        protected uint m_textureId;
+        protected byte WrapMode;                          
+        protected byte TextureMode;
+        protected byte AlphaChannel;
+        protected uint TextureId;
         //个数为TextureCount， 不同的TextureName间用一个标记隔开
-        protected string m_textureNameArray;
+        protected string TextureNameArray;
     }
 
     public class NullTextures
     {
-        private byte m_textureCount;
-        private List<NullTexture> m_textureArray;
+        private byte TextureCount;
+        private List<NullTexture> TextureArray;
     }
 
 }
