@@ -1,14 +1,14 @@
 ﻿
-namespace Animation
+namespace NullAnimation
 {
-    public class MeshMorpher
+    public class NullMeshMorpher
     {
-        class MeshFrameData
+        class NullMeshFrameData
         {
 
         }
 
-        class MeshFrames
+        class NullMeshFrames
         {
 
         }
