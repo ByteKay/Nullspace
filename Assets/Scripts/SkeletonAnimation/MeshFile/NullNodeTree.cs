@@ -8,42 +8,72 @@ namespace NullMesh
 {
     public class NullNodeTree : INullStream
     {
-        public string m_nodeName;    // node name
-        public uint m_nodeHandle;         // unique handle to the node
-        public Vector3 m_pos;
-        public Quaternion m_q;
-        public ushort m_numChildren;            // number of children
-        public List<NullNodeTree> m_children;               // sub trees
-        public ushort m_groupId;
-		protected ushort mCurrentVersion;
-        public uint m_typeName;           // non-streamed data
+        public string NodeName;    // node name
+        public uint NodeHandle;         // unique handle to the node
+        public Vector3 Pos;
+        public Quaternion Quat;
+        public ushort NumChildren;            // number of children
+        public List<NullNodeTree> Children;               // sub trees
+        public ushort GroupId;
+		protected ushort CurrentVersion;
+        public uint TypeName;           // non-streamed data
 
 
         public NullNodeTree(ushort version)
         {
-            m_nodeName = null;
-            m_nodeHandle = 0;
-            m_pos = Vector3.zero;
-            m_q = Quaternion.identity;
-            m_numChildren = 0;
-            m_children = null;
-            m_typeName = 0;
-            mCurrentVersion = version;
-            m_groupId = 0;
+            NodeName = null;
+            NodeHandle = 0;
+            Pos = Vector3.zero;
+            Quat = Quaternion.identity;
+            NumChildren = 0;
+            Children = null;
+            TypeName = 0;
+            CurrentVersion = version;
+            GroupId = 0;
         }
 
         public NullNodeTree this[int idx]
         {
             get
             {
-                return idx < m_children.Count ? m_children[idx] : null;
+                return idx < Children.Count ? Children[idx] : null;
             }
         }
 
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            // SaveToStream(NullMemoryStream stream, bool namehandleOnly)
+            throw new Exception();
+        }
+
+        public int SaveToStream(NullMemoryStream stream, bool namehandleOnly)
+        {
+            return SaveNodeTreeToStreamRecursive(this, stream, namehandleOnly);
+        }
+
+        public int SaveNodeTreeToStreamRecursive(NullNodeTree nodeTree, NullMemoryStream stream, bool namehandleOnly)
+        {
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            int size = stream.WriteString(nodeTree.NodeName);
+            size += stream.WriteUInt(nodeTree.NodeHandle);
+            size += stream.WriteUShort(nodeTree.GroupId);
+            size += stream.WriteBool(namehandleOnly);
+            if (!namehandleOnly)
+            {
+                size += stream.WriteVector3(Pos);
+                size += stream.WriteQuaternion(Quat);
+            }
+            size += stream.WriteUShort(nodeTree.NumChildren);
+            for (int i = 0; i < nodeTree.NumChildren; i++)
+            {
+                NullNodeTree node = nodeTree.Children[i];
+                if (node != null)
+                {
+                    size += SaveNodeTreeToStreamRecursive(node, stream, namehandleOnly);
+                }
+            }
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
@@ -53,12 +83,12 @@ namespace NullMesh
 
         public void Clear()
         {
-            for (int i = 0; i < m_numChildren; i++)
+            for (int i = 0; i < NumChildren; i++)
             {
-                DeleteNodeRecursive(m_children[i]);
+                DeleteNodeRecursive(Children[i]);
             }
-            m_numChildren = 0;
-            m_children = null;
+            NumChildren = 0;
+            Children = null;
         }
 
         public void DeleteNodeRecursive(NullNodeTree nodeTree)
@@ -67,34 +97,34 @@ namespace NullMesh
             {
                 return;
             }
-            for (int i = 0; i < nodeTree.m_numChildren; i++)
+            for (int i = 0; i < nodeTree.NumChildren; i++)
             {
-                NullNodeTree node = nodeTree.m_children[i];
+                NullNodeTree node = nodeTree.Children[i];
                 DeleteNodeRecursive(node);
             }
-            nodeTree.m_numChildren = 0;
-            nodeTree.m_children = null;
+            nodeTree.NumChildren = 0;
+            nodeTree.Children = null;
         }
 
         public bool LoadNodeTreeFromStreamRecursive(NullNodeTree nodeTree, NullMemoryStream stream)
         {
             nodeTree.Clear();
-            bool res = stream.ReadString(out nodeTree.m_nodeName);
-            res &= stream.ReadUInt(out nodeTree.m_nodeHandle);
-            res &= stream.ReadUShort(out nodeTree.m_groupId);
+            bool res = stream.ReadString(out nodeTree.NodeName);
+            res &= stream.ReadUInt(out nodeTree.NodeHandle);
+            res &= stream.ReadUShort(out nodeTree.GroupId);
             bool nameHandleOnly = false;
             res &= stream.ReadBool(out nameHandleOnly);
             if (!nameHandleOnly)
             {
-                res &= stream.ReadVector3(out m_pos);
-                res &= stream.ReadQuaternion(out m_q);
+                res &= stream.ReadVector3(out Pos);
+                res &= stream.ReadQuaternion(out Quat);
             }
-            ushort count = 0;
+            ushort count;
             res &= stream.ReadUShort(out count);
             nodeTree.SetNumChildren(count);
-            for (int i = 0; i < nodeTree.m_numChildren; i++)
+            for (int i = 0; i < nodeTree.NumChildren; i++)
             {
-                NullNodeTree node = nodeTree.m_children[i];
+                NullNodeTree node = nodeTree.Children[i];
                 res &= LoadNodeTreeFromStreamRecursive(node, stream);
             }
             return res;
@@ -104,14 +134,14 @@ namespace NullMesh
         {
             if (count > 0)
             {
-                m_numChildren = count;
-                if (m_children == null)
+                NumChildren = count;
+                if (Children == null)
                 {
-                    m_children = new List<NullNodeTree>(m_numChildren);
+                    Children = new List<NullNodeTree>(NumChildren);
                 }
-                for (int i = 0; i < m_numChildren; ++i)
+                for (int i = 0; i < NumChildren; ++i)
                 {
-                    m_children.Add(new NullNodeTree(mCurrentVersion));
+                    Children.Add(new NullNodeTree(CurrentVersion));
                 }
             }
         }
@@ -129,9 +159,9 @@ namespace NullMesh
                 return 0;
             }
             ushort count = 1;
-            for (int i = 0; i < nodeTree.m_numChildren; i++)
+            for (int i = 0; i < nodeTree.NumChildren; i++)
             {
-                count += GetNodeCountRecursive(nodeTree.m_children[i]);
+                count += GetNodeCountRecursive(nodeTree.Children[i]);
             }
             return count;
         }
@@ -145,7 +175,7 @@ namespace NullMesh
 
         internal string GetNodeName()
         {
-            return m_nodeName;
+            return NodeName;
         }
 
         public void FindNodeRecursive(NullNodeTree node, uint boneId, ref NullNodeTree result)
@@ -171,12 +201,12 @@ namespace NullMesh
 
         private int GetChildrenCount()
         {
-            return m_numChildren;
+            return NumChildren;
         }
 
         private uint GetNodeHandle()
         {
-            return m_nodeHandle;
+            return NodeHandle;
         }
     }
 }

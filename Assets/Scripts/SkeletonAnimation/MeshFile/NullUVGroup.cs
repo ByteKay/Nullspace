@@ -16,67 +16,87 @@ namespace NullMesh
             UVT_RESERVE = 3,        //maxium texture layer 
         };
 
-        protected byte m_UVDataType;
-        protected byte m_UVType;
-        protected double m_UVScale;
-        protected List<Vector2> m_UVArray;
-        protected ushort mCurrentVersion;
-        private ushort m_UVCount;
-        private uint m_UVGroupSize;
-        private byte uvType;
+        protected byte UVDataType;
+        protected byte mUVType;
+        protected double UVScale;
+        protected List<Vector2> UVArray;
+        protected ushort CurrentVersion;
+        private ushort UVCount;
+        private uint UVGroupSize;
 
         public NullUVGroup(ushort version, ushort size, byte type)
         {
-            mCurrentVersion = version;
-            m_UVScale = 1.0;
-            m_UVDataType = (byte)NullDataStructType.DST_FLOAT;
-            m_UVCount = size;
-            m_UVType = type;
-            m_UVArray = null;
+            CurrentVersion = version;
+            UVScale = 1.0;
+            UVDataType = (byte)NullDataStructType.DST_FLOAT;
+            UVCount = size;
+            mUVType = type;
+            UVArray = null;
         }
 
         public void Clear()
         {
-            m_UVArray = null;
+            UVArray = null;
+            UVCount = 0;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            uint dataSize = UVCount;
+            if (UVArray == null)
+            {
+                dataSize = 0;
+            }
+            int size = stream.WriteUInt(dataSize);
+            if (dataSize == 0)
+            {
+                return size;
+            }
+            size += stream.WriteByte(mUVType);
+            size += stream.WriteByte(UVDataType);
+            size += stream.WriteList(UVArray, true);
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            bool res = stream.ReadUShort(out m_UVCount);
-            if (m_UVCount == 0)
+            bool res = stream.ReadUShort(out UVCount);
+            if (UVCount == 0)
             {
                 return res;
             }
-            res &= stream.ReadByte(out m_UVType);
-            res &= stream.ReadByte(out m_UVDataType);
-            res &= stream.ReadList(out m_UVArray);
+            res &= stream.ReadByte(out mUVType);
+            res &= stream.ReadByte(out UVDataType);
+            res &= stream.ReadList(out UVArray, UVCount);
             return res;
         }
     }
 
     public class NullUVGroups : INullStream
     {
-        protected ushort mCurrentVersion;
-        protected Dictionary<byte, NullUVGroup> m_UVGroupList;
-        private ushort m_UVGroupSize;
-        private byte m_internalSize;
-        private ushort m_vertexCount;
+        protected ushort CurrentVersion;
+        protected Dictionary<byte, NullUVGroup> UVGroupList;
+        private ushort UVGroupSize;
+        private byte InternalSize;
+        private ushort VertexCount;
 
         public NullUVGroups(ushort currentVersion, ushort vertexCount)
         {
-            mCurrentVersion = currentVersion;
-            m_vertexCount = vertexCount;
+            CurrentVersion = currentVersion;
+            VertexCount = vertexCount;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            int size = stream.WriteByte(InternalSize);
+            for (byte i = 0; i < InternalSize; i++)
+            {
+                size += UVGroupList[i].SaveToStream(stream);
+            }
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
@@ -98,24 +118,29 @@ namespace NullMesh
 
         public NullUVGroup AppendUV(byte uvType)
         {
-            if (m_UVGroupList == null)
+            if (UVGroupList == null)
             {
-                m_UVGroupList = new Dictionary<byte, NullUVGroup>();
+                UVGroupList = new Dictionary<byte, NullUVGroup>();
             }
-            if (m_UVGroupList.ContainsKey(uvType))
+            if (UVGroupList.ContainsKey(uvType))
             {
                 return null;
             }
-            NullUVGroup group = new NullUVGroup(mCurrentVersion, m_UVGroupSize, uvType);
-            m_UVGroupList.Add(uvType, group);
-            m_internalSize++;
+            NullUVGroup group = new NullUVGroup(CurrentVersion, UVGroupSize, uvType);
+            UVGroupList.Add(uvType, group);
+            InternalSize++;
             return group;
         }
 
         public void Clear()
         {
-            m_UVGroupList = null;
-            m_internalSize = 0;
+            UVGroupList = null;
+            InternalSize = 0;
+        }
+
+        public int GetUVGroupCount()
+        {
+            return UVGroupList.Count;
         }
     }
 

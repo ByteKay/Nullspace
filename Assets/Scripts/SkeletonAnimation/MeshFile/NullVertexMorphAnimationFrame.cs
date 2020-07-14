@@ -8,81 +8,86 @@ namespace NullMesh
 {
     public class NullVertexMorphObject : INullStream
     {
-        protected byte m_vertexDataType;
-        protected ushort m_vertexCount;
-        protected List<Vector3> m_vertexPosArray;
-        protected List<Vector3> m_normalArray;
-        protected uint m_meshObjectIndex;
+        protected byte VertexDataType;
+        protected ushort VertexCount;
+        protected List<Vector3> VertexPosArray;
+        protected List<Vector3> NormalArray;
+        protected uint MeshObjectIndex;
 
-        //protected float[] m_offset; // 3
-        //protected double m_scale;
-
-        public NullVertexMorphObject(byte dst, ushort vc)
+        public NullVertexMorphObject()
         {
-            m_vertexDataType = dst;
-            m_vertexCount = vc;
-            m_vertexPosArray = new List<Vector3>();
-            m_normalArray = new List<Vector3>();
+            VertexDataType = 0;
+            VertexCount = 0;
+            VertexPosArray = new List<Vector3>();
+            NormalArray = new List<Vector3>();
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            int size = stream.WriteByte(VertexDataType);
+            size += stream.WriteUShort(VertexCount);
+            size += stream.WriteUInt(MeshObjectIndex);
+            size += stream.WriteList(VertexPosArray, true);
+            size += stream.WriteList(NormalArray, true);
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
-            bool res = stream.ReadUInt(out m_meshObjectIndex);
-            res &= stream.ReadList(out m_vertexPosArray);
-            res &= stream.ReadList(out m_normalArray);
+            bool res = stream.ReadByte(out VertexDataType);
+            res &= stream.ReadUShort(out VertexCount);
+            res &= stream.ReadUInt(out MeshObjectIndex);
+            res &= stream.ReadList(out VertexPosArray, VertexCount);
+            res &= stream.ReadList(out NormalArray, VertexCount);
             return res;
         }
     }
 
     public class NullVertexMorphAnimationFrame : INullStream
     {
-        protected List<NullVertexMorphObject> m_vertexMorphObjectList;
-        protected ushort m_vertexMorphObjectCount;
+        protected List<NullVertexMorphObject> VertexMorphObjectList;
+        protected ushort VertexMorphObjectCount;
 
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            int size = stream.WriteUShort(VertexMorphObjectCount);
+            for (int i = 0; i < VertexMorphObjectCount; i++)
+            {
+                size += VertexMorphObjectList[i].SaveToStream(stream);
+            }
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            ushort count = 0;
+            ushort count;
             bool res = stream.ReadUShort(out count);
-            byte dst = 0;
-            ushort vc = 0;
             for (int i = 0; i < count; i++)
             {
-                res = stream.ReadByte(out dst);
-                res &= stream.ReadUShort(out vc);
-                NullVertexMorphObject av = AppendVertexMorphObject(dst, vc);
+                NullVertexMorphObject av = AppendVertexMorphObject();
                 res &= av.LoadFromStream(stream);
             }
             return res;
         }
 
-        public NullVertexMorphObject AppendVertexMorphObject(byte dst, ushort vc)
+        public NullVertexMorphObject AppendVertexMorphObject()
         {
-            if (m_vertexMorphObjectList == null)
+            if (VertexMorphObjectList == null)
             {
-                m_vertexMorphObjectList = new List<NullVertexMorphObject>();
+                VertexMorphObjectList = new List<NullVertexMorphObject>();
             }
-            NullVertexMorphObject av = new NullVertexMorphObject(dst, vc);
-            m_vertexMorphObjectList.Add(av);
-            m_vertexMorphObjectCount++;
+            NullVertexMorphObject av = new NullVertexMorphObject();
+            VertexMorphObjectList.Add(av);
+            VertexMorphObjectCount++;
             return av;
         }
 
         public void Clear()
         {
-            m_vertexMorphObjectList = null;
-            m_vertexMorphObjectCount = 0;
+            VertexMorphObjectList = null;
+            VertexMorphObjectCount = 0;
         }
     }
 }

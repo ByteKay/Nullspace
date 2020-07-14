@@ -8,40 +8,49 @@ namespace NullMesh
 {
     public class NullSocketNode : INullStream
     {
-		protected uint m_handle;
-        protected uint m_parent;
-        protected Vector3 m_position;
-        protected Quaternion m_quat;
+		protected uint Handle;
+        protected uint Parent;
+        protected Vector3 Position;
+        protected Quaternion Quat;
 
         public NullSocketNode(uint handle)
         {
-            m_handle = handle;
-            m_parent = 0;
+            Handle = handle;
+            Parent = 0;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
-            bool res = stream.ReadUInt(out m_handle);
-            res &= stream.ReadUInt(out m_parent);
-            res &= stream.ReadVector3(out m_position);
-            res &= stream.ReadQuaternion(out m_quat);
+            bool res = stream.ReadUInt(out Handle);
+            res &= stream.ReadUInt(out Parent);
+            res &= stream.ReadVector3(out Position);
+            res &= stream.ReadQuaternion(out Quat);
             return res;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            int size = stream.WriteUInt(Handle);
+            size += stream.WriteUInt(Parent);
+            size += stream.WriteVector3(Position);
+            size += stream.WriteQuaternion(Quat);
+            return size;
         }
     }
 
     public class NullSocketNodes : INullStream
     {
-		protected ushort m_socketNodeCount;
-        protected List<NullSocketNode> m_socketNodeArray;
+		protected ushort SocketNodeCount;
+        protected List<NullSocketNode> SocketNodeArray;
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            int size = stream.WriteUShort(SocketNodeCount);
+            for (int i = 0; i < SocketNodeCount; i++)
+            {
+                size += SocketNodeArray[i].SaveToStream(stream);
+            }
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
@@ -49,7 +58,7 @@ namespace NullMesh
             Clear();
             ushort count = 0;
             bool res = stream.ReadUShort(out count);
-            for (int i = 0; i < m_socketNodeCount; i++)
+            for (int i = 0; i < SocketNodeCount; i++)
             {
                 NullSocketNode node = AppendSocketNode((uint)i);
                 res &= node.LoadFromStream(stream);
@@ -59,20 +68,20 @@ namespace NullMesh
 
         public NullSocketNode AppendSocketNode(uint handle)
         {
-            if (m_socketNodeArray == null)
+            if (SocketNodeArray == null)
             {
-                m_socketNodeArray = new List<NullSocketNode>();
+                SocketNodeArray = new List<NullSocketNode>();
             }
             NullSocketNode node = new NullSocketNode(handle);
-            m_socketNodeArray.Add(node);
-            m_socketNodeCount++;
+            SocketNodeArray.Add(node);
+            SocketNodeCount++;
             return node;
         }
 
         public void Clear()
         {
-            m_socketNodeArray = null;
-            m_socketNodeCount = 0;
+            SocketNodeArray = null;
+            SocketNodeCount = 0;
         }
     }
 }

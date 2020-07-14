@@ -4,67 +4,117 @@ using System.Text;
 
 namespace NullMesh
 {
-    public enum E_HXBWorkingFlag
+    public enum NullWorkingFlag
     {
-        EHXWF_AUTO_DETECT = 0,
-        EHXWF_STATIC_MESH = 1,
-        EHXWF_SKELETON_MESHPIECE = 2,
-        EHXWF_NODE_ANIM = 3,
+        WF_AUTO_DETECT = 0,
+        WF_STATIC_MESH = 1,
+        WF_SKELETON_MESHPIECE = 2,
+        WF_NODE_ANIM = 3,
     }
 
     public class NullMeshFile : INullStream
     {
-
+        public const ushort MESH_FILE_VERSION = 100;
+        private static uint StaticMesh = MakeFourCC("HXBO");
+        private static uint SkeletonMesh = MakeFourCC("HXBS");
+        private static uint SkeletonAnimation = MakeFourCC("HXBA");
         public static uint MakeFourCC(string four)
         {
             return BitConverter.ToUInt32(Encoding.UTF8.GetBytes(four), 0);
         }
 
-        private const ushort MESH_FILE_VERSION = 100;
-
-        private static uint StaticMesh = MakeFourCC("HXBO");
-        private static uint SkeletonMesh = MakeFourCC("HXBS");
-        private static uint SkeletonAnimation = MakeFourCC("HXBA");
-
-        protected ushort m_version;
-        protected E_HXBWorkingFlag m_workingMode;
-        protected uint m_blockSize;
+        protected ushort mVersion;
+        protected NullWorkingFlag mWorkingMode;
+        protected uint mBlockSize;
         //base mesh
-        protected NullMeshObjects m_meshObjectList;
-        protected NullMeshObjects m_skinObjectList;
-        protected NullSocketNodes m_socketNodeList;
-        protected NullNodeDummy m_nodeDummy;
+        protected NullMeshObjects mMeshObjectList;
+        protected NullMeshObjects mSkinObjectList;
+        protected NullSocketNodes mSocketNodeList;
+        protected NullNodeDummy mNodeDummy;
         //skeleton animation
-        protected NullNodeTree m_nodeTree;
-        protected NullSkeletonBinding m_skeletonBinding;
-        protected NullSkeletonAnimations m_skeletonAnimations;
+        protected NullNodeTree mNodeTree;
+        protected NullSkeletonBinding mSkeletonBinding;
+        protected NullSkeletonAnimations mSkeletonAnimations;
         //ertex morph animation
-        protected NullVertexMorphAnimations m_vertexMorphAnimations;
+        protected NullVertexMorphAnimations mVertexMorphAnimations;
 
         public int SaveToStream(NullMemoryStream stream)
         {
+            uint foucc = GenerateFouCC();
+            if (foucc == 0)
+            {
+                return 0;
+            }
+            mVersion = MESH_FILE_VERSION;
+            stream.WriteUInt(foucc);
+            stream.WriteUInt(mBlockSize);
+            stream.WriteUShort(mVersion);
+            int size = 0;
+            switch (mWorkingMode)
+            {
+                case NullWorkingFlag.WF_STATIC_MESH:
+                    size = SaveToStreamForStaticMesh(stream);
+                    break;
+                case NullWorkingFlag.WF_SKELETON_MESHPIECE:
+                    size = SaveToStreamForSkeletonMesh(stream);
+                    break;
+                case NullWorkingFlag.WF_NODE_ANIM:
+                    size = SaveToStreamForSkeletonAnimation(stream);
+                    break;
+                default:
+                    return 0;
+            }
+
             return 0;
+        }
+
+        public int SaveToStreamForStaticMesh(NullMemoryStream stream)
+        {
+            int size = mMeshObjectList.SaveToStream(stream);
+            size += mVertexMorphAnimations.SaveToStream(stream);
+            return size;
+        }
+
+        public int SaveToStreamForSkeletonMesh(NullMemoryStream stream)
+        {
+            int size = mMeshObjectList.SaveToStream(stream);
+            size += mSkinObjectList.SaveToStream(stream);
+            size += mVertexMorphAnimations.SaveToStream(stream);
+            size += mSocketNodeList.SaveToStream(stream);
+            size += mNodeDummy.SaveToStream(stream);
+            size += mNodeTree.SaveToStream(stream, false);
+            size += mSkeletonBinding.SaveToStream(stream);
+            return size;
+        }
+
+        public int SaveToStreamForSkeletonAnimation(NullMemoryStream stream)
+        {
+            int size = mNodeTree.SaveToStream(stream, true);
+            size += mSocketNodeList.SaveToStream(stream);
+            size += mNodeDummy.SaveToStream(stream);
+            size += mSkeletonAnimations.SaveToStream(stream);
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             uint foucc = 0;
             bool res = stream.ReadUInt(out foucc);
-            res &= stream.ReadUInt(out m_blockSize);
-            res &= stream.ReadUShort(out m_version);
-            if (!res || m_version > MESH_FILE_VERSION || !ValidateFileHeader(foucc, m_version))
+            res &= stream.ReadUInt(out mBlockSize);
+            res &= stream.ReadUShort(out mVersion);
+            if (!res || mVersion > MESH_FILE_VERSION || !ValidateFileHeader(foucc, mVersion))
             {
                 return false;
             }
-            switch (m_workingMode)
+            switch (mWorkingMode)
             {
-                case E_HXBWorkingFlag.EHXWF_STATIC_MESH:
+                case NullWorkingFlag.WF_STATIC_MESH:
                     res = LoadFromStreamForStaticMesh(stream);
                     break;
-                case E_HXBWorkingFlag.EHXWF_SKELETON_MESHPIECE:
+                case NullWorkingFlag.WF_SKELETON_MESHPIECE:
                     res = LoadFromStreamForSkeletonMesh(stream);
                     break;
-                case E_HXBWorkingFlag.EHXWF_NODE_ANIM:
+                case NullWorkingFlag.WF_NODE_ANIM:
                     res = LoadFromStreamForSkeletonAnimation(stream);
                     break;
                 default:
@@ -73,24 +123,49 @@ namespace NullMesh
             return true;
         }
 
+        public uint GenerateFouCC()
+        {
+            uint fouCC = 0;
+            switch (mWorkingMode)
+            {
+                case NullWorkingFlag.WF_STATIC_MESH:
+                    fouCC = StaticMesh;
+                    break;
+                case NullWorkingFlag.WF_SKELETON_MESHPIECE:
+                    fouCC = SkeletonMesh;
+                    break;
+                case NullWorkingFlag.WF_NODE_ANIM:
+                    fouCC = SkeletonAnimation;
+                    break;
+            }
+            return fouCC;
+        }
+
+        private bool LoadFromStreamForStaticMesh(NullMemoryStream stream)
+        {
+            bool res = mMeshObjectList.LoadFromStream(stream);
+            res &= mVertexMorphAnimations.LoadFromStream(stream);
+            return res;
+        }
+
         private bool LoadFromStreamForSkeletonMesh(NullMemoryStream stream)
         {
-            bool res = m_meshObjectList.LoadFromStream(stream);
-            res &= m_skinObjectList.LoadFromStream(stream);
-            res &= m_vertexMorphAnimations.LoadFromStream(stream);
-            res &= m_socketNodeList.LoadFromStream(stream);
-            res &= m_nodeDummy.LoadFromStream(stream);
-            res &= m_nodeTree.LoadFromStream(stream);
-            res &= m_skeletonBinding.LoadFromStream(stream);
+            bool res = mMeshObjectList.LoadFromStream(stream);
+            res &= mSkinObjectList.LoadFromStream(stream);
+            res &= mVertexMorphAnimations.LoadFromStream(stream);
+            res &= mSocketNodeList.LoadFromStream(stream);
+            res &= mNodeDummy.LoadFromStream(stream);
+            res &= mNodeTree.LoadFromStream(stream);
+            res &= mSkeletonBinding.LoadFromStream(stream);
             return res;
         }
 
         private bool LoadFromStreamForSkeletonAnimation(NullMemoryStream stream)
         {
-            bool res = m_nodeTree.LoadFromStream(stream);
-            res &= m_socketNodeList.LoadFromStream(stream);
-            res &= m_nodeDummy.LoadFromStream(stream);
-            res &= m_skeletonAnimations.LoadFromStream(stream);
+            bool res = mNodeTree.LoadFromStream(stream);
+            res &= mSocketNodeList.LoadFromStream(stream);
+            res &= mNodeDummy.LoadFromStream(stream);
+            res &= mSkeletonAnimations.LoadFromStream(stream);
             if (res)
             {
                 ResolveBoneNames();
@@ -100,33 +175,26 @@ namespace NullMesh
 
         private void ResolveBoneNames()
         {
-            if (m_nodeTree == null || m_nodeTree.GetNodeCount() == 0 || m_skeletonAnimations == null)
+            if (mNodeTree == null || mNodeTree.GetNodeCount() == 0 || mSkeletonAnimations == null)
             {
                 return;
             }
-            for (int i = 0; i < m_skeletonAnimations.GetAnimationCount(); i++)
+            for (int i = 0; i < mSkeletonAnimations.GetAnimationCount(); i++)
             {
-                NullSkeletonAnimation animation = m_skeletonAnimations[i];
+                NullSkeletonAnimation animation = mSkeletonAnimations[i];
                 for (int j = 0; j < animation.GetNodeCount(); j++)
                 {
                     NullSkeletonNodeAnimation node = animation[j];
                     {
                         uint id = node.GetParent();
-                        NullNodeTree bone = m_nodeTree.FindNode(id);
+                        NullNodeTree bone = mNodeTree.FindNode(id);
                         if (bone != null)
                         {
                             node.SetBoneName(bone.GetNodeName());
-                        } 
+                        }
                     }
                 }
             }
-        }
-
-        private bool LoadFromStreamForStaticMesh(NullMemoryStream stream)
-        {
-            bool res = m_meshObjectList.LoadFromStream(stream);
-            res &= m_vertexMorphAnimations.LoadFromStream(stream);
-            return res;
         }
 
         private bool ValidateFileHeader(uint aType, ushort version)
@@ -145,63 +213,63 @@ namespace NullMesh
             }
             else
             {
-                m_workingMode = E_HXBWorkingFlag.EHXWF_AUTO_DETECT;
+                mWorkingMode = NullWorkingFlag.WF_AUTO_DETECT;
             }
             return true;
         }
 
         private void Clear()
         {
-            m_version = MESH_FILE_VERSION;
-            m_blockSize = 0;
-            m_meshObjectList = null;
-            m_skinObjectList = null;
-            m_socketNodeList = null;
-            m_nodeDummy = null;
-            m_nodeTree = null;
-            m_skeletonBinding = null;
-            m_skeletonAnimations = null;
-            m_vertexMorphAnimations = null;
+            mVersion = MESH_FILE_VERSION;
+            mBlockSize = 0;
+            mMeshObjectList = null;
+            mSkinObjectList = null;
+            mSocketNodeList = null;
+            mNodeDummy = null;
+            mNodeTree = null;
+            mSkeletonBinding = null;
+            mSkeletonAnimations = null;
+            mVertexMorphAnimations = null;
         }
 
         private void InitializeAsStaticMesh(ushort version)
         {
             Clear();
-            m_workingMode = E_HXBWorkingFlag.EHXWF_STATIC_MESH;
-            m_version = version;
-            m_blockSize = 0;
+            mWorkingMode = NullWorkingFlag.WF_STATIC_MESH;
+            mVersion = version;
+            mBlockSize = 0;
             //base mesh
-            m_meshObjectList = new NullMeshObjects(m_version);
-            m_vertexMorphAnimations = new NullVertexMorphAnimations();
+            mMeshObjectList = new NullMeshObjects(mVersion);
+            mVertexMorphAnimations = new NullVertexMorphAnimations();
         }
 
         private void InitializeAsSkeletonMesh(ushort version)
         {
             Clear();
-            m_workingMode = E_HXBWorkingFlag.EHXWF_SKELETON_MESHPIECE;
-            m_version = version;
-            m_blockSize = 0;
+            mWorkingMode = NullWorkingFlag.WF_SKELETON_MESHPIECE;
+            mVersion = version;
+            mBlockSize = 0;
             //base mesh
-            m_meshObjectList = new NullMeshObjects(m_version);
-            m_skinObjectList = new NullMeshObjects(m_version);
-            m_socketNodeList = new NullSocketNodes();
-            m_nodeDummy = new NullNodeDummy();
-            m_nodeTree = new NullNodeTree(m_version);
-            m_skeletonBinding = new NullSkeletonBinding(m_version);
-            m_vertexMorphAnimations = new NullVertexMorphAnimations();
+            mMeshObjectList = new NullMeshObjects(mVersion);
+            mSkinObjectList = new NullMeshObjects(mVersion);
+            mSocketNodeList = new NullSocketNodes();
+            mNodeDummy = new NullNodeDummy();
+            mNodeTree = new NullNodeTree(mVersion);
+            mSkeletonBinding = new NullSkeletonBinding(mVersion);
+            mVertexMorphAnimations = new NullVertexMorphAnimations();
         }
 
         private void InitializeAsSkeletonAnimation(ushort version)
         {
             Clear();
-            m_workingMode = E_HXBWorkingFlag.EHXWF_NODE_ANIM;
-            m_version = version;
-            m_blockSize = 0;
+            mWorkingMode = NullWorkingFlag.WF_NODE_ANIM;
+            mVersion = version;
+            mBlockSize = 0;
             //base mesh
-            m_nodeTree = new NullNodeTree(m_version);
-            m_socketNodeList = new NullSocketNodes();
-            m_nodeDummy = new NullNodeDummy();
-            m_skeletonAnimations = new NullSkeletonAnimations(m_version);
+            mNodeTree = new NullNodeTree(mVersion);
+            mSocketNodeList = new NullSocketNodes();
+            mNodeDummy = new NullNodeDummy();
+            mSkeletonAnimations = new NullSkeletonAnimations(mVersion);
         }
 
     }
