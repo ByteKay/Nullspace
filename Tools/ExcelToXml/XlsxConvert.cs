@@ -7,15 +7,20 @@ using OfficeOpenXml;
 using System.Xml.Linq;
 
 namespace Nullspace
-{
+{       
+    /// <summary>
+    /// 一个文件 一个 CS
+    /// 一个 sheet 一个 class
+    /// </summary>
     public class XlsxConvert
     {
         private static string CSharpOutDir;
         private static string XMLOutDir;
-        private static bool AllInOne;
-        private static StringBuilder CSharpBuilder;
+        private static int NameRow = 1;
+        private static int TypeRow = 3;
+        private static int DataRow = 4;
 
-        public static void Convert(string xlsxDir, string outCshapDir, string outXmlDir, bool allInOne, HashSet<string> ignore)
+        public static void Convert(string xlsxDir, string outCshapDir, string outXmlDir, HashSet<string> ignore)
         {
             CSharpOutDir = outCshapDir;
             if (!Directory.Exists(CSharpOutDir))
@@ -27,18 +32,7 @@ namespace Nullspace
             {
                 Directory.CreateDirectory(XMLOutDir);
             }
-            AllInOne = allInOne;
-            CSharpBuilder = new StringBuilder();
             string[] files = Directory.GetFiles(xlsxDir, "*.xlsx");
-
-            if(AllInOne)
-            {
-                CSharpBuilder.AppendLine("using System;");
-                CSharpBuilder.AppendLine("using System.Collections.Generic;");
-                CSharpBuilder.AppendLine("using System.Text;");
-                CSharpBuilder.AppendLine("namespace Nullspace");
-                CSharpBuilder.AppendLine("{");
-            }
             foreach (string file in files)
             {
                 string fileName = Path.GetFileNameWithoutExtension(file).Trim();
@@ -51,25 +45,15 @@ namespace Nullspace
                 GeneratorCS(file);
                 ExcelToXml(file);
             }
-            if(AllInOne)
-            {
-                CSharpBuilder.AppendLine("}");
-                string filePath = CSharpOutDir + "/ResourceDatas.cs";
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
-                File.WriteAllText(filePath, CSharpBuilder.ToString());
-            }
         }
 
-        private static void ExportOneSheet(ExcelWorksheet tDS, int colName, int colType, ref List<string> names,  ref List<string> nameTypes)
+        private static void GetSheetNameAndTypes(ExcelWorksheet tDS, ref List<string> names,  ref List<string> nameTypes)
         {
             ExcelRange range = tDS.Cells;
             object[,] values = (object[,])range.Value;
             int rows = values.GetLength(0);
             int cols = values.GetLength(1);
-            int nameRow = colName - 1;
+            int nameRow = NameRow - 1;
             for (int j = 0; j < cols; ++j)
             {
                 if (values[nameRow, j] == null)
@@ -79,26 +63,22 @@ namespace Nullspace
                 string name = values[nameRow, j].ToString();
                 names.Add(name.ToString());
             }
-            int nameTypeRow = colType - 1;
+            int nameTypeRow = TypeRow - 1;
             for (int j = 0; j < names.Count; ++j)
             {
                 if (values[nameTypeRow, j] == null)
                 {
                     values[nameTypeRow, j] = "";
-                    return;
+                    throw new Exception("empty " + j);
                 }
                 string name = values[nameTypeRow, j].ToString();
                 nameTypes.Add(name.ToString());
             }
         }
 
-        public static void GeneratorCS(string fileFullPath, int colName = 1, int colType = 3)
+        public static void GeneratorCS(string fileFullPath)
         {
             FileInfo newFile = new FileInfo(fileFullPath);
-            string fileName = Path.GetFileNameWithoutExtension(fileFullPath);
-            fileName = fileName.Trim();
-            List<string> names = new List<string>();
-            List<string> nameTypes = new List<string>();
             using (ExcelPackage pck = new ExcelPackage(newFile))
             {
                 try
@@ -106,14 +86,35 @@ namespace Nullspace
                     ExcelWorkbook workBook = pck.Workbook;
                     if (workBook != null)
                     {
+
+                        HashSet<string> removeField = new HashSet<string>();
+                        removeField.Add("id");
+                        string fileName = GetFileName(fileFullPath);
+                        StringBuilder builder = new StringBuilder();
+                        builder.AppendLine("using System;");
+                        builder.AppendLine("using System.Collections.Generic;");
+                        builder.AppendLine("using System.Text;");
+                        builder.AppendLine("namespace Nullspace");
+                        builder.AppendLine("{");
+
                         int cnt = workBook.Worksheets.Count;
                         var enumerator = workBook.Worksheets.GetEnumerator();
                         while (enumerator.MoveNext())
                         {
                             ExcelWorksheet tDS = enumerator.Current;
-                            string sheetName = tDS.Name;
-                            ExportOneSheet(tDS, colName, colType, ref names, ref nameTypes);
+                            string sheetName = fileName + UpperFirst(tDS.Name);
+                            List<string> names = new List<string>();
+                            List<string> nameTypes = new List<string>();
+                            GetSheetNameAndTypes(tDS, ref names, ref nameTypes);
+                            MakeCS(sheetName, names, nameTypes, builder, removeField);
+                            builder.AppendLine();
                         }
+                        string filePath = CSharpOutDir + "/Resource" + fileName + ".cs";
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                        File.WriteAllText(filePath, builder.ToString());
                     }
                 }
                 catch (Exception e)
@@ -121,43 +122,14 @@ namespace Nullspace
                     Console.WriteLine(e.Message + " " + fileFullPath);
                 }
             }
-            HashSet<string> removeField = new HashSet<string>();
-            removeField.Add("id");
-            fileName = Regex.Replace(fileName, @"\d", "");
-            string desc = Regex.Replace(fileName, @"[a-zA-Z]+", "");
-            fileName = Regex.Replace(fileName, @"[\u4e00-\u9fa5]+", "");
-            fileName = "Resource" + char.ToUpper(fileName[0]) + fileName.Substring(1);
-
-            if (AllInOne)
-            {
-                MakeCS(fileName, desc, names, nameTypes, CSharpBuilder, removeField);
-            }
-            else
-            {
-                StringBuilder builder = new StringBuilder();
-                builder.AppendLine("using System;");
-                builder.AppendLine("using System.Collections.Generic;");
-                builder.AppendLine("using System.Text;");
-                builder.AppendLine("namespace Nullspace");
-                builder.AppendLine("{");
-                MakeCS(fileName, desc, names, nameTypes, builder, removeField);
-                builder.AppendLine("}");
-                string filePath = CSharpOutDir + "/" + fileName + ".cs";
-                MakeCS(fileName, desc, names, nameTypes, CSharpBuilder, removeField);
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
-                File.WriteAllText(filePath, builder.ToString());
-            }
         }
 
-        static void MakeCS(string fileName, string desc, List<string> names, List<string> nameTypes, StringBuilder builder, HashSet<string> removeField)
+        static void MakeCS(string fileName, List<string> names, List<string> nameTypes, StringBuilder builder, HashSet<string> removeField)
         {
             string tab = "    ";
             string doubleTab = tab + tab;
-            builder.Append(tab).Append("[XmlData(\"").Append(fileName + ".xml\"").Append(", \"").Append(desc).Append("\")]").AppendLine("");
-            builder.Append(tab).Append("public class ").Append(fileName).Append(" : XmlData<").Append(fileName).Append(">").Append(", IStream").AppendLine("");
+            builder.Append(tab).Append("[XmlData(\"").Append(fileName + "\"]").AppendLine();
+            builder.Append(tab).Append("public class ").Append(fileName).Append(" : XmlData<").Append(fileName).Append(">").Append(", IStream").AppendLine();
             builder.Append(tab).AppendLine("{");
             int count = nameTypes.Count;
             for (int i = 0; i < count; ++i)
@@ -172,7 +144,7 @@ namespace Nullspace
 
             builder.Append(doubleTab).Append("public int SaveToStream(NullMemoryStream stream)").AppendLine();
             builder.Append(doubleTab).Append("{").AppendLine();
-            builder.Append(doubleTab).Append(tab).Append("int size = 0;").AppendLine();
+            builder.Append(doubleTab).Append(tab).Append("int size = stream.WriteInt(id);").AppendLine();
             for (int i = 0; i < count; ++i)
             {
                 if (removeField.Contains(names[i]))
@@ -187,7 +159,7 @@ namespace Nullspace
             builder.AppendLine();
             builder.Append(doubleTab).Append("public bool LoadFromStream(NullMemoryStream stream)").AppendLine();
             builder.Append(doubleTab).Append("{").AppendLine();
-            builder.Append(doubleTab).Append(tab).Append("bool res = true;").AppendLine();
+            builder.Append(doubleTab).Append(tab).Append("bool res = stream.ReadInt(out id);").AppendLine();
             for (int i = 0; i < count; ++i)
             {
                 if (removeField.Contains(names[i]))
@@ -197,9 +169,8 @@ namespace Nullspace
                 builder.Append(doubleTab).Append(tab).Append("res &= ").Append(GetReadString(names[i], nameTypes[i])).AppendLine();
             }
             builder.Append(doubleTab).Append(tab).Append("return res;").AppendLine();
-            builder.Append(doubleTab).AppendLine("}");
-
-            builder.Append(tab).AppendLine("}");
+            builder.Append(doubleTab).Append("}").AppendLine();
+            builder.Append(tab).Append("}").AppendLine();
         }
 
         public static string GetWriteString(string name, string type)
@@ -246,45 +217,54 @@ namespace Nullspace
             return null;
         }
 
-        public static void ExcelToXml(string fileFullPath, string sheetName = "Sheet1", int colName = 1, int startDataRow = 4)
+        public static string GetFileName(string fullPath)
         {
-            FileInfo newFile = new FileInfo(fileFullPath);
-            string fileName = Path.GetFileNameWithoutExtension(fileFullPath);
+            string fileName = Path.GetFileNameWithoutExtension(fullPath);
             fileName = fileName.Trim();
             fileName = Regex.Replace(fileName, @"\d", "");
             string desc = Regex.Replace(fileName, @"[a-zA-Z]+", "");
             fileName = Regex.Replace(fileName, @"[\u4e00-\u9fa5]+", "");
-            fileName = "Resource" + char.ToUpper(fileName[0]) + fileName.Substring(1);
+            fileName = char.ToUpper(fileName[0]) + fileName.Substring(1);
+            return fileName;
+        }
+
+        public static string UpperFirst(string str)
+        {
+            return char.ToUpper(str[0]) + str.Substring(1);
+        }
+
+        public static void ExcelToXml(string fileFullPath)
+        {
+            FileInfo newFile = new FileInfo(fileFullPath);
+            string fileName = GetFileName(fileFullPath);
+
             using (ExcelPackage pck = new ExcelPackage(newFile))
             {
                 try
                 {
                     ExcelWorkbook workBook = pck.Workbook;
-                    if (workBook != null)
+                    if (workBook != null && workBook.Worksheets.Count > 0)
                     {
-                        if (workBook.Worksheets.Count > 0)
+                        int cnt = workBook.Worksheets.Count;
+                        var enumerator = workBook.Worksheets.GetEnumerator();
+                        while (enumerator.MoveNext())
                         {
                             var root = new System.Security.SecurityElement("root");
-                            ExcelWorksheet tDS = workBook.Worksheets[sheetName];
+                            ExcelWorksheet tDS = enumerator.Current;
                             ExcelRange range = tDS.Cells;
                             object[,] values = (object[,])range.Value;
                             int rows = values.GetLength(0);
                             int cols = values.GetLength(1);
-                            int nameRow = colName - 1;
+                            int nameRow = NameRow - 1;
                             List<string> names = new List<string>();
-                            for (int j = 0; j < cols; ++j)
-                            {
-                                if (values[nameRow, j] == null)
-                                {
-                                    break;
-                                }
-                                string name = values[nameRow, j].ToString();
-                                names.Add(name.ToString());
-                            }
+                            List<string> nameTypes = new List<string>();
+                            GetSheetNameAndTypes(tDS, ref names, ref nameTypes);
+                            string xmlFileName = fileName + UpperFirst(tDS.Name);
+
                             cols = names.Count;
-                            for (int i = startDataRow - 1; i < rows; ++i)
+                            for (int i = DataRow - 1; i < rows; ++i)
                             {
-                                var xml = new System.Security.SecurityElement(fileName);
+                                var xml = new System.Security.SecurityElement(xmlFileName);
                                 if (values[i, 0] == null)
                                 {
                                     break;
@@ -299,7 +279,7 @@ namespace Nullspace
                                 }
                                 root.AddChild(xml);
                             }
-                            string filePath = XMLOutDir + "/" + fileName + ".xml";
+                            string filePath = XMLOutDir + "/" + xmlFileName + ".xml";
                             if (File.Exists(filePath))
                             {
                                 File.Delete(filePath);
