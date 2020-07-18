@@ -14,7 +14,7 @@ namespace NullMesh
 
     public class NullMeshFile : INullStream
     {
-        public const ushort MESH_FILE_VERSION = 100;
+        public const int MESH_FILE_VERSION = 100;
         private static uint StaticMesh = MakeFourCC("HXBO");
         private static uint SkeletonMesh = MakeFourCC("HXBS");
         private static uint SkeletonAnimation = MakeFourCC("HXBA");
@@ -23,9 +23,9 @@ namespace NullMesh
             return BitConverter.ToUInt32(Encoding.UTF8.GetBytes(four), 0);
         }
 
-        protected ushort mVersion;
+        public int CurrentVersion;
         protected NullWorkingFlag mWorkingMode;
-        protected uint mBlockSize;
+        protected int mBlockSize;
         //base mesh
         protected NullMeshObjects mMeshObjectList;
         protected NullMeshObjects mSkinObjectList;
@@ -45,10 +45,10 @@ namespace NullMesh
             {
                 return 0;
             }
-            mVersion = MESH_FILE_VERSION;
+            CurrentVersion = MESH_FILE_VERSION;
             stream.WriteUInt(foucc);
-            stream.WriteUInt(mBlockSize);
-            stream.WriteUShort(mVersion);
+            stream.WriteInt(mBlockSize);
+            stream.WriteInt(CurrentVersion);
             int size = 0;
             switch (mWorkingMode)
             {
@@ -100,9 +100,9 @@ namespace NullMesh
         {
             uint foucc = 0;
             bool res = stream.ReadUInt(out foucc);
-            res &= stream.ReadUInt(out mBlockSize);
-            res &= stream.ReadUShort(out mVersion);
-            if (!res || mVersion > MESH_FILE_VERSION || !ValidateFileHeader(foucc, mVersion))
+            res &= stream.ReadInt(out mBlockSize);
+            res &= stream.ReadInt(out CurrentVersion);
+            if (!res || CurrentVersion > MESH_FILE_VERSION || !ValidateFileHeader(foucc, CurrentVersion))
             {
                 return false;
             }
@@ -186,7 +186,7 @@ namespace NullMesh
                 {
                     NullSkeletonNodeAnimation node = animation[j];
                     {
-                        uint id = node.GetParent();
+                        int id = node.GetParent();
                         NullNodeTree bone = mNodeTree.FindNode(id);
                         if (bone != null)
                         {
@@ -197,7 +197,7 @@ namespace NullMesh
             }
         }
 
-        private bool ValidateFileHeader(uint aType, ushort version)
+        private bool ValidateFileHeader(uint aType, int version)
         {
             if (aType == StaticMesh)
             {
@@ -220,7 +220,7 @@ namespace NullMesh
 
         private void Clear()
         {
-            mVersion = MESH_FILE_VERSION;
+            CurrentVersion = MESH_FILE_VERSION;
             mBlockSize = 0;
             mMeshObjectList = null;
             mSkinObjectList = null;
@@ -232,44 +232,44 @@ namespace NullMesh
             mVertexMorphAnimations = null;
         }
 
-        private void InitializeAsStaticMesh(ushort version)
+        private void InitializeAsStaticMesh(int version)
         {
             Clear();
             mWorkingMode = NullWorkingFlag.WF_STATIC_MESH;
-            mVersion = version;
+            CurrentVersion = version;
             mBlockSize = 0;
             //base mesh
-            mMeshObjectList = new NullMeshObjects(mVersion);
+            mMeshObjectList = new NullMeshObjects(CurrentVersion);
             mVertexMorphAnimations = new NullVertexMorphAnimations();
         }
 
-        private void InitializeAsSkeletonMesh(ushort version)
+        private void InitializeAsSkeletonMesh(int version)
         {
             Clear();
             mWorkingMode = NullWorkingFlag.WF_SKELETON_MESHPIECE;
-            mVersion = version;
+            CurrentVersion = version;
             mBlockSize = 0;
             //base mesh
-            mMeshObjectList = new NullMeshObjects(mVersion);
-            mSkinObjectList = new NullMeshObjects(mVersion);
+            mMeshObjectList = new NullMeshObjects(CurrentVersion);
+            mSkinObjectList = new NullMeshObjects(CurrentVersion);
             mSocketNodeList = new NullSocketNodes();
             mNodeDummy = new NullNodeDummy();
-            mNodeTree = new NullNodeTree(mVersion);
-            mSkeletonBinding = new NullSkeletonBinding(mVersion);
+            mNodeTree = new NullNodeTree(CurrentVersion);
+            mSkeletonBinding = new NullSkeletonBinding(CurrentVersion);
             mVertexMorphAnimations = new NullVertexMorphAnimations();
         }
 
-        private void InitializeAsSkeletonAnimation(ushort version)
+        private void InitializeAsSkeletonAnimation(int version)
         {
             Clear();
             mWorkingMode = NullWorkingFlag.WF_NODE_ANIM;
-            mVersion = version;
+            CurrentVersion = version;
             mBlockSize = 0;
             //base mesh
-            mNodeTree = new NullNodeTree(mVersion);
+            mNodeTree = new NullNodeTree(CurrentVersion);
             mSocketNodeList = new NullSocketNodes();
             mNodeDummy = new NullNodeDummy();
-            mSkeletonAnimations = new NullSkeletonAnimations(mVersion);
+            mSkeletonAnimations = new NullSkeletonAnimations(CurrentVersion);
         }
 
     }

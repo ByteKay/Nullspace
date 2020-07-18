@@ -6,141 +6,121 @@ using UnityEngine;
 
 namespace NullMesh
 {
+    public enum UVType
+    {
+        UVT_DEFAULT = 0,        //default, equal uv for base-texture
+        UVT_NORMAL_MAP = 1,     //uv for normal/gloss map
+        UVT_LIGHT_MAP = 2,      //uv for light-map
+        UVT_RESERVE = 3,        //maxium texture layer 
+    };
+
     public class NullUVGroup : INullStream
     {
-        public enum UVType
+        public int CurrentVersion;
+        protected UVType mUVType;
+        protected double mUVScale;
+        protected NullDataStructType mUVDataType;
+        protected List<Vector2> mUVArray;
+
+        public NullUVGroup()
         {
-            UVT_DEFAULT = 0,        //default, equal uv for base-texture
-            UVT_NORMAL_MAP = 1,     //uv for normal/gloss map
-            UVT_LIGHT_MAP = 2,      //uv for light-map
-            UVT_RESERVE = 3,        //maxium texture layer 
-        };
+            mUVScale = 1.0;
+            mUVType = UVType.UVT_DEFAULT;
+            mUVDataType = NullDataStructType.DST_FLOAT;
+            mUVArray = new List<Vector2>();
+        }
 
-        protected byte UVDataType;
-        protected byte mUVType;
-        protected double UVScale;
-        protected List<Vector2> UVArray;
-        protected ushort CurrentVersion;
-        private ushort UVCount;
-        private uint UVGroupSize;
-
-        public NullUVGroup(ushort version, ushort size, byte type)
+        public NullUVGroup(int version, UVType type) : this()
         {
             CurrentVersion = version;
-            UVScale = 1.0;
-            UVDataType = (byte)NullDataStructType.DST_FLOAT;
-            UVCount = size;
             mUVType = type;
-            UVArray = null;
         }
 
         public void Clear()
         {
-            UVArray = null;
-            UVCount = 0;
+            mUVArray.Clear();
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
-            uint dataSize = UVCount;
-            if (UVArray == null)
-            {
-                dataSize = 0;
-            }
-            int size = stream.WriteUInt(dataSize);
-            if (dataSize == 0)
+            int size = stream.WriteList(mUVArray, false);
+            if (mUVArray.Count == 0)
             {
                 return size;
             }
-            size += stream.WriteByte(mUVType);
-            size += stream.WriteByte(UVDataType);
-            size += stream.WriteList(UVArray, true);
+            size += stream.WriteByte((byte)mUVType);
+            size += stream.WriteByte((byte)mUVDataType);
             return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            bool res = stream.ReadUShort(out UVCount);
-            if (UVCount == 0)
+            bool res = stream.ReadList(out mUVArray);
+            if (mUVArray.Count == 0)
             {
                 return res;
             }
-            res &= stream.ReadByte(out mUVType);
-            res &= stream.ReadByte(out UVDataType);
-            res &= stream.ReadList(out UVArray, UVCount);
+            byte b;
+            res &= stream.ReadByte(out b);
+            mUVType = (UVType)b;
+            res &= stream.ReadByte(out b);
+            mUVDataType = (NullDataStructType)b;
             return res;
         }
     }
 
     public class NullUVGroups : INullStream
     {
-        protected ushort CurrentVersion;
-        protected Dictionary<byte, NullUVGroup> UVGroupList;
-        private ushort UVGroupSize;
-        private byte InternalSize;
-        private ushort VertexCount;
+        public int CurrentVersion;
+        protected int mVertexCount;
+        protected List<NullUVGroup> mUVGroupList;
 
-        public NullUVGroups(ushort currentVersion, ushort vertexCount)
+        public NullUVGroups()
+        {
+            mUVGroupList = new List<NullUVGroup>();
+            mVertexCount = 0;
+        }
+
+        public NullUVGroups(int currentVersion, int vertexCount) : this()
         {
             CurrentVersion = currentVersion;
-            VertexCount = vertexCount;
+            mVertexCount = vertexCount;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
-            int size = stream.WriteByte(InternalSize);
-            for (byte i = 0; i < InternalSize; i++)
-            {
-                size += UVGroupList[i].SaveToStream(stream);
-            }
-            return size;
+            return stream.WriteList(mUVGroupList, false);
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            byte size = 0;
-            bool res = stream.ReadByte(out size);
-            for (int i = 0; i < size; i++)
-            {
-                //add a uv whitch type id == 0xff, will always success
-                NullUVGroup group = AppendUV(0xff);
-                if (group != null)
-                {
-                    res &= group.LoadFromStream(stream);
-                }
-            }
-            return res;
+            return stream.ReadList(out mUVGroupList);
         }
 
         public NullUVGroup AppendUV(byte uvType)
         {
-            if (UVGroupList == null)
-            {
-                UVGroupList = new Dictionary<byte, NullUVGroup>();
-            }
-            if (UVGroupList.ContainsKey(uvType))
-            {
-                return null;
-            }
-            NullUVGroup group = new NullUVGroup(CurrentVersion, UVGroupSize, uvType);
-            UVGroupList.Add(uvType, group);
-            InternalSize++;
-            return group;
+            //if (mUVGroupList.ContainsKey(uvType))
+            //{
+            //    return null;
+            //}
+            //NullUVGroup group = new NullUVGroup(CurrentVersion, uvType);
+            //mUVGroupList.Add(uvType, group);
+            //mInternalSize++;
+            return null;
         }
 
         public void Clear()
         {
-            UVGroupList = null;
-            InternalSize = 0;
+            mUVGroupList.Clear();
         }
 
         public int GetUVGroupCount()
         {
-            return UVGroupList.Count;
+            return mUVGroupList.Count;
         }
     }
 

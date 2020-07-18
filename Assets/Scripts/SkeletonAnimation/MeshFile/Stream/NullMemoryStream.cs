@@ -166,17 +166,27 @@ namespace NullMesh
             return size;
         }
 
-        public bool ReadMap<U, V>(out Dictionary<U, V> map, int useCount = 0) where V : new()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="map"></param>
+        /// <param name="useCount">-1表示需要读int；表示不读任何数据,返回 true</param>
+        /// <returns></returns>
+        public bool ReadMap<U, V>(out Dictionary<U, V> map, int useCount = -1) where V : new()
         {
+            map = new Dictionary<U, V>();
+            if (useCount == 0)
+            {
+                return true;
+            }
             MethodInfo keyMethod = GetReadMethod<U>();
             MethodInfo valueMethod = GetReadMethod<V>();
             UnityEngine.Debug.Assert(keyMethod != null && valueMethod != null, "ReadMap");
             bool res = false;
             int count = useCount;
-            map = null;
+            // 处理 -1 和 大于0 的情况
             if (count > 0 || ReadInt(out count))
             {
-                map = new Dictionary<U, V>(count);
                 U u = default(U);
                 V v = IsStreamType<V>() ? new V() : default(V);
                 object[] keyParameters = new object[1];
@@ -193,14 +203,25 @@ namespace NullMesh
             return res;
         }
 
-        public bool ReadList<T>(out List<T> values, int useCount = 0)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="values"></param>
+        /// <param name="useCount">-1表示需要读int；表示不读任何数据,返回 true</param>
+        /// <returns></returns>
+        public bool ReadList<T>(out List<T> values, int useCount = -1) where T : new()
         {
-            values = null;
+            values = new List<T>();
             int count = useCount;
+            if (count == 0)
+            {
+                return true;
+            }
             if (count > 0 || ReadInt(out count))
             {
-                values = new List<T>(count);
-                T v = default(T);
+                values.Capacity = count;
+                T v = IsStreamType<T>() ? new T() : default(T);
                 MethodInfo info = GetReadMethod<T>();
                 UnityEngine.Debug.Assert(info != null, "" + typeof(T).FullName);
                 object[] parameters = new object[] { v };
@@ -499,6 +520,10 @@ namespace NullMesh
         [ReadWrite(ReadWriteType.Write, typeof(string))]
         public int WriteString(string str)
         {
+            if (str == null)
+            {
+                str = "";
+            }
             byte[] bytes = Encoding.UTF8.GetBytes(str);
             ushort len = (ushort)bytes.Length;
             int size = WriteUShort(len);

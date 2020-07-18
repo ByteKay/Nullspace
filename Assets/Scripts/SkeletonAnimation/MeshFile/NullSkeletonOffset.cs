@@ -8,167 +8,145 @@ namespace NullMesh
 {
     public class NullSkeletonOffset : INullStream
     {
-        protected uint BoneHandle;
-        protected string BoneName;
-        protected ushort FrameCount;
-        protected List<Vector3> PosArray;
-        protected List<float> FrameTimes;                
-		protected ushort CurrentVersion;
+        public int CurrentVersion;
+        protected string mBoneName;
+        protected int mBoneHandle;
+        protected List<Vector3> mPosArray;
+        protected List<float> mFrameTimes;
 
-        public NullSkeletonOffset(ushort version, ushort frameCount)
+        public NullSkeletonOffset()
+        {
+            mPosArray = new List<Vector3>();
+            mFrameTimes = new List<float>();
+            mBoneName = "";
+            mBoneHandle = 0;
+        }
+
+        public NullSkeletonOffset(int version) : this()
         {
             CurrentVersion = version;
-            FrameCount = frameCount;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            int size = stream.WriteInt(mBoneHandle);
+            size += stream.WriteString(mBoneName);
+            size += stream.WriteList(mPosArray, false);
+            size += stream.WriteList(mFrameTimes, true);
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
-            ushort count = 0;
-            bool res = stream.ReadUShort(out count);
-            SetFrameCount(count);
-            res &= stream.ReadUInt(out BoneHandle);
-            res &= stream.ReadString(out BoneName);
-            res &= stream.ReadList(out PosArray);
-            res &= stream.ReadList(out FrameTimes);
+            bool res = stream.ReadInt(out mBoneHandle);
+            res &= stream.ReadString(out mBoneName);
+            res &= stream.ReadList(out mPosArray);
+            res &= stream.ReadList(out mFrameTimes, mPosArray.Count);
             return res;
-        }
-
-        public bool SetFrameCount(ushort frameCount)
-        {
-            Clear();
-            FrameCount = frameCount;
-            if (FrameCount > 0)
-            {
-                PosArray = new List<Vector3>(FrameCount);
-                FrameTimes = new List<float>(FrameCount);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         public void Clear()
         {
-            FrameCount = 0;
-            PosArray = null;
-            FrameTimes = null;
+            mPosArray.Clear();
+            mFrameTimes.Clear();
         }
     }
 
     public class NullSkeletonOffsets : INullStream
     {
-		protected string AnimationName;
-        protected byte AnimationOffsetCount;
-        protected List<NullSkeletonOffset> AnimationOffsetArray;
-		protected ushort CurrentVersion;
+        public int CurrentVersion;
+        protected string mAnimationName;
+        protected List<NullSkeletonOffset> mAnimationOffsetArray;
+
+        public NullSkeletonOffsets()
+        {
+            mAnimationOffsetArray = new List<NullSkeletonOffset>();
+            mAnimationName = "";
+        }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            int size = stream.WriteList(mAnimationOffsetArray, false);
+            if (mAnimationOffsetArray.Count > 0)
+            {
+                size += stream.WriteString(mAnimationName);
+            }
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            byte count = 0;
-            bool res = stream.ReadByte(out count);
-            if (count > 0)
+            bool res = stream.ReadList(out mAnimationOffsetArray);
+            if (mAnimationOffsetArray.Count > 0)
             {
-                res &= stream.ReadString(out AnimationName);
-                for (int i = 0; i < count; i++)
-                {
-                    NullSkeletonOffset offset = AppendSkeletonOffset(0);
-                    res &= offset.LoadFromStream(stream);
-                }
+                res &= stream.ReadString(out mAnimationName);
             }
             return res;
         }
 
-        public NullSkeletonOffset AppendSkeletonOffset(ushort frameCount)
+        public NullSkeletonOffset AppendSkeletonOffset()
         {
-            if (AnimationOffsetArray == null)
-            {
-                AnimationOffsetArray = new List<NullSkeletonOffset>();
-            }
-            NullSkeletonOffset offset = new NullSkeletonOffset(CurrentVersion, frameCount);
-            AnimationOffsetArray.Add(offset);
-            AnimationOffsetCount++;
+            NullSkeletonOffset offset = new NullSkeletonOffset(CurrentVersion);
+            mAnimationOffsetArray.Add(offset);
             return offset;
         }
 
         public void Clear()
         {
-            for (int i = 0; i < AnimationOffsetCount; i++)
+            for (int i = 0; i < mAnimationOffsetArray.Count(); i++)
             {
-                AnimationOffsetArray[i].Clear();
+                mAnimationOffsetArray[i].Clear();
             }
-            AnimationOffsetArray = null;
-            AnimationOffsetCount = 0;
+            mAnimationOffsetArray.Clear();
         }
     }
     
     public class NullSkeletonOffsetFile : INullStream
     {
-        protected ushort OffsetsCount;
-        protected List<NullSkeletonOffsets> AnimationOffsetsArray;
-        protected ushort BlockSize;
-        protected ushort Version;
+        public int CurrentVersion;
+        protected List<NullSkeletonOffsets> mAnimationOffsetsArray;
+        protected int mBlockSize;
+        
+        public NullSkeletonOffsetFile()
+        {
+            mAnimationOffsetsArray = new List<NullSkeletonOffsets>();
+            mBlockSize = 0;
+        }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            throw new NotImplementedException();
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            uint fourCC = NullMeshFile.MakeFourCC("HXBO");
+            int size = stream.WriteUInt(fourCC);
+            size += stream.WriteInt(CurrentVersion);
+            size += stream.WriteInt(mBlockSize);
+            size += stream.WriteList(mAnimationOffsetsArray, false);
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            uint fourCC = 0;
+            uint fourCC;
             stream.ReadUInt(out fourCC);
             if (NullMeshFile.MakeFourCC("HXBO") != fourCC)
             {
                 return false;
             }
-            bool res = stream.ReadUShort(out Version);
-            res &= stream.ReadUShort(out BlockSize);
-            ushort count = 0;
-            res &= stream.ReadUShort(out count);
-            SetAnimationOffsetsCount(count);
-            for (int i = 0; i < OffsetsCount; i++)
-            {
-                res &= AnimationOffsetsArray[i].LoadFromStream(stream);
-            }
+            bool res = stream.ReadInt(out CurrentVersion);
+            res &= stream.ReadInt(out mBlockSize);
+            res &= stream.ReadList(out mAnimationOffsetsArray);
             return res;
         }
 
         public void Clear()
         {
-            for (int i = 0; i < OffsetsCount; i++)
+            for (int i = 0; i < mAnimationOffsetsArray.Count; i++)
             {
-                AnimationOffsetsArray[i].Clear();
+                mAnimationOffsetsArray[i].Clear();
             }
-            AnimationOffsetsArray = null;
-            OffsetsCount = 0;
-        }
-
-        public void SetAnimationOffsetsCount(ushort count)
-        {
-            Clear();
-            OffsetsCount = count;
-            if (OffsetsCount > 0)
-            {
-                AnimationOffsetsArray = new List<NullSkeletonOffsets>(OffsetsCount);
-                for (int i = 0; i < OffsetsCount; ++i)
-                {
-                    AnimationOffsetsArray.Add(new NullSkeletonOffsets());
-                }
-            }
+            mAnimationOffsetsArray.Clear();
         }
     }
 

@@ -7,118 +7,97 @@ namespace NullMesh
 {
     public class NullVertexMorphAnimation : INullStream
     {
-        protected string AnimationName;
-        protected List<NullVertexMorphAnimationFrame> VertexMorphFrameList;
-        protected ushort VertexMorphFrameCount;
-        protected ushort FrameRate;
-        protected List<float> FrameArray;
+        protected string mAnimationName;
+        protected int mFrameRate;
+        protected List<float> mFrameArray;
+        protected List<NullVertexMorphAnimationFrame> mVertexMorphFrameList;
 
-        public NullVertexMorphAnimation(ushort frameRate)
+        public NullVertexMorphAnimation()
         {
-            FrameRate = frameRate;
+            mVertexMorphFrameList = new List<NullVertexMorphAnimationFrame>();
+            mFrameArray = new List<float>();
+            mFrameRate = 0;
+            mAnimationName = "";
+        }
+
+        public NullVertexMorphAnimation(int frameRate) : this()
+        {
+            mFrameRate = frameRate;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            int size = stream.WriteUShort(VertexMorphFrameCount);
-            if (VertexMorphFrameCount == 0)
+            int size = stream.WriteList(mFrameArray, false);
+            if (mFrameArray.Count == 0)
             {
                 return size;
             }
-            size += stream.WriteString(AnimationName);
-            size += stream.WriteUShort(FrameRate);
-            for (int i = 0; i < VertexMorphFrameCount; i++)
-            {
-                NullVertexMorphAnimationFrame av = VertexMorphFrameList[i];
-                size += av.SaveToStream(stream);
-            }
-            size += stream.WriteList(FrameArray, true);
+            size += stream.WriteList(mVertexMorphFrameList, true);
+            size += stream.WriteString(mAnimationName);
+            size += stream.WriteInt(mFrameRate);
             return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            bool res = stream.ReadUShort(out VertexMorphFrameCount);
-            if (VertexMorphFrameCount == 0)
+            bool res = stream.ReadList(out mFrameArray);
+            if (mFrameArray.Count == 0)
             {
                 return res;
             }
-            res &= stream.ReadString(out AnimationName);
-            res &= stream.ReadUShort(out FrameRate);
-            for (int i = 0; i < VertexMorphFrameCount; i++)
-            {
-                NullVertexMorphAnimationFrame av = AppendVertexMorphAnimationFrame();
-                res &= av.LoadFromStream(stream);
-            }
-            res &= stream.ReadList(out FrameArray, VertexMorphFrameCount);
+            res &= stream.ReadList(out mVertexMorphFrameList, mFrameArray.Count);
+            res &= stream.ReadString(out mAnimationName);
+            res &= stream.ReadInt(out mFrameRate);
             return res;
         }
 
         public NullVertexMorphAnimationFrame AppendVertexMorphAnimationFrame()
         {
             NullVertexMorphAnimationFrame av = new NullVertexMorphAnimationFrame();
-            if (VertexMorphFrameList == null)
-            {
-                VertexMorphFrameList = new List<NullVertexMorphAnimationFrame>();
-            }
-            VertexMorphFrameList.Add(av);
-            VertexMorphFrameCount++;
+            mVertexMorphFrameList.Add(av);
             return av;
         }
 
         public void Clear()
         {
-            VertexMorphFrameList = null;
-            VertexMorphFrameCount = 0;
-            FrameArray = null;
+            mVertexMorphFrameList.Clear();
+            mFrameArray.Clear();
         }
     }
 
     public class NullVertexMorphAnimations : INullStream
     {
-        protected byte AnimationCount;
-        protected List<NullVertexMorphAnimation> AnimationArray;
+        protected List<NullVertexMorphAnimation> mAnimationArray;
+
+        public NullVertexMorphAnimations()
+        {
+            mAnimationArray = new List<NullVertexMorphAnimation>();
+        }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            int size = stream.WriteByte(AnimationCount);
-            for (int i = 0; i < AnimationCount; i++)
-            {
-                size += AnimationArray[i].SaveToStream(stream);
-            }
+            int size = stream.WriteList(mAnimationArray, false);
             return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            byte count = 0;
-            bool res = stream.ReadByte(out count);
-            for (int i = 0; i < count; i++)
-            {
-                NullVertexMorphAnimation animation = AppendAnimation();
-                res &= animation.LoadFromStream(stream);
-            }
+            bool res = stream.ReadList(out mAnimationArray);
             return res;
         }
 
-        public NullVertexMorphAnimation AppendAnimation(ushort frameRate = 30)
+        public NullVertexMorphAnimation AppendAnimation(int frameRate = 30)
         {
             NullVertexMorphAnimation animation = new NullVertexMorphAnimation(frameRate);
-            if (AnimationArray == null)
-            {
-                AnimationArray = new List<NullVertexMorphAnimation>();
-            }
-            AnimationArray.Add(animation);
-            AnimationCount++;
+            mAnimationArray.Add(animation);
             return animation;
         }
 
         public void Clear()
         {
-            AnimationArray = null;
-            AnimationCount = 0;
+            mAnimationArray.Clear();
         }
     }
 }

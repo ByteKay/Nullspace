@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace NullMesh
 {
-    public enum NullMeshObjectOptionEnum
+    public enum NullMeshObjectOptionEnum : ushort
     {
         MOO_LARGE_MESH = 0x0080,
         MOO_COLLIDER = 0x0040,
@@ -18,7 +18,7 @@ namespace NullMesh
         MOO_INVISIBLE = 0x0001,
     }
 
-    public enum NullPrimitiveType
+    public enum NullPrimitiveType : byte
     {
         MOT_UNKNOWN = 0,
         MOT_TRIANGLES = 1,
@@ -26,7 +26,7 @@ namespace NullMesh
         MOT_TRIANGLE_STRIPS = 3,
     }
 
-    public enum NullFacegroupOpacity
+    public enum NullFacegroupOpacity : byte
     {
         EHXFO_DEFAULT = 0,
         EHXFO_SOLID,
@@ -34,7 +34,7 @@ namespace NullMesh
         EHXFO_ALPHAREF
     }
 
-    public enum NullDataStructType
+    public enum NullDataStructType : byte
     {
         DST_DEFAULT = 0,
         DST_SHORT = 1,
@@ -47,49 +47,75 @@ namespace NullMesh
     /// </summary>
     public partial class NullMeshObject : INullStream
     {
-        public ushort mCurrentVersion;
-        public ushort VertexCount;
-        public float[] Offset;
-        public double VertexScale;
-        public List<Vector3> VertexArray;
-        public List<Vector3Int> FaceArray;
-        public uint FaceIndexCount;
-        public byte SmoothGroup;
-        private NullPrimitiveType MeshType;
-        private uint TriangleCount;
-        private bool IncludingNormal;
-        private bool IncludeTangent;
-        private bool IncludingVertexColor;
+        public int CurrentVersion;
+        public List<Vector3> VertexPosArray;
+        public List<Vector3Int> FaceIndexArray;
 
-        public NullMeshObject(ushort version)
+        public int VertexCount { get { return VertexPosArray.Count; } }
+        public int FaceIndexCount { get { return FaceIndexArray.Count; } }
+
+        public List<Vector3> NormalArray;
+        public List<Vector3> TangentArray;
+        public List<Vector3> BinormalArray;
+        public List<Color> VertexColorArray;
+        public string MaterialName;
+        public int MaterialId;
+        public NullFacegroupOpacity Opacity;
+
+        public byte SmoothGroup;
+        public NullUVGroups UVGroups;
+
+        protected int mMask;
+        protected string mMeshObjectName;
+        protected int mMeshObjectHandle;
+        protected int mParentHandle;
+
+        private NullPrimitiveType mMeshType;
+        private bool mIncludingNormal;
+        private bool mIncludeTangent;
+        private bool mIncludingVertexColor;
+
+        public NullMeshObject()
         {
-            mCurrentVersion = version;
-            Mask = 0;
-            MeshObjectName = null;
-            MeshObjectHandle = 0;
-            ParentHandle = 0;
-            VertexCount = 0;
-            FaceIndexCount = 0;
-            Offset = new float[3];
-            VertexScale = 1.0;
-            VertexArray = null;
-            FaceArray = null;
-            UVGroups = null;
-            NormalArray = null;
-            TangentArray = null;
-            BinormalArray = null;
-            VertexColorArray = null;
-            SmoothGroup = 0;
-            MaterialName = null;
-            MaterialId = 0;
+            mMeshObjectName = "";
+            mMeshObjectHandle = 0;
+            mMask = 0;
+            mParentHandle = 0;
+
             Opacity = NullFacegroupOpacity.EHXFO_DEFAULT;
-            MeshType = NullPrimitiveType.MOT_INDEXED_PRIMITIVES;
-            SetMeshObjectType((byte)MeshType);
-            //if (m_faceIndexCount == 0 || m_vertexCount <= 0 || m_vertexCount > 65535)
-            //{
-            //    // 应该抛出异常，不支持 超过 65536 的模型
-            //    return;
-            //}
+            VertexPosArray = new List<Vector3>();
+            FaceIndexArray = new List<Vector3Int>();
+            NormalArray = new List<Vector3>();
+            TangentArray = new List<Vector3>();
+            BinormalArray = new List<Vector3>();
+            VertexColorArray = new List<Color>();
+            SmoothGroup = 0;
+            MaterialName = "";
+            MaterialId = 0;
+            UVGroups = new NullUVGroups();
+        }
+
+        public NullMeshObject(int version) : this()
+        {
+            CurrentVersion = version;
+
+            SetMeshObjectType((byte)mMeshType);
+            if (VertexCount > 65535)
+            {
+                // 应该抛出异常，不支持 超过 65536 的模型
+                throw new Exception("不支持 超过 65536 的模型");
+            }
+            switch (mMeshType)
+            {
+                case NullPrimitiveType.MOT_TRIANGLES:
+                    break;
+                case NullPrimitiveType.MOT_INDEXED_PRIMITIVES:
+                    break;
+                case NullPrimitiveType.MOT_TRIANGLE_STRIPS:
+                    break;
+                case NullPrimitiveType.MOT_UNKNOWN:
+                    break;
+            }
         }
 
         public void SetMeshObjectLargeMesh(bool isLargeMesh)
@@ -101,30 +127,28 @@ namespace NullMesh
             ushort v = (ushort)NullMeshObjectOptionEnum.MOO_LARGE_MESH;
             if (isLargeMesh)
             {
-                Mask |= v;
+                mMask |= v;
             }
             else
             {
-                Mask &= (ushort)~v;
+                mMask &= (ushort)~v;
             }
         }
 
         public void Clear()
         {
-            VertexCount = 0;
-            FaceIndexCount = 0;
-            VertexArray = null;
-            FaceArray = null;
-            UVGroups = null;
-            NormalArray = null;
-            TangentArray = null;
-            BinormalArray = null;
-            VertexColorArray = null;
+            VertexPosArray.Clear();
+            FaceIndexArray.Clear();
+            UVGroups.Clear();
+            NormalArray.Clear();
+            TangentArray.Clear();
+            BinormalArray.Clear();
+            VertexColorArray.Clear();
         }
 
         public NullDataStructType GetVertexDataType()
         {
-            NullDataStructType dataType = (NullDataStructType)((Mask >> 8) & 0x0f);
+            NullDataStructType dataType = (NullDataStructType)((mMask >> 8) & 0x0f);
             if (dataType != NullDataStructType.DST_SHORT)
             {
                 dataType = NullDataStructType.DST_FLOAT;
@@ -134,22 +158,22 @@ namespace NullMesh
 
         public bool IsLargeMeshObject()
         {
-            return (Mask & (ushort)NullMeshObjectOptionEnum.MOO_LARGE_MESH) != 0;
+            return (mMask & (ushort)NullMeshObjectOptionEnum.MOO_LARGE_MESH) != 0;
         }
 
         public byte GetMeshObjectType()
         {
-            return (byte)((Mask >> 12) & 0x0f);
+            return (byte)((mMask >> 12) & 0x0f);
         }
 
         public void SetMeshObjectType(byte mot)
         {
-            Mask = (ushort)((((mot << 12) & 0xf000)) | (Mask & 0x0fff));
+            mMask = (ushort)((((mot << 12) & 0xf000)) | (mMask & 0x0fff));
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            mCurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
             int size = SaveBaseDataToStream(stream);
             size += SaveVertexDataToStream(stream);
             size += SaveUVGroupToStream(stream);
@@ -173,7 +197,7 @@ namespace NullMesh
         private int SaveMaterialToStream(NullMemoryStream stream)
         {
             int size = stream.WriteString(MaterialName);
-            size += stream.WriteUInt(MaterialId);
+            size += stream.WriteInt(MaterialId);
             size += stream.WriteByte((byte)Opacity);
             return size;
         }
@@ -203,7 +227,7 @@ namespace NullMesh
             {
                 if (UVGroups == null)
                 {
-                    UVGroups = new NullUVGroups(mCurrentVersion, VertexCount);
+                    UVGroups = new NullUVGroups(CurrentVersion, VertexCount);
                 }
                 size += UVGroups.SaveToStream(stream);
             }
@@ -212,17 +236,17 @@ namespace NullMesh
 
         private int SaveVertexDataToStream(NullMemoryStream stream)
         {
-            int size = stream.WriteList(VertexArray, false);
-            size += stream.WriteList(FaceArray, false);
+            int size = stream.WriteList(VertexPosArray, false);
+            size += stream.WriteList(FaceIndexArray, false);
             return size;
         }
 
         private int SaveBaseDataToStream(NullMemoryStream stream)
         {
-            int size = stream.WriteUShort(Mask);
-            size += stream.WriteString(MeshObjectName);
-            size += stream.WriteUInt(MeshObjectHandle);
-            size += stream.WriteUInt(ParentHandle);
+            int size = stream.WriteInt(mMask);
+            size += stream.WriteString(mMeshObjectName);
+            size += stream.WriteInt(mMeshObjectHandle);
+            size += stream.WriteInt(mParentHandle);
             return size;
         }
 
@@ -239,22 +263,21 @@ namespace NullMesh
 
         public bool LoadBaseDataFromStream(NullMemoryStream stream)
         {
-            bool res = stream.ReadUShort(out Mask);
-            res &= stream.ReadString(out MeshObjectName);
-            res &= stream.ReadUInt(out MeshObjectHandle);
-            res &= stream.ReadUInt(out ParentHandle);
+            bool res = stream.ReadInt(out mMask);
+            res &= stream.ReadString(out mMeshObjectName);
+            res &= stream.ReadInt(out mMeshObjectHandle);
+            res &= stream.ReadInt(out mParentHandle);
             return res;
         }
 
         public bool LoadVertexDataFromStream(NullMemoryStream stream)
         {
             Clear();
-            bool res = stream.ReadList(out VertexArray);
-            res &= stream.ReadList(out FaceArray);
+            bool res = stream.ReadList(out VertexPosArray);
+            res &= stream.ReadList(out FaceIndexArray);
             if (res)
             {
-                VertexCount = (ushort)VertexArray.Count;
-                FaceIndexCount = (uint)FaceArray.Count;
+
                 SetMeshObjectLargeMesh(VertexCount > 65535);
             }
             return res;
@@ -268,7 +291,7 @@ namespace NullMesh
             {
                 if (UVGroups == null)
                 {
-                    UVGroups = new NullUVGroups(mCurrentVersion, VertexCount);
+                    UVGroups = new NullUVGroups(CurrentVersion, VertexCount);
                 }
                 res &= UVGroups.LoadFromStream(stream);
             }
@@ -309,7 +332,7 @@ namespace NullMesh
         {
             byte b;
             bool res = stream.ReadString(out MaterialName);
-            res &= stream.ReadUInt(out MaterialId);
+            res &= stream.ReadInt(out MaterialId);
             res &= stream.ReadByte(out b);
             if (res)
             {
@@ -339,56 +362,23 @@ namespace NullMesh
         }
     }
 
-    public partial class NullMeshObject
-    {
-        protected ushort Mask;
-        protected string MeshObjectName;		
-        protected uint MeshObjectHandle;				
-        protected uint ParentHandle;
-    }
-
-    public partial class NullMeshObject
-    {
-        public NullUVGroups UVGroups;
-        public List<Vector3> NormalArray;
-        public List<Vector3> TangentArray;
-        public List<Vector3> BinormalArray;
-        public List<Color> VertexColorArray;
-    }
-
-    public partial class NullMeshObject
-    {
-        public string MaterialName;
-        public uint MaterialId;               
-        public NullFacegroupOpacity Opacity;
-    }
-
     public class NullMeshObjects : INullStream
     {
         protected List<NullMeshObject> MeshObjectList;
-        protected ushort MeshObjectCount;
-        protected ushort CurrentVersion;
+        protected int CurrentVersion;
 
-        public NullMeshObjects(ushort version)
+        public NullMeshObjects()
         {
-            CurrentVersion = version;
-            MeshObjectCount = 0;
-            MeshObjectList = null;
+            MeshObjectList = new List<NullMeshObject>();
         }
 
-        public int SaveToStream(NullMemoryStream stream)
+        public NullMeshObjects(int version) : this()
         {
-            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
-            int size = stream.WriteUShort(MeshObjectCount);
-            for (byte i = 0; i < MeshObjectCount; i++)
-            {
-                 NullMeshObject meshObject = this[i];
-                if (meshObject != null)
-                {
-                    size += meshObject.SaveToStream(stream);
-                }
-            }
-            return size;
+            CurrentVersion = version;
+        }
+        public void Clear()
+        {
+            MeshObjectList.Clear();
         }
 
         public NullMeshObject this[int idx]
@@ -399,30 +389,23 @@ namespace NullMesh
             }
         }
 
-
-        public void Clear()
+        public int SaveToStream(NullMemoryStream stream)
         {
-            MeshObjectList = null;
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            int size = stream.WriteList(MeshObjectList, false);
+            return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            ushort count = 0;
-            bool res = stream.ReadUShort(out count);
-            for (int i = 0; i < count; i++)
-            {
-                NullMeshObject meshObject = AppendMeshObject(NullPrimitiveType.MOT_INDEXED_PRIMITIVES);
-                res &= meshObject.LoadFromStream(stream);
-            }
-            return res;
+            return stream.ReadList(out MeshObjectList);
         }
 
         public NullMeshObject AppendMeshObject(NullPrimitiveType meshType)
         {
             NullMeshObject meshObject = new NullMeshObject(CurrentVersion);
             MeshObjectList.Add(meshObject);
-            MeshObjectCount++;
             return meshObject;
         }
     }

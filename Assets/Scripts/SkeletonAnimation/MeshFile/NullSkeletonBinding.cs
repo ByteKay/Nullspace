@@ -9,192 +9,139 @@ namespace NullMesh
     {
         public class NullNodeWeight : INullStream
         {
-            public uint Target;
+            public int Target;
             public float Weight;
 
             public bool LoadFromStream(NullMemoryStream stream)
             {
-                bool res = stream.ReadUInt(out Target);
+                bool res = stream.ReadInt(out Target);
                 res &= stream.ReadFloat(out Weight);
                 return res;
             }
 
             public int SaveToStream(NullMemoryStream stream)
             {
-                int size = stream.WriteUInt(Target);
+                int size = stream.WriteInt(Target);
                 size += stream.WriteFloat(Weight);
                 return size;
             }
         }
 
-        protected ushort CurrentVersion;
-        protected byte WeightCount;       
-        protected List<NullNodeWeight> NodeWeightArray;
+        public int CurrentVersion;     
+        protected List<NullNodeWeight> mNodeWeightArray;
 
-        public NullSkeletonBindingNode(ushort version)
+        public NullSkeletonBindingNode()
+        {
+            mNodeWeightArray = new List<NullNodeWeight>();
+        }
+
+        public NullSkeletonBindingNode(int version) : this()
         {
             CurrentVersion = version;
-            WeightCount = 0;
-            NodeWeightArray = null;
         }
 
         public void StandarizeWeights()
         {
             float totalWeight = 0.0f;
-            for (int i = 0; i < WeightCount; i++)
+            for (int i = 0; i < mNodeWeightArray.Count; i++)
             {
-                totalWeight += NodeWeightArray[i].Weight;
+                totalWeight += mNodeWeightArray[i].Weight;
             }
             if (totalWeight < 1e-4f)
             {
                 totalWeight = 1e-4f;
             }
-            for (int i = 0; i < WeightCount; i++)
+            for (int i = 0; i < mNodeWeightArray.Count; i++)
             {
-                NodeWeightArray[i].Weight = NodeWeightArray[i].Weight / totalWeight;
+                mNodeWeightArray[i].Weight = mNodeWeightArray[i].Weight / totalWeight;
             }
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
-            int size = stream.WriteByte(WeightCount);
-            for (int i = 0; i < WeightCount; i++)
-            {
-                size += NodeWeightArray[i].SaveToStream(stream);
-            }
+            int size = stream.WriteList(mNodeWeightArray, false);
             return size;
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            byte count = 0;
-            bool res = stream.ReadByte(out count);
-            SetWeightCount(count);
-            for (int i = 0; i < WeightCount; i++)
-            {
-                res &= NodeWeightArray[i].LoadFromStream(stream);
-            }
-            return res;
-        }
-
-        public bool SetWeightCount(byte cnt)
-        {
-            WeightCount = cnt;
-            if (WeightCount == 0)
-            {
-                return false;
-            }
-            if (NodeWeightArray == null)
-            {
-                NodeWeightArray = new List<NullNodeWeight>();
-            }
-            for (int i = 0; i < WeightCount; ++i)
-            {
-                NodeWeightArray.Add(new NullNodeWeight());
-            }
-            return true;
+            return stream.ReadList(out mNodeWeightArray);
         }
 
         public void Clear()
         {
-            NodeWeightArray = null;
-            WeightCount = 0;
+            mNodeWeightArray.Clear();
         }
     }
 
     public class NullSkeletonPiece : INullStream
     {
-        protected ushort CurrentVersion;
-		protected uint PieceHandle;
-        protected ushort BindingNodeCount;
-        protected List<NullSkeletonBindingNode> BindingNodeArray;
+        public int CurrentVersion;
+		protected int mPieceHandle;
+        protected List<NullSkeletonBindingNode> mBindingNodeArray;
 
-        public NullSkeletonPiece(ushort version)
+        public NullSkeletonPiece()
+        {
+            mPieceHandle = 0;
+            mBindingNodeArray = new List<NullSkeletonBindingNode>();
+        }
+
+        public NullSkeletonPiece(int version) : this()
         {
             CurrentVersion = version;
-            PieceHandle = 0;
-            BindingNodeCount = 0;
-            BindingNodeArray = null;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
-            int size = stream.WriteUShort(BindingNodeCount);
-            size += stream.WriteUInt(PieceHandle);
-            for (int i = 0; i < BindingNodeCount; i++)
-            {
-                size += BindingNodeArray[i].SaveToStream(stream);
-            }
+            int size = stream.WriteInt(mPieceHandle);
+            size += stream.WriteList(mBindingNodeArray, false);
             return size;
         }
 
         public void StandarizeWeights()
         {
-            for (int i = 0; i < BindingNodeCount; i++)
+            for (int i = 0; i < mBindingNodeArray.Count; i++)
             {
-                BindingNodeArray[i].StandarizeWeights();
+                mBindingNodeArray[i].StandarizeWeights();
             }
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            ushort count = 0;
-            bool res = stream.ReadUShort(out count);
-            res &= stream.ReadUInt(out PieceHandle);
-            SetSkeletonBindingNodeCount(count);
-            for (int i = 0; i < BindingNodeCount; i++)
-            {
-                res &= BindingNodeArray[i].LoadFromStream(stream);
-            }
+            bool res = stream.ReadInt(out mPieceHandle);
+            res &= stream.ReadList(out mBindingNodeArray);
             return res;
-        }
-
-        public bool SetSkeletonBindingNodeCount(ushort count)
-        {
-            Clear();
-            BindingNodeCount = count;
-            if (BindingNodeCount == 0)
-            {
-                return false;
-            }
-            BindingNodeArray = new List<NullSkeletonBindingNode>(BindingNodeCount);
-            for (int i = 0; i < BindingNodeCount; i++)
-            {
-                BindingNodeArray[i] = new NullSkeletonBindingNode(CurrentVersion);
-            }
-            return true;
-
         }
 
         public void Clear()
         {
-            for (int i = 0; i < BindingNodeCount; i++)
+            for (int i = 0; i < mBindingNodeArray.Count; i++)
             {
-                BindingNodeArray[i].Clear();
+                mBindingNodeArray[i].Clear();
             }
-
-            BindingNodeArray = null;
-            BindingNodeCount = 0;
-            PieceHandle = 0;
+            mBindingNodeArray.Clear();
+            mPieceHandle = 0;
         }
     }
     
     public class NullSkeletonBinding : INullStream
     {
-        protected ushort CurrentVersion;
-        protected string SkeletonName;
-        protected ushort BindingPieceCount;
-        protected List<NullSkeletonPiece> BindingPieceNodeArray;
+        public int CurrentVersion;
+        protected string mSkeletonName;
+        protected List<NullSkeletonPiece> mBindingPieceNodeArray;
 
-        public NullSkeletonBinding(ushort version)
+        public NullSkeletonBinding()
         {
-            BindingPieceCount = 0;
-            BindingPieceNodeArray = null;
-            SkeletonName = null;
+            mBindingPieceNodeArray =  new List<NullSkeletonPiece>();
+            mSkeletonName = "";
+        }
+
+        public NullSkeletonBinding(int version) : this()
+        {
             CurrentVersion = version;
         }
 
@@ -202,57 +149,30 @@ namespace NullMesh
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
             StandarizeWeights();
-            int size = stream.WriteUShort(BindingPieceCount);
-            size += stream.WriteString(SkeletonName);
-            for (int i = 0; i < BindingPieceCount; i++)
-            {
-                size += BindingPieceNodeArray[i].SaveToStream(stream);
-            }
+            int size = stream.WriteString(mSkeletonName);
+            size += stream.WriteList(mBindingPieceNodeArray, false);
             return size;
         }
 
         public void StandarizeWeights()
         {
-            for (int i = 0; i < BindingPieceCount; i++)
+            for (int i = 0; i < mBindingPieceNodeArray.Count; i++)
             {
-                BindingPieceNodeArray[i].StandarizeWeights();
+                mBindingPieceNodeArray[i].StandarizeWeights();
             }
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             Clear();
-            ushort count = 0;
-            bool res = stream.ReadUShort(out count);
-            res &= stream.ReadString(out SkeletonName);
-            SetSkeletonBindingCount(count);
-            for (int i = 0; i < BindingPieceCount; i++)
-            {
-                res &= BindingPieceNodeArray[i].LoadFromStream(stream);
-            }
+            bool res = stream.ReadString(out mSkeletonName);
+            res &= stream.ReadList(out mBindingPieceNodeArray);
             return res;
-        }
-
-        public bool SetSkeletonBindingCount(ushort count)
-        {
-            Clear();
-            BindingPieceCount = count;
-            if (BindingPieceCount == 0)
-            {
-                return false;
-            }
-            BindingPieceNodeArray = new List<NullSkeletonPiece>(BindingPieceCount);
-            for (int i = 0; i < BindingPieceCount; i++)
-            {
-                BindingPieceNodeArray[i] = new NullSkeletonPiece(CurrentVersion);
-            }
-            return true;
         }
 
         public void Clear()
         {
-            BindingPieceNodeArray = null;
-            BindingPieceCount = 0;
+            mBindingPieceNodeArray.Clear();
         }
     }
 }
