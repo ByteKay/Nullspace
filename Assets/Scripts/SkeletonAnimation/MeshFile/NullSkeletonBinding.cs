@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine.Assertions;
 
 namespace NullMesh
 {
@@ -11,6 +12,17 @@ namespace NullMesh
         {
             public int Target;
             public float Weight;
+
+            public NullNodeWeight()
+            {
+
+            }
+
+            public NullNodeWeight(int target, float weight)
+            {
+                Target = target;
+                Weight = weight;
+            }
 
             public bool LoadFromStream(NullMemoryStream stream)
             {
@@ -38,6 +50,36 @@ namespace NullMesh
         public NullSkeletonBindingNode(int version) : this()
         {
             CurrentVersion = version;
+        }
+
+        public bool SetWeightCount(int weightCount)
+        {
+            Clear();
+            if (weightCount == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < weightCount; i++)
+            {
+                mNodeWeightArray.Add(new NullNodeWeight());
+            }
+            return true;
+        }
+
+        public NullNodeWeight AppendWeightNode(int target, float weight)
+        {
+            for (int i = 0; i < mNodeWeightArray.Count; i++)
+            {
+                if (mNodeWeightArray[i].Target == target)
+                {
+                    mNodeWeightArray[i].Weight += weight;
+                    return mNodeWeightArray[i];
+                }
+            }
+
+            NullNodeWeight nodeWeight = new NullNodeWeight(target, weight);
+            mNodeWeightArray.Add(nodeWeight);
+            return nodeWeight;
         }
 
         public void StandarizeWeights()
@@ -93,6 +135,44 @@ namespace NullMesh
             CurrentVersion = version;
         }
 
+        public NullSkeletonBindingNode this[int idx]
+        {
+            get
+            {
+                Assert.IsTrue(idx < mBindingNodeArray.Count, "");
+                return mBindingNodeArray[idx];
+            }
+        }
+
+
+        public void SetPieceHandle(int handle)
+        {
+            mPieceHandle = handle;
+        }
+
+        public int GetPieceHandle()
+        {
+            return mPieceHandle;
+        }
+
+        public void SetNodeZero(int index)
+        {
+            if (index < mBindingNodeArray.Count)
+            {
+                mBindingNodeArray[index] = null;
+            }
+        }
+
+        public bool SetSkeletonBindingNodeCount(int count)
+        {
+            Clear();
+            for (int i = 0; i < count; i++)
+            {
+                mBindingNodeArray.Add(new NullSkeletonBindingNode(CurrentVersion));
+            }
+            return true;
+        }
+
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
@@ -121,7 +201,10 @@ namespace NullMesh
         {
             for (int i = 0; i < mBindingNodeArray.Count; i++)
             {
-                mBindingNodeArray[i].Clear();
+                if (mBindingNodeArray[i] != null)
+                {
+                    mBindingNodeArray[i].Clear();
+                }
             }
             mBindingNodeArray.Clear();
             mPieceHandle = 0;
@@ -168,6 +251,64 @@ namespace NullMesh
             bool res = stream.ReadString(out mSkeletonName);
             res &= stream.ReadList(out mBindingPieceNodeArray);
             return res;
+        }
+
+        public void SetPieceZero(int index)
+        {
+            if (mBindingPieceNodeArray[index] != null)
+            {
+                mBindingPieceNodeArray[index].Clear();
+                mBindingPieceNodeArray[index] = null;
+            }
+        }
+
+        public void RefreshSkeletonPiece()
+        {
+            mBindingPieceNodeArray.RemoveAll((piece) => { return piece == null; });
+        }
+
+        public string GetSkeletonName()
+        {
+            return mSkeletonName;
+        }
+
+        public void SetSkeletonName(string name)
+        {
+            mSkeletonName = name;
+        }
+
+        public NullSkeletonPiece AppendSkeletonPiece()
+        {
+            NullSkeletonPiece piece = new NullSkeletonPiece(CurrentVersion);
+            mBindingPieceNodeArray.Add(piece);
+            return piece;
+        }
+
+        public bool ExchangeSkeletonPiece(int first, int second)
+        {
+            if ((first >= GetSkeletonBindingCount()) || (second >= GetSkeletonBindingCount()))
+            {
+                return false;
+            }
+            NullSkeletonPiece tmp = mBindingPieceNodeArray[first];
+            mBindingPieceNodeArray[first] = mBindingPieceNodeArray[second];
+            mBindingPieceNodeArray[second] = tmp;
+            return true;
+        }
+
+        public bool SetSkeletonBindingCount(int count)
+        {
+            Clear();
+            for (int i = 0; i < count; i++)
+            {
+                mBindingPieceNodeArray.Add(new NullSkeletonPiece(CurrentVersion));
+            }
+            return true;
+        }
+
+        public int GetSkeletonBindingCount()
+        {
+            return mBindingPieceNodeArray.Count;
         }
 
         public void Clear()

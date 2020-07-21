@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace NullMesh
 {
@@ -32,6 +33,15 @@ namespace NullMesh
         {
             CurrentVersion = version;
         }
+        public Vector3 GetPosition()
+        {
+            return Pos;
+        }
+
+        public Quaternion GetQuaternion()
+        {
+            return Quat;
+        }
 
         public int NumChildren { get { return Children.Count; } }
 
@@ -39,7 +49,8 @@ namespace NullMesh
         {
             get
             {
-                return idx < Children.Count ? Children[idx] : null;
+                Assert.IsTrue(idx < Children.Count, "");
+                return Children[idx];
             }
         }
 
@@ -93,6 +104,117 @@ namespace NullMesh
             Children.Clear();
         }
 
+        public void SetNumChildren(int count)
+        {
+            if (count > 0)
+            {
+                Children.Clear();
+                for (int i = 0; i < NumChildren; ++i)
+                {
+                    Children.Add(new NullNodeTree(CurrentVersion));
+                }
+            }
+        }
+
+        public int GetNodeCount()
+        {
+            return GetNodeCountRecursive(this);
+        }
+
+        public void SetNodeName(string name)
+        {
+            NodeName = name;
+        }
+        public string GetNodeName()
+        {
+            return NodeName;
+        }
+
+        public void SetNodeHandle(int handle)
+        {
+            NodeHandle = handle;
+        }
+        public int GetNodeHandle()
+        {
+            return NodeHandle;
+        }
+
+        public int GetChildrenCount()
+        {
+            return NumChildren;
+        }
+
+
+        public NullNodeTree FindNode(int boneId)
+        {
+            NullNodeTree result = null;
+            FindNodeRecursive(this, boneId, ref result);
+            return result;
+        }
+
+        public NullNodeTree FindNode(string nodeName)
+        {
+            NullNodeTree result = null;
+            FindNodeRecursive(this, nodeName, ref result);
+            return result;
+        }
+        public void FindNodeRecursive(NullNodeTree node, string nodeName, ref NullNodeTree result)
+        {
+            if (result != null)
+            {
+                return;
+            }
+	        if (node.GetNodeName().Equals(nodeName))
+	        {
+		        result = node;
+		        return;
+	        }
+	        for (int i = 0; i < node.GetChildrenCount(); i++)
+	        {
+
+                FindNodeRecursive(node[i], nodeName, ref result);
+                if (result != null)
+                {
+                    break;
+                }
+	        }
+        }
+
+        public void FindNodeRecursive(NullNodeTree node, int boneId, ref NullNodeTree result)
+        {
+            if (result != null)
+            {
+                return;
+            }
+            if (node.GetNodeHandle() == boneId)
+            {
+                result = node;
+                return;
+            }
+            for (int i = 0; i < node.GetChildrenCount(); i++)
+            {
+                FindNodeRecursive(node[i], boneId, ref result);
+                if (result != null)
+                {
+                    break;
+                }
+            }
+        }
+
+        public int GetNodeCountRecursive(NullNodeTree nodeTree)
+        {
+            if (nodeTree == null)
+            {
+                return 0;
+            }
+            int count = 1;
+            for (int i = 0; i < nodeTree.NumChildren; i++)
+            {
+                count += GetNodeCountRecursive(nodeTree.Children[i]);
+            }
+            return count;
+        }
+
         public void DeleteNodeRecursive(NullNodeTree nodeTree)
         {
             if (nodeTree == null)
@@ -131,79 +253,5 @@ namespace NullMesh
             return res;
         }
 
-        public void SetNumChildren(int count)
-        {
-            if (count > 0)
-            {
-                Children.Clear();
-                for (int i = 0; i < NumChildren; ++i)
-                {
-                    Children.Add(new NullNodeTree(CurrentVersion));
-                }
-            }
-        }
-
-        public int GetNodeCount()
-        {
-            return GetNodeCountRecursive(this);
-        }
-
-
-        public int GetNodeCountRecursive(NullNodeTree nodeTree)
-        {
-            if (nodeTree == null)
-            {
-                return 0;
-            }
-            int count = 1;
-            for (int i = 0; i < nodeTree.NumChildren; i++)
-            {
-                count += GetNodeCountRecursive(nodeTree.Children[i]);
-            }
-            return count;
-        }
-
-        public NullNodeTree FindNode(int boneId)
-        {
-            NullNodeTree result = null;
-            FindNodeRecursive(this, boneId, ref result);
-            return result;
-        }
-
-        internal string GetNodeName()
-        {
-            return NodeName;
-        }
-
-        public void FindNodeRecursive(NullNodeTree node, int boneId, ref NullNodeTree result)
-        {
-            if (result != null)
-            {
-                return;
-            }
-            if (node.GetNodeHandle() == boneId)
-            {
-                result = node;
-                return;
-            }
-            for (int i = 0; i < node.GetChildrenCount(); i++)
-            {
-                FindNodeRecursive(node[i], boneId, ref result);
-                if (result != null)
-                {
-                    break;
-                }
-            }
-        }
-
-        private int GetChildrenCount()
-        {
-            return NumChildren;
-        }
-
-        private int GetNodeHandle()
-        {
-            return NodeHandle;
-        }
     }
 }

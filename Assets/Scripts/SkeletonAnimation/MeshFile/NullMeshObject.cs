@@ -95,27 +95,14 @@ namespace NullMesh
             UVGroups = new NullUVGroups();
         }
 
-        public NullMeshObject(int version) : this()
+        public NullMeshObject(int version, NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor) : this()
         {
             CurrentVersion = version;
-
-            SetMeshObjectType((byte)mMeshType);
-            if (VertexCount > 65535)
+            if (triangleCount == 0)
             {
-                // 应该抛出异常，不支持 超过 65536 的模型
-                throw new Exception("不支持 超过 65536 的模型");
+                return;
             }
-            switch (mMeshType)
-            {
-                case NullPrimitiveType.MOT_TRIANGLES:
-                    break;
-                case NullPrimitiveType.MOT_INDEXED_PRIMITIVES:
-                    break;
-                case NullPrimitiveType.MOT_TRIANGLE_STRIPS:
-                    break;
-                case NullPrimitiveType.MOT_UNKNOWN:
-                    break;
-            }
+            SetMeshObjectType((byte)meshType);
         }
 
         public void SetMeshObjectLargeMesh(bool isLargeMesh)
@@ -360,6 +347,11 @@ namespace NullMesh
         {
             return VertexColorArray != null;
         }
+
+        internal void SetMeshObjectHandle(int handle)
+        {
+            mMeshObjectHandle = handle;
+        }
     }
 
     public class NullMeshObjects : INullStream
@@ -402,11 +394,30 @@ namespace NullMesh
             return stream.ReadList(out MeshObjectList);
         }
 
-        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType)
+        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
         {
-            NullMeshObject meshObject = new NullMeshObject(CurrentVersion);
+            NullMeshObject meshObject = new NullMeshObject(CurrentVersion, meshType, triangleCount, includingNormal, includeTangent, includingVertexColor);
             MeshObjectList.Add(meshObject);
             return meshObject;
+        }
+
+        public int GetMeshObjectIndex(NullMeshObject mesh)
+        {
+            int index = 0xffff;
+            for (int i = 0; i < MeshObjectList.Count; i++)
+            {
+                if (mesh == MeshObjectList[i])
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+        internal int GetMeshObjectCount()
+        {
+            return MeshObjectList.Count;
         }
     }
 }

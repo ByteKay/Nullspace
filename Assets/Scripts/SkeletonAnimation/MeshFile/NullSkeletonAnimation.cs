@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace NullMesh
 {
@@ -20,9 +21,25 @@ namespace NullMesh
             mQuatArray = new List<Quaternion>();
         }
 
-        public NullSkeletonNodeAnimation(int version) : this()
+        public NullSkeletonNodeAnimation(int version, int frameCount) : this()
         {
             CurrentVersion = version;
+            mParent = 0;
+            mBoneName = "";
+            SetFrameCount(frameCount);
+        }
+
+        public void SetFrameCount(int frameCount)
+        {
+            Clear();
+            if (frameCount > 0)
+            {
+                for (int i = 0; i < frameCount; i++)
+                {
+                    mPosArray.Add(Vector3.zero);
+                    mQuatArray.Add(Quaternion.identity);
+                }
+            }
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -30,16 +47,30 @@ namespace NullMesh
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
             int size = stream.WriteInt(mParent);
             size += stream.WriteList(mPosArray, false);
-            size += stream.WriteList(mQuatArray, false);
+            size += stream.WriteList(mQuatArray, true);
             size += stream.WriteString(mBoneName);
             return size;
+        }
+
+        public void RemoveFrames(HashSet<int> indexSet)
+        {
+            if (indexSet.Count > 0)
+            {
+                List<int> idxes = indexSet.ToList();
+                idxes.Sort();
+                for (int i = idxes.Count - 1; i >= 0; --i)
+                {
+                    mPosArray.RemoveAt(idxes[i]);
+                    mQuatArray.RemoveAt(idxes[i]);
+                }
+            }
         }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
             bool res = stream.ReadInt(out mParent);
             res &= stream.ReadList(out mPosArray);
-            res &= stream.ReadList(out mQuatArray);
+            res &= stream.ReadList(out mQuatArray, GetFrameCount());
             res &= stream.ReadString(out mBoneName);
             return res;
         }
@@ -50,14 +81,39 @@ namespace NullMesh
             mQuatArray.Clear();
         }
 
+        public List<Vector3>  GetPosition()
+        {
+            return mPosArray;
+        }
+
+        public List<Quaternion> GetQuat()
+        {
+            return mQuatArray;
+        }
+
+        public void SetParent(int parent)
+        {
+            mParent = parent;
+        }
+
         public int GetParent()
         {
             return mParent;
         }
 
+        public int GetFrameCount()
+        {
+            return mPosArray.Count;
+        }
+
         public void SetBoneName(string v)
         {
             mBoneName = v;
+        }
+
+        public string GetBoneName()
+        {
+            return mBoneName;
         }
     }
 
@@ -75,6 +131,60 @@ namespace NullMesh
             mNodeAnimationArray = new List<NullSkeletonNodeAnimation>();
         }
 
+        public bool SetAnimationNodeAndFrameCount(int frameCount, int nodeCount = 0)
+        {
+            Clear();
+            if (frameCount > 0)
+            {
+                if (nodeCount > 0)
+                {
+                    for (int i = 0; i < nodeCount; i++)
+                    {
+                        mNodeAnimationArray.Add(new NullSkeletonNodeAnimation(CurrentVersion, frameCount));
+                    }
+                }
+                mFrameArray = new List<float>(frameCount);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void SetAnimationName(string name)
+        {
+            mAnimationName = name;
+        }
+
+        public NullSkeletonNodeAnimation AppendAnimationNode()
+        {
+            NullSkeletonNodeAnimation animation = new NullSkeletonNodeAnimation(CurrentVersion, mFrameArray.Count);
+            mNodeAnimationArray.Add(animation);
+            return animation;
+        }
+
+        public int GetNodeCount()
+        {
+            return mNodeAnimationArray.Count;
+        }
+
+        public string GetAnimationName()
+        {
+            return mAnimationName;
+        }
+
+        public void SetFrameTime(int index, float time)
+        {
+            Assert.IsTrue(index < mFrameArray.Count, "");
+            mFrameArray[index] = time;
+        }
+
+        public void SetFrameRate(int frameRate)
+        {
+            mFrameRate = frameRate;
+        }
+
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
@@ -90,7 +200,8 @@ namespace NullMesh
         {
             get
             {
-                return idx < mNodeAnimationArray.Count ? mNodeAnimationArray[idx] : null;
+                Assert.IsTrue(idx < mNodeAnimationArray.Count, "");
+                return mNodeAnimationArray[idx];
             }
         }
 
@@ -113,10 +224,6 @@ namespace NullMesh
             mNodeAnimationArray.Clear();
         }
 
-        public int GetNodeCount()
-        {
-            return mNodeAnimationArray.Count;
-        }
     }
 
     public class NullSkeletonAnimations : INullStream
@@ -133,15 +240,20 @@ namespace NullMesh
         {
             CurrentVersion = version;
         }
+        public int GetAnimationCount()
+        {
+            return mAnimationArray.Count;
+        }
 
         public NullSkeletonAnimation this[int idx]
         {
             get
             {
-                return idx < mAnimationArray.Count ? mAnimationArray[idx] : null;
+                Assert.IsTrue(idx < mAnimationArray.Count, "");
+                return mAnimationArray[idx];
             }
         }
-
+        
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
@@ -165,9 +277,6 @@ namespace NullMesh
         {
             mAnimationArray.Clear();
         }
-        public int GetAnimationCount()
-        {
-            return mAnimationArray.Count;
-        }
+
     }
 }

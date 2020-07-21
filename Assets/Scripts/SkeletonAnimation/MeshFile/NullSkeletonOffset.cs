@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace NullMesh
 {
@@ -64,6 +65,11 @@ namespace NullMesh
             mAnimationName = "";
         }
 
+        public NullSkeletonOffsets(int version) : this()
+        {
+            CurrentVersion = version;
+        }
+
         public int SaveToStream(NullMemoryStream stream)
         {
             int size = stream.WriteList(mAnimationOffsetArray, false);
@@ -113,6 +119,33 @@ namespace NullMesh
             mAnimationOffsetsArray = new List<NullSkeletonOffsets>();
             mBlockSize = 0;
         }
+        public int GetAnimationOffsetsCount()
+        {
+            return mAnimationOffsetsArray.Count;
+        }
+
+        public NullSkeletonOffsets this[int index]
+        {
+            get
+            {
+                Assert.IsTrue(index < GetAnimationOffsetsCount(), "");
+                return mAnimationOffsetsArray[index];
+            }
+        }
+
+        public void SetAnimationOffsetsCount(int count)
+        {
+            Clear();
+            if (count > 0)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    mAnimationOffsetsArray.Add(new NullSkeletonOffsets(CurrentVersion));
+                }
+            }
+        }
+
+        public int OffsetsCount { get { return mAnimationOffsetsArray.Count; } }
 
         public int SaveToStream(NullMemoryStream stream)
         {

@@ -12,7 +12,38 @@ namespace NullMesh
         WF_NODE_ANIM = 3,
     }
 
-    public class NullMeshFile : INullStream
+    public partial class NullMeshFile
+    {
+        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
+        {
+            NullMeshObject mesh = null;
+            switch (mWorkingMode)
+            {
+                case NullWorkingFlag.WF_STATIC_MESH:
+                case NullWorkingFlag.WF_SKELETON_MESHPIECE:
+                    mesh = mMeshObjectList.AppendMeshObject(meshType, triangleCount, includingNormal, includeTangent, includingVertexColor);
+                    mesh.SetMeshObjectHandle(mMeshObjectList.GetMeshObjectIndex(mesh));
+                    break;
+            }
+            return mesh;
+        }
+
+        public NullMeshObject AppendSkinObject(NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
+        {
+            NullMeshObject mesh = null;
+            switch (mWorkingMode)
+            {
+                case NullWorkingFlag.WF_SKELETON_MESHPIECE:
+                    mesh = mSkinObjectList.AppendMeshObject(meshType, triangleCount, includingNormal, includeTangent, includingVertexColor);
+                    mesh.SetMeshObjectHandle(mMeshObjectList.GetMeshObjectCount() + mSkinObjectList.GetMeshObjectIndex(mesh));
+                    break;
+            }
+            return mesh;
+        }
+
+    }
+
+    public partial class NullMeshFile : INullStream
     {
         public const int MESH_FILE_VERSION = 100;
         private static uint StaticMesh = MakeFourCC("HXBO");
@@ -271,6 +302,5 @@ namespace NullMesh
             mNodeDummy = new NullNodeDummy();
             mSkeletonAnimations = new NullSkeletonAnimations(CurrentVersion);
         }
-
     }
 }
