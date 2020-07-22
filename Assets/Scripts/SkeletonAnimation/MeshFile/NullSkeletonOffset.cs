@@ -23,9 +23,68 @@ namespace NullMesh
             mBoneHandle = 0;
         }
 
-        public NullSkeletonOffset(int version) : this()
+        public NullSkeletonOffset(int version, int frameCount) : this()
         {
             CurrentVersion = version;
+        }
+
+        public void SetFrameCount(int frameCount)
+        {
+            Clear();
+            for (int i = 0; i < frameCount; ++i)
+            {
+                mPosArray.Add(Vector3.zero);
+                mFrameTimes.Add(0);
+            }
+        }
+
+        public void SetFrameOffset(int index, Vector3 position)
+        {
+            if (index >= mPosArray.Count)
+            {
+                return;
+            }
+            mPosArray[index] = position;
+        }
+
+        public List<Vector3> GetPosition()
+        {
+            return mPosArray;
+        }
+
+        public List<float> GetFrameTimes()
+        {
+            return mFrameTimes;
+        }
+
+        public void SetBone(NullNodeTree nodeTree)
+        {
+            if (nodeTree == null)
+            {
+                return;
+            }
+            SetBoneHandle(nodeTree.GetNodeHandle());
+            SetBoneName(nodeTree.GetNodeName());
+        }
+
+        public void SetBoneHandle(int handle)
+        {
+            mBoneHandle = handle;
+        }
+
+        public int GetBoneHandle()
+        {
+            return mBoneHandle;
+        }
+
+        public string GetBoneName()
+        {
+            return mBoneName;
+        }
+
+        public void SetBoneName(string name)
+        {
+            mBoneName = name;
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -51,6 +110,7 @@ namespace NullMesh
             mPosArray.Clear();
             mFrameTimes.Clear();
         }
+
     }
 
     public class NullSkeletonOffsets : INullStream
@@ -68,6 +128,11 @@ namespace NullMesh
         public NullSkeletonOffsets(int version) : this()
         {
             CurrentVersion = version;
+        }
+
+        public void SetAnimationName(string name)
+        {
+            mAnimationName = name;
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -91,9 +156,9 @@ namespace NullMesh
             return res;
         }
 
-        public NullSkeletonOffset AppendSkeletonOffset()
+        public NullSkeletonOffset AppendSkeletonOffset(int frameCount)
         {
-            NullSkeletonOffset offset = new NullSkeletonOffset(CurrentVersion);
+            NullSkeletonOffset offset = new NullSkeletonOffset(CurrentVersion, frameCount);
             mAnimationOffsetArray.Add(offset);
             return offset;
         }
@@ -146,6 +211,61 @@ namespace NullMesh
         }
 
         public int OffsetsCount { get { return mAnimationOffsetsArray.Count; } }
+        public void BuildOffsetsFromSkeletonAnimations(NullSkeletonAnimations animations, string nodeName, Vector3 skeletonPos)
+        {
+            if (animations == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < animations.GetAnimationCount(); i++)
+            {
+                NullSkeletonAnimation animation = animations[i];
+                NullSkeletonOffsets offsets = BuildOffsetsFromSkeletonAnimation(animation, nodeName, skeletonPos);
+                if (offsets != null)
+                {
+                    mAnimationOffsetsArray.Add(offsets);
+                }
+            }
+        }
+
+        protected NullSkeletonOffsets BuildOffsetsFromSkeletonAnimation(NullSkeletonAnimation animation, string nodeName, Vector3 skeletonPos)
+        {
+            if (animation == null || animation.GetFrameCount() == 0 || animation.GetNodeCount() == 0)
+            {
+                return null;
+            }
+
+            //the first node of animation always is the root node
+            NullSkeletonNodeAnimation rootNode = null;
+            if (nodeName != null)
+            {
+                rootNode = animation[nodeName];
+            }
+            else
+            {
+                rootNode = animation[0];
+            }
+
+            NullSkeletonOffsets offsets = new NullSkeletonOffsets(CurrentVersion);
+            offsets.SetAnimationName(animation.GetAnimationName());
+
+            NullSkeletonOffset offset = offsets.AppendSkeletonOffset(rootNode.GetFrameCount());
+            offset.SetBoneHandle(0);
+
+            var srcPosOffsets = rootNode.GetPosition();
+            var srcQuatOffsets = rootNode.GetQuat();
+            var dstFrameOffsets = offset.GetPosition();
+            var dstFrameTimes = offset.GetFrameTimes();
+            var srcFrameTimes = animation.GetFrameTimes();
+            for (int i = 0; i < rootNode.GetFrameCount(); i++)
+            {
+                dstFrameTimes[i] = srcFrameTimes[i];
+                dstFrameOffsets[i] = srcPosOffsets[i] + skeletonPos;
+                srcPosOffsets[i] = Vector3.zero;
+            }
+            return offsets;
+        }
 
         public int SaveToStream(NullMemoryStream stream)
         {

@@ -54,7 +54,6 @@ namespace NullMesh
             }
         }
 
-
         public int SaveToStream(NullMemoryStream stream)
         {
             // SaveToStream(NullMemoryStream stream, bool namehandleOnly)

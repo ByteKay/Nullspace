@@ -8,25 +8,101 @@ namespace NullMesh
 {
     public class NullVertexMorphObject : INullStream
     {
-        protected NullDataStructType VertexDataType;
-        protected int MeshObjectIndex;
-        protected List<Vector3> VertexPosArray;
-        protected List<Vector3> NormalArray;
+        protected NullDataStructType mVertexDataType;
+        protected int mMeshObjectIndex;
+        protected List<Vector3> mVertexPosArray;
+        protected List<Vector3> mNormalArray;
 
 
         public NullVertexMorphObject()
         {
-            VertexDataType = 0;
-            VertexPosArray = new List<Vector3>();
-            NormalArray = new List<Vector3>();
+            mVertexDataType = NullDataStructType.DST_FLOAT;
+            mVertexPosArray = new List<Vector3>();
+            mNormalArray = new List<Vector3>();
+        }
+
+        public NullVertexMorphObject(NullDataStructType vertexDataType, int vertexCount) : this()
+        {
+            mVertexDataType = vertexDataType;
+            for (int i = 0; i < vertexCount; ++i)
+            {
+                mVertexPosArray.Add(Vector3.zero);
+                mNormalArray.Add(Vector3.zero);
+            }
+        }
+        public bool SetVertexAndNormal(int index, ref Vector3 vertex, ref Vector3 normal)
+        {
+            return SetVertex(index, vertex) && SetNormal(index, normal);
+        }
+
+        public bool SetVertex(int index, Vector3 vertex)
+        {
+            if (index >= GetVertexCount())
+            {
+                return false;
+            }
+            mVertexPosArray[index] = vertex;
+            return true;
+        }
+
+        public bool SetNormal(int index, Vector3 normal)
+        {
+            if (index >= GetVertexCount())
+            {
+                return false;
+            }
+            mNormalArray[index] = normal;
+            return true;
+        }
+
+        public bool GetVertex(int index, out Vector3 vertex)
+        {
+            vertex = Vector3.zero;
+            if (index >= GetVertexCount())
+            {
+                return false;
+            }
+            vertex = mVertexPosArray[index];
+            return true;
+        }
+
+        public bool GetNormal(int index, out Vector3 normal)
+        {
+            normal = Vector3.zero;
+            if (index >= GetVertexCount())
+            {
+                return false;
+            }
+            normal = mNormalArray[index];
+            return true;
+        }
+
+        public List<Vector3> GetVertexData()
+        {
+            return mVertexPosArray;
+        }
+
+        public int GetMeshObjectIndex()
+        {
+            return mMeshObjectIndex;
+        }
+
+        public void SetMeshObjectIndex(int index)
+        {
+            mMeshObjectIndex = index;
+        }
+
+        public int GetVertexCount()
+        {
+            return mVertexPosArray.Count;
         }
 
         public int SaveToStream(NullMemoryStream stream)
         {
-            int size = stream.WriteByte((byte)VertexDataType);
-            size += stream.WriteInt(MeshObjectIndex);
-            size += stream.WriteList(VertexPosArray, false);
-            size += stream.WriteList(NormalArray, true);
+            int size = stream.WriteByte((byte)mVertexDataType);
+            size += stream.WriteInt(mMeshObjectIndex);
+            size += stream.WriteList(mVertexPosArray, false);
+            size += stream.WriteList(mNormalArray, true);
             return size;
         }
 
@@ -34,13 +110,17 @@ namespace NullMesh
         {
             byte b;
             bool res = stream.ReadByte(out b);
-            res &= stream.ReadInt(out MeshObjectIndex);
-            res &= stream.ReadList(out VertexPosArray);
-            res &= stream.ReadList(out NormalArray, Count);
+            res &= stream.ReadInt(out mMeshObjectIndex);
+            res &= stream.ReadList(out mVertexPosArray);
+            res &= stream.ReadList(out mNormalArray, GetVertexCount());
             return res;
         }
 
-        public int Count { get { return VertexPosArray.Count; } }
+        public void Clear()
+        {
+            mVertexPosArray.Clear();
+            mNormalArray.Clear();
+        }
     }
 
     public class NullVertexMorphAnimationFrame : INullStream
@@ -50,6 +130,39 @@ namespace NullMesh
         public NullVertexMorphAnimationFrame()
         {
             mVertexMorphObjectList = new List<NullVertexMorphObject>();
+        }
+
+        public NullVertexMorphObject AppendVertexMorphObject(NullDataStructType vertexDataType, int vertexCount)
+        {
+            NullVertexMorphObject av = new NullVertexMorphObject(vertexDataType, vertexCount);
+            mVertexMorphObjectList.Add(av);
+            return av;
+        }
+
+        public NullVertexMorphObject FindMorphAnimationNodeByIndex(int index)
+        {
+            for (int i = 0; i < mVertexMorphObjectList.Count; i++)
+            {
+                NullVertexMorphObject mo = mVertexMorphObjectList[i];
+                if (mo.GetMeshObjectIndex() == index)
+                {
+                    return mo;
+                }
+            }
+            return null;
+        }
+
+        public NullVertexMorphObject this[int index]
+        {
+            get
+            {
+                return index < mVertexMorphObjectList.Count ? mVertexMorphObjectList[index] : null;
+            }
+        }
+
+        public int GetMorphObjectCount()
+        {
+            return mVertexMorphObjectList.Count;
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -63,13 +176,6 @@ namespace NullMesh
             Clear();
             bool res = stream.ReadList(out mVertexMorphObjectList);
             return res;
-        }
-
-        public NullVertexMorphObject AppendVertexMorphObject()
-        {
-            NullVertexMorphObject av = new NullVertexMorphObject();
-            mVertexMorphObjectList.Add(av);
-            return av;
         }
 
         public void Clear()

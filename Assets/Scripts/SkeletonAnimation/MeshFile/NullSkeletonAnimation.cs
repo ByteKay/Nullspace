@@ -122,12 +122,12 @@ namespace NullMesh
         public int CurrentVersion;
         protected string mAnimationName;
         protected int mFrameRate;
-        protected List<float> mFrameArray;
+        protected List<float> mFrameTimes;
         protected List<NullSkeletonNodeAnimation> mNodeAnimationArray;
 
         public NullSkeletonAnimation()
         {
-            mFrameArray = new List<float>();
+            mFrameTimes = new List<float>();
             mNodeAnimationArray = new List<NullSkeletonNodeAnimation>();
         }
 
@@ -143,57 +143,16 @@ namespace NullMesh
                         mNodeAnimationArray.Add(new NullSkeletonNodeAnimation(CurrentVersion, frameCount));
                     }
                 }
-                mFrameArray = new List<float>(frameCount);
+                for (int i = 0; i < frameCount; ++i)
+                {
+                    mFrameTimes.Add(0);
+                }
                 return true;
             }
             else
             {
                 return false;
             }
-        }
-
-        public void SetAnimationName(string name)
-        {
-            mAnimationName = name;
-        }
-
-        public NullSkeletonNodeAnimation AppendAnimationNode()
-        {
-            NullSkeletonNodeAnimation animation = new NullSkeletonNodeAnimation(CurrentVersion, mFrameArray.Count);
-            mNodeAnimationArray.Add(animation);
-            return animation;
-        }
-
-        public int GetNodeCount()
-        {
-            return mNodeAnimationArray.Count;
-        }
-
-        public string GetAnimationName()
-        {
-            return mAnimationName;
-        }
-
-        public void SetFrameTime(int index, float time)
-        {
-            Assert.IsTrue(index < mFrameArray.Count, "");
-            mFrameArray[index] = time;
-        }
-
-        public void SetFrameRate(int frameRate)
-        {
-            mFrameRate = frameRate;
-        }
-
-        public int SaveToStream(NullMemoryStream stream)
-        {
-            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
-            int size = stream.WriteString(mAnimationName);
-            size += stream.WriteInt(CurrentVersion);
-            size += stream.WriteInt(mFrameRate);
-            size += stream.WriteList(mFrameArray, false);
-            size += stream.WriteList(mNodeAnimationArray, false);
-            return size;
         }
 
         public NullSkeletonNodeAnimation this[int idx]
@@ -205,6 +164,73 @@ namespace NullMesh
             }
         }
 
+        public NullSkeletonNodeAnimation this[string name]
+        {
+            get
+            {
+                foreach (var anim in mNodeAnimationArray)
+                {
+                    if (anim.GetBoneName() == name)
+                    {
+                        return anim;
+                    }
+                }
+                return null;
+            }
+        }
+        public void SetAnimationName(string name)
+        {
+            mAnimationName = name;
+        }
+
+        public NullSkeletonNodeAnimation AppendAnimationNode()
+        {
+            NullSkeletonNodeAnimation animation = new NullSkeletonNodeAnimation(CurrentVersion, mFrameTimes.Count);
+            mNodeAnimationArray.Add(animation);
+            return animation;
+        }
+
+        public int GetNodeCount()
+        {
+            return mNodeAnimationArray.Count;
+        }
+
+        public int GetFrameCount()
+        {
+            return mFrameTimes.Count;
+        }
+
+        public string GetAnimationName()
+        {
+            return mAnimationName;
+        }
+
+        public void SetFrameTime(int index, float time)
+        {
+            Assert.IsTrue(index < mFrameTimes.Count, "");
+            mFrameTimes[index] = time;
+        }
+
+        public void SetFrameRate(int frameRate)
+        {
+            mFrameRate = frameRate;
+        }
+
+        public List<float> GetFrameTimes()
+        {
+            return mFrameTimes;
+        }
+
+        public int SaveToStream(NullMemoryStream stream)
+        {
+            CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
+            int size = stream.WriteString(mAnimationName);
+            size += stream.WriteInt(CurrentVersion);
+            size += stream.WriteInt(mFrameRate);
+            size += stream.WriteList(mFrameTimes, false);
+            size += stream.WriteList(mNodeAnimationArray, false);
+            return size;
+        }
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
@@ -212,7 +238,7 @@ namespace NullMesh
             bool res = stream.ReadString(out mAnimationName);
             res &= stream.ReadInt(out CurrentVersion);
             res &= stream.ReadInt(out mFrameRate);
-            res &= stream.ReadList(out mFrameArray);
+            res &= stream.ReadList(out mFrameTimes);
             res &= stream.ReadList(out mNodeAnimationArray);
 
             return res;
@@ -220,7 +246,7 @@ namespace NullMesh
 
         public void Clear()
         {
-            mFrameArray.Clear();
+            mFrameTimes.Clear();
             mNodeAnimationArray.Clear();
         }
 

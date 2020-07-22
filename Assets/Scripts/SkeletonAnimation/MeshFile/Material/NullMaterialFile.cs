@@ -25,6 +25,34 @@ namespace NullMesh
             CurrentVersion = version;
         }
 
+        public bool SetMaterialCount(int count)
+        {
+            Clear();
+            for (int i = 0; i < count; i++)
+            {
+                mMaterialArray.AddMaterial();
+            }
+            return count > 0;
+        }
+
+        public NullMaterial this[int index]
+        {
+            get
+            {
+                return mMaterialArray[index];
+            }
+        }
+
+        public void Clear()
+        {
+            mMaterialArray.Clear();
+        }
+
+        public bool ValidateFileHeader(uint aType)
+        {
+            return aType == NullMeshFile.MaterialCC;
+        }
+
         public int SaveToStream(NullMemoryStream stream)
         {
             CurrentVersion = NullMeshFile.MESH_FILE_VERSION;
@@ -39,7 +67,13 @@ namespace NullMesh
 
         public bool LoadFromStream(NullMemoryStream stream)
         {
-            bool res = stream.ReadUInt(out mBlockSize);
+            uint fouCC;
+            bool res = stream.ReadUInt(out fouCC);
+            if (!res || ValidateFileHeader(fouCC))
+            {
+                return false;
+            }
+            res = stream.ReadUInt(out mBlockSize);
             res &= stream.ReadUInt(out mReserved);
             res &= stream.ReadUInt(out mReserved2);
             res &= stream.ReadUInt(out mReserved3);

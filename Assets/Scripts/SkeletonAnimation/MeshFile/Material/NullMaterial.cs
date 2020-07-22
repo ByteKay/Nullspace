@@ -15,12 +15,49 @@ namespace NullMesh
         protected uint mSpecularColor;
         protected uint mEmissiveColor;
         protected byte mShinStrength;
-        protected byte mShininess;              
+        protected byte mShininess;
         protected NullTextures mTextureArray;
 
         public NullMaterial()
         {
+            mAmbientColor = 0x0f0f0fff;
+            mDiffuseColor = 0xc0c0c0ff;
+            mSpecularColor = 0xc0c0c0ff;
+            mEmissiveColor = 0x000000ff;
+            mShinStrength = 26;
+            mShininess = 10;
+            mMaterialId = 0;
+            mLibraryName = "";
+            mMaterialName = "";
             mTextureArray = new NullTextures();
+        }
+
+        public bool SetTextureCount(int count)
+        {
+            Clear();
+            for (int i = 0; i < count; i++)
+            {
+                mTextureArray.AddTexture(i);
+            }
+            return count > 0;
+        }
+
+        public NullTexture this[int index]
+        {
+            get
+            {
+                return mTextureArray[index];
+            }
+        }
+
+        public NullTexture AddTexture(int textureId = 0, NullTextureWrap wrapMode = NullTextureWrap.EHXTW_WRAP_UV, NullTextureMode textureMode = NullTextureMode.EHXTM_MODAL, byte alphaChannel = 0, string fileName = "")
+        {
+            return mTextureArray.AddTexture(textureId, wrapMode, textureMode, alphaChannel, fileName);
+        }
+
+        public void Clear()
+        {
+            mTextureArray.Clear();
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -61,6 +98,26 @@ namespace NullMesh
         public NullMaterials()
         {
             mMaterialArray = new List<NullMaterial>();
+        }
+
+        public NullMaterial this[int index]
+        {
+            get
+            {
+                return index < mMaterialArray.Count ? mMaterialArray[index] : null;
+            }
+        }
+
+        public NullMaterial AddMaterial()
+        {
+            NullMaterial mat = new NullMaterial();
+            mMaterialArray.Add(mat);
+            return mat;
+        }
+
+        public void Clear()
+        {
+            mMaterialArray.Clear();
         }
 
         public bool LoadFromStream(NullMemoryStream stream)

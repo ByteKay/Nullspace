@@ -15,7 +15,8 @@ namespace NullMesh
 
             public NullNodeWeight()
             {
-
+                Target = 0;
+                Weight = 0;
             }
 
             public NullNodeWeight(int target, float weight)

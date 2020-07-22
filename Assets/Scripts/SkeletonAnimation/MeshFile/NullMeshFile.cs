@@ -46,6 +46,7 @@ namespace NullMesh
     public partial class NullMeshFile : INullStream
     {
         public const int MESH_FILE_VERSION = 100;
+        public static uint MaterialCC = MakeFourCC("HXBM");
         private static uint StaticMesh = MakeFourCC("HXBO");
         private static uint SkeletonMesh = MakeFourCC("HXBS");
         private static uint SkeletonAnimation = MakeFourCC("HXBA");

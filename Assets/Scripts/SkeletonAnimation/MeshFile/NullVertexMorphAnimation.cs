@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine.Assertions;
 
 namespace NullMesh
 {
@@ -23,6 +24,63 @@ namespace NullMesh
         public NullVertexMorphAnimation(int frameRate) : this()
         {
             mFrameRate = frameRate;
+        }
+
+        public bool SetAnimationFrameCount(int frameCount)
+        {
+            Clear();
+            if (frameCount == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < frameCount; i++)
+            {
+                mVertexMorphFrameList.Add(new NullVertexMorphAnimationFrame());
+                mFrameArray.Add(0);
+            }
+            return true;
+        }
+
+        public int GetFrameCount()
+        {
+            return mFrameArray.Count;
+        }
+
+        public void SetFrameTime(int index, float time)
+        {
+            Assert.IsTrue(index < mFrameArray.Count, "");
+            mFrameArray[index] = time;
+        }
+
+        public void SetFrameRate(int frameRate)
+        {
+            mFrameRate = frameRate;
+        }
+
+        public NullVertexMorphAnimationFrame this[int index]
+        {
+            get
+            {
+                Assert.IsTrue(index < mVertexMorphFrameList.Count, "");
+                return mVertexMorphFrameList[index];
+            }
+            
+        }
+        public string GetAnimationName()
+        {
+            return mAnimationName;
+        }
+
+        public void SetAnimationName(string name)
+        {
+            mAnimationName = name;
+        }
+
+        public NullVertexMorphAnimationFrame AppendVertexMorphAnimationFrame()
+        {
+            NullVertexMorphAnimationFrame av = new NullVertexMorphAnimationFrame();
+            mVertexMorphFrameList.Add(av);
+            return av;
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -52,13 +110,6 @@ namespace NullMesh
             return res;
         }
 
-        public NullVertexMorphAnimationFrame AppendVertexMorphAnimationFrame()
-        {
-            NullVertexMorphAnimationFrame av = new NullVertexMorphAnimationFrame();
-            mVertexMorphFrameList.Add(av);
-            return av;
-        }
-
         public void Clear()
         {
             mVertexMorphFrameList.Clear();
@@ -74,6 +125,25 @@ namespace NullMesh
         {
             mAnimationArray = new List<NullVertexMorphAnimation>();
         }
+        public int GetAnimationCount()
+        {
+            return mAnimationArray.Count;
+        }
+        public NullVertexMorphAnimation this[int index]
+        {
+            get
+            {
+                return index < mAnimationArray.Count ? mAnimationArray[index] : null;
+            }
+            
+        }
+
+        public NullVertexMorphAnimation AppendAnimation(int frameRate = 30)
+        {
+            NullVertexMorphAnimation animation = new NullVertexMorphAnimation(frameRate);
+            mAnimationArray.Add(animation);
+            return animation;
+        }
 
         public int SaveToStream(NullMemoryStream stream)
         {
@@ -88,12 +158,6 @@ namespace NullMesh
             return res;
         }
 
-        public NullVertexMorphAnimation AppendAnimation(int frameRate = 30)
-        {
-            NullVertexMorphAnimation animation = new NullVertexMorphAnimation(frameRate);
-            mAnimationArray.Add(animation);
-            return animation;
-        }
 
         public void Clear()
         {
