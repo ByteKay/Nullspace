@@ -13,7 +13,6 @@ namespace NullMesh
         protected List<Vector3> mVertexPosArray;
         protected List<Vector3> mNormalArray;
 
-
         public NullVertexMorphObject()
         {
             mVertexDataType = NullDataStructType.DST_FLOAT;
@@ -116,10 +115,40 @@ namespace NullMesh
             return res;
         }
 
+        public bool ExtractToTrianglesFromIndexedPrimitives(List<Vector3Int> originalFaceIndices)
+        {
+            List<Vector3> pos = new List<Vector3>();
+            List<Vector3> normal = new List<Vector3>();
+            for (int i = 0; i < originalFaceIndices.Count; i++)
+            {
+                Vector3Int face = originalFaceIndices[i];
+                pos.Add(mVertexPosArray[face.x]);
+                pos.Add(mVertexPosArray[face.y]);
+                pos.Add(mVertexPosArray[face.z]);
+                normal.Add(mNormalArray[face.x]);
+                normal.Add(mNormalArray[face.y]);
+                normal.Add(mNormalArray[face.z]);
+            }
+            mVertexPosArray = pos;
+            mNormalArray = normal;
+            return true;
+        }
+
         public void Clear()
         {
             mVertexPosArray.Clear();
             mNormalArray.Clear();
+        }
+
+        public bool BuildIndexedPrimitives(List<NullMergeIndex> indexMapping)
+        {
+            if (mVertexPosArray == null)
+            {
+                return false;
+            }
+            mVertexPosArray = NullMeshObject.ReCreateCompactData(mVertexPosArray, indexMapping);
+            mNormalArray = NullMeshObject.ReCreateCompactData(mNormalArray, indexMapping);
+            return true;
         }
     }
 

@@ -102,6 +102,13 @@ namespace NullMesh
             return stream;
         }
 
+        public static NullMemoryStream ReadAndWrite()
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            NullMemoryStream stream = new NullMemoryStream(memoryStream);
+            return stream;
+        }
+
         public static NullMemoryStream WriteToFile(string path)
         {
             FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
@@ -143,10 +150,15 @@ namespace NullMesh
                 mStream = null;
             }
         }
-
+        
         private bool CanRead(int size)
         {
             return mStream.Position + size <= mStream.Length;
+        }
+
+        public void Seek(long offset, SeekOrigin orgin)
+        {
+            mStream.Seek(offset, orgin);
         }
 
         public int WriteMap<U, V>(Dictionary<U, V> values, bool ignoreWriteCount)

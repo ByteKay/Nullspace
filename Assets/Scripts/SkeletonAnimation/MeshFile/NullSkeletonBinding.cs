@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace NullMesh
@@ -145,7 +146,6 @@ namespace NullMesh
             }
         }
 
-
         public void SetPieceHandle(int handle)
         {
             mPieceHandle = handle;
@@ -171,6 +171,37 @@ namespace NullMesh
             {
                 mBindingNodeArray.Add(new NullSkeletonBindingNode(CurrentVersion));
             }
+            return true;
+        }
+
+        public bool ExtractToTrianglesFromIndexedPrimitives(List<Vector3Int> originalFaceIndices)
+        {
+            //build new node-array
+            List<NullSkeletonBindingNode> newBindingNodeArray = new List<NullSkeletonBindingNode>();
+            for (int i = 0; i < originalFaceIndices.Count * 3; i++)
+            {
+                newBindingNodeArray.Add(new NullSkeletonBindingNode(CurrentVersion));
+            }
+            using (NullMemoryStream stream = NullMemoryStream.ReadAndWrite())
+            {
+                for (int i = 0; i < originalFaceIndices.Count; i++)
+                {
+                    int id0 = originalFaceIndices[i].x;
+                    int id1 = originalFaceIndices[i].y;
+                    int id2 = originalFaceIndices[i].z;
+                    stream.WriteStream(mBindingNodeArray[id0]);
+                    stream.WriteStream(mBindingNodeArray[id1]);
+                    stream.WriteStream(mBindingNodeArray[id2]);
+                    newBindingNodeArray[i * 3 + 0].LoadFromStream(stream);
+                    newBindingNodeArray[i * 3 + 1].LoadFromStream(stream);
+                    newBindingNodeArray[i * 3 + 2].LoadFromStream(stream);
+                }
+            }
+            for (int i = 0; i < mBindingNodeArray.Count; ++i)
+            {
+                mBindingNodeArray[i].Clear();
+            }
+            mBindingNodeArray = newBindingNodeArray;
             return true;
         }
 
@@ -210,6 +241,30 @@ namespace NullMesh
             mBindingNodeArray.Clear();
             mPieceHandle = 0;
         }
+
+        public bool BuildIndexedPrimitives(List<NullMergeIndex> indexMapping)
+        {
+            //build new node-array
+            List<NullSkeletonBindingNode> newBindingNodeArray = new List<NullSkeletonBindingNode>();
+            for (int i = 0; i < indexMapping.Count; i++)
+            {
+                newBindingNodeArray.Add(new NullSkeletonBindingNode(CurrentVersion));
+            }
+            //extract
+            for (int i = 0; i < indexMapping.Count; i++)
+            {
+                NullMemoryStream stream = NullMemoryStream.ReadAndWrite();
+                NullMergeIndex index = indexMapping[i];
+                mBindingNodeArray[index.index].SaveToStream(stream);
+                newBindingNodeArray[i].LoadFromStream(stream);
+            }
+            for (int i = 0; i < mBindingNodeArray.Count; i++)
+            {
+                mBindingNodeArray[i].Clear();
+            }
+            mBindingNodeArray = newBindingNodeArray;
+            return true;
+        }
     }
     
     public class NullSkeletonBinding : INullStream
@@ -227,6 +282,15 @@ namespace NullMesh
         public NullSkeletonBinding(int version) : this()
         {
             CurrentVersion = version;
+        }
+
+        public NullSkeletonPiece this[int index]
+        {
+            get
+            {
+                Assert.IsTrue(index < mBindingPieceNodeArray.Count, "");
+                return mBindingPieceNodeArray[index];
+            }
         }
 
         public int SaveToStream(NullMemoryStream stream)

@@ -121,6 +121,131 @@ namespace NullMesh
             return res;
         }
 
+        public bool ExtractToTrianglesFromIndexedPrimitives(List<Vector3Int> faceIndices)
+        {
+            List<Vector2> uvArray = new List<Vector2>();
+            int triangleCount = faceIndices.Count;
+            for (int i = 0; i < triangleCount; ++i)
+            {
+                Vector3Int face = faceIndices[i];
+                uvArray.Add(mUVArray[face.x]);
+                uvArray.Add(mUVArray[face.y]);
+                uvArray.Add(mUVArray[face.z]);
+            }
+            mUVArray = uvArray;
+            mUVCount = uvArray.Count;
+            return true;
+        }
+
+        public bool BuildIndexedPrimitives(List<NullMergeIndex> indexMapping)
+        {
+            if (mUVCount == 0)
+            {
+                return false;
+            }
+            List<Vector2> newData = NullMeshObject.ReCreateCompactData(mUVArray, indexMapping);
+            mUVArray = newData;
+            mUVCount = newData.Count;
+            return true;
+        }
+
+        private float RoundUpValue(float value, float errorLimit)
+        {
+            if (value > 0)
+            {
+                float roundValue = (float)((int)(value + 0.5f));
+                float absError = Mathf.Abs(value - roundValue);
+                if (absError <= errorLimit)
+                {
+                    return roundValue;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+            else
+            {
+                float roundValue = (float)((int)(value - 0.5f));
+                float absError = Mathf.Abs(value - roundValue);
+                if (absError <= errorLimit)
+                {
+                    return roundValue;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+        }
+        public bool StandarizeUVs(float errorLimit)
+        {
+            if (mUVArray == null || mUVArray.Count == 0)
+            {
+                return false;
+            }
+            //assume the owner mesh-object had been extracted to triangles and in float format
+            for (int i = 0; i < mUVArray.Count / 3; i++)
+            {
+                //get uvs for triangle
+                Vector2 uv1 = mUVArray[i * 3];
+                Vector2 uv2 = mUVArray[i * 3 + 1];
+                Vector2 uv3 = mUVArray[i * 3 + 2];
+
+                //roundup values
+                uv1.x = RoundUpValue(uv1.x, errorLimit);
+                uv1.y = RoundUpValue(uv1.y, errorLimit);
+                uv2.x = RoundUpValue(uv2.x, errorLimit);
+                uv2.y = RoundUpValue(uv2.y, errorLimit);
+                uv3.x = RoundUpValue(uv3.x, errorLimit);
+                uv3.y = RoundUpValue(uv3.y, errorLimit);
+
+                Vector2 min = Vector2.Min(uv3, Vector2.Min(uv1, uv2));
+                Vector2 max = Vector2.Max(uv3, Vector2.Max(uv1, uv2));
+                //standarize uv
+                float du = 0.0f;
+                float dv = 0.0f;
+                while (min.x < 0.0f)
+                {
+                    min.x += 1.0f;
+                    max.x += 1.0f;
+                    du += 1.0f;
+                }
+                while (min.y < 0.0f)
+                {
+                    min.y += 1.0f;
+                    max.y += 1.0f;
+                    dv += 1.0f;
+                }
+                while (min.x > 1.0f)
+                {
+                    min.x -= 1.0f;
+                    max.x -= 1.0f;
+                    du -= 1.0f;
+                }
+                while (min.y > 1.0f)
+                {
+                    min.y -= 1.0f;
+                    max.y -= 1.0f;
+                    dv -= 1.0f;
+                }
+                Vector2 duv = new Vector2(du, dv);
+                //adjust triangle-uvs center
+                uv1 += duv;
+                uv2 += duv;
+                uv3 += duv;
+                //calculating and pushing back new values
+                mUVArray[i * 3] = uv1;
+                mUVArray[i * 3 + 1] = uv2;
+                mUVArray[i * 3 + 2] = uv3;
+            }
+            return true;
+        }
+
+        public List<Vector2> GetUVData()
+        {
+            return mUVArray;
+        }
     }
 
     public class NullUVGroups : INullStream
@@ -153,6 +278,16 @@ namespace NullMesh
             return stream.ReadList(out mUVGroupList);
         }
 
+        public bool ExtractToTrianglesFromIndexedPrimitives(List<Vector3Int> faceIndices)
+        {
+            bool res = false;
+            for (int i = 0; i < mUVGroupList.Count; i++)
+            {
+                res |= mUVGroupList[i].ExtractToTrianglesFromIndexedPrimitives(faceIndices);
+            }
+            return res;
+        }
+
         public int GetUVGroupCount()
         {
             return mUVGroupList.Count;
@@ -173,6 +308,8 @@ namespace NullMesh
                 return null;
             }
         }
+
+        public int Count { get { return mUVGroupList.Count; } }
 
         public NullUVGroup GetUVGroupByIndex(int index)
         {
@@ -230,6 +367,15 @@ namespace NullMesh
         public void Clear()
         {
             mUVGroupList.Clear();
+        }
+
+        public void BuildIndexedPrimitives(List<NullMergeIndex> indexMapping)
+        {
+            for (int i = 0; i < mUVGroupList.Count; ++i)
+            {
+                mUVGroupList[i].BuildIndexedPrimitives(indexMapping);
+            }
+            mVertexCount = indexMapping.Count;
         }
     }
 
