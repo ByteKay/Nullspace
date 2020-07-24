@@ -91,6 +91,18 @@ namespace NullMesh
             return mQuatArray;
         }
 
+        public void SetPosition(int index, Vector3 pos)
+        {
+            Assert.IsTrue(index < GetFrameCount(), "");
+            mPosArray[index] = pos;
+        }
+
+        public void SetQuaternion(int index, Quaternion q)
+        {
+            Assert.IsTrue(index < GetFrameCount(), "");
+            mQuatArray[index] = q;
+        }
+
         public void SetParent(int parent)
         {
             mParent = parent;

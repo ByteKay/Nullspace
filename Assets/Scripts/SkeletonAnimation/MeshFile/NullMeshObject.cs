@@ -361,7 +361,7 @@ namespace NullMesh
             Opacity = NullFacegroupOpacity.EHXFO_DEFAULT;
         }
 
-        public NullMeshObject(int version, NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor) : this()
+        public NullMeshObject(int version, NullPrimitiveType meshType, int triangleCount, int vertexCount, bool includingNormal, bool includeTangent, bool includingVertexColor) : this()
         {
             CurrentVersion = version;
             SetMeshObjectType(meshType);
@@ -369,15 +369,12 @@ namespace NullMesh
             {
                 return;
             }
-            int vertexCount = 0;
             switch (GetMeshObjectType())
             {
                 case NullPrimitiveType.MOT_TRIANGLES:
                     vertexCount = triangleCount * 3;
                     break;
                 case NullPrimitiveType.MOT_INDEXED_PRIMITIVES:
-                    //should never happened
-                    vertexCount = triangleCount * 3;
                     break;
                 //case NullPrimitiveType.MOT_TRIANGLE_STRIPS:
                 //    vertexCount = triangleCount + 2;
@@ -408,6 +405,11 @@ namespace NullMesh
             }
         }
 
+        /// <summary>
+        /// 返回 平均值 和 总和
+        /// </summary>
+        /// <param name="sum"></param>
+        /// <returns></returns>
         public Vector3 GetCenter(ref Vector3 sum)
         {
             sum = Vector3.zero;
@@ -425,6 +427,7 @@ namespace NullMesh
 
         public void Transform(Matrix4x4 m)
         {
+            Assert.IsTrue(GetMeshObjectType() == NullPrimitiveType.MOT_TRIANGLES, "");
             int vt = GetVertexCount();
             //do transform
             for (int i = 0; i < vt; i++)
@@ -490,11 +493,11 @@ namespace NullMesh
             mMeshObjectHandle = handle;
         }
 
-        void SetVertexAndIndexCount(int count, int faceCount = 0)
+        void SetVertexAndIndexCount(int vertexCount, int faceCount = 0)
         {
             Clear();
-            SetMeshObjectLargeMesh(count > 65535);
-            for (int i = 0; i < count; ++i)
+            SetMeshObjectLargeMesh(vertexCount > 65535);
+            for (int i = 0; i < vertexCount; ++i)
             {
                 VertexPosArray.Add(Vector3.zero);
             }
@@ -713,7 +716,7 @@ namespace NullMesh
                 //    }
                 //    break;
                 case NullPrimitiveType.MOT_INDEXED_PRIMITIVES:
-                    GetFace(index, ref faceIndex);
+                    GetTriangleIndex(index, ref faceIndex);
                     GetVertex(faceIndex.x, ref p1);
                     GetVertex(faceIndex.y, ref p2);
                     GetVertex(faceIndex.z, ref p3);
@@ -752,7 +755,13 @@ namespace NullMesh
             BinormalArray[index] = binormal;
         }
 
-        public void GetFace(int index, ref Vector3Int face)
+        public void SetTriangleIndex(int index, Vector3Int face)
+        {
+            Assert.IsTrue(index < GetTriangleCount(), "");
+            FaceArray[index] = face;
+        }
+
+        public void GetTriangleIndex(int index, ref Vector3Int face)
         {
             Assert.IsTrue(index < GetTriangleCount(), "");
             face = FaceArray[index];
@@ -857,6 +866,34 @@ namespace NullMesh
             {
                 UVGroups.RemoveUVGroup(uvType);
             }
+        }
+
+        public NullUVGroup GetOrCreateUVGroup(UVType uvType)
+        {
+            if (GetVertexCount() == 0)
+            {
+                return null;
+            }
+            NullUVGroup group = GetUVGroup(uvType);
+            if (group == null)
+            {
+                group = UVGroups.AppendUV(uvType);
+            }
+            return group;
+        }
+
+        public NullUVGroup GetOrCreateUVGroup(UVType uvType, int uvSize)
+        {
+            if (GetVertexCount() == 0)
+            {
+                return null;
+            }
+            NullUVGroup group = GetUVGroup(uvType);
+            if (group == null)
+            {
+                group = UVGroups.AppendUV(uvType, uvSize);
+            }
+            return group;
         }
 
         public NullUVGroup GetUVGroup(UVType uvType)
@@ -1198,9 +1235,9 @@ namespace NullMesh
             return stream.ReadList(out MeshObjectList);
         }
 
-        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
+        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType, int triangleCount, int vertexCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
         {
-            NullMeshObject meshObject = new NullMeshObject(CurrentVersion, meshType, triangleCount, includingNormal, includeTangent, includingVertexColor);
+            NullMeshObject meshObject = new NullMeshObject(CurrentVersion, meshType, triangleCount, vertexCount, includingNormal, includeTangent, includingVertexColor);
             MeshObjectList.Add(meshObject);
             return meshObject;
         }

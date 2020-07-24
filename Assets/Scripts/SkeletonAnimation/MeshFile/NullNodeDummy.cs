@@ -24,7 +24,27 @@ namespace NullMesh
             mPos.Set(v1, v2, v3);
             mQuat.Set(v4, v5, v6, v7);
         }
-        
+
+        public void SetPosition(float v1, float v2, float v3)
+        {
+            mPos.Set(v1, v2, v3);
+        }
+
+        public void SetQuaternion(float v1, float v2, float v3, float v4)
+        {
+            mQuat.Set(v1, v2, v3, v4);
+        }
+
+        public void SetPosition(Vector3 v)
+        {
+            mPos = v;
+        }
+
+        public void SetQuaternion(Quaternion q)
+        {
+            mQuat = q;
+        }
+
         public Vector3 GetPosition()
         {
             return mPos;

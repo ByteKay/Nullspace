@@ -60,7 +60,7 @@ namespace NullMesh
 
         private static bool IsStreamType<T>()
         {
-            return typeof(T).GetInterface("IStream", false) != null;
+            return typeof(T).GetInterface("INullStream", false) != null;
         }
 
         private static MethodInfo GetMethod<T>(Dictionary<Type, MethodInfo> readWriteMap)

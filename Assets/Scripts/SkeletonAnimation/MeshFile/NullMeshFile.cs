@@ -16,33 +16,31 @@ namespace NullMesh
 
     public partial class NullMeshFile
     {
-        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
+        public NullMeshObject AppendMeshObject(NullPrimitiveType meshType, int triangleCount, int vertexCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
         {
             NullMeshObject mesh = null;
             switch (mWorkingMode)
             {
                 case NullWorkingFlag.WF_STATIC_MESH:
                 case NullWorkingFlag.WF_SKELETON_MESHPIECE:
-                    mesh = mMeshObjectList.AppendMeshObject(meshType, triangleCount, includingNormal, includeTangent, includingVertexColor);
+                    mesh = mMeshObjectList.AppendMeshObject(meshType, triangleCount, vertexCount, includingNormal, includeTangent, includingVertexColor);
                     mesh.SetMeshObjectHandle(mMeshObjectList.GetMeshObjectIndex(mesh));
                     break;
             }
             return mesh;
         }
-
-        public NullMeshObject AppendSkinObject(NullPrimitiveType meshType, int triangleCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
+        public NullMeshObject AppendSkinObject(NullPrimitiveType meshType, int triangleCount, int vertexCount, bool includingNormal, bool includeTangent, bool includingVertexColor)
         {
             NullMeshObject mesh = null;
             switch (mWorkingMode)
             {
                 case NullWorkingFlag.WF_SKELETON_MESHPIECE:
-                    mesh = mSkinObjectList.AppendMeshObject(meshType, triangleCount, includingNormal, includeTangent, includingVertexColor);
+                    mesh = mSkinObjectList.AppendMeshObject(meshType, triangleCount, vertexCount, includingNormal, includeTangent, includingVertexColor);
                     mesh.SetMeshObjectHandle(mMeshObjectList.GetMeshObjectCount() + mSkinObjectList.GetMeshObjectIndex(mesh));
                     break;
             }
             return mesh;
         }
-
         public bool ExtractToTriangles()
         {
             bool res = false;
@@ -106,7 +104,6 @@ namespace NullMesh
 
             return res;
         }
-
         public bool BuildIndexedPrimitives()
         {
             bool res = false;
@@ -151,7 +148,6 @@ namespace NullMesh
             }
             return res;
         }
-
         public static List<T> Make<T>(int count) where T : new()
         {
             List<T> res = new List<T>();
@@ -168,7 +164,6 @@ namespace NullMesh
                 lst[i] = v;
             }
         }
-
         protected bool BuildTangentForMeshObjects(NullMeshObjects meshObjects, float thresHold, bool forceSmooth = false)
         {
             if (meshObjects == null || meshObjects.GetMeshObjectCount() == 0)
@@ -247,31 +242,19 @@ namespace NullMesh
             }
 	        return true;
         }
-
         public static Vector3 CalcPlaneNormal3f(Vector3 p1, Vector3 p2, Vector3 p3)
         {
             return Vector3.Cross(p2 - p1, p3 - p1).normalized;
         }
-
-
         /// <summary>
-        ///                   p3
-        ///                   -
-        ///                 /   \
-        ///                /     \
-        ///               /       \
-        ///              /         \
-        ///             _ _ _ _ _ _ _
-        ///           p1             p2
-        ///           
-        ///                  uv3
-        ///                   -
-        ///                 /   \
-        ///                /     \
-        ///               /       \
-        ///              /         \
-        ///             _ _ _ _ _ _ _
-        ///           uv1             uv2
+        ///                   p3                          uv3
+        ///                   -                            -
+        ///                 /   \                        /   \
+        ///                /     \                      /     \
+        ///               /       \                    /       \
+        ///              /         \                  /         \
+        ///             _ _ _ _ _ _ _                _ _ _ _ _ _ _
+        ///           p1             p2            uv1             uv2
         ///           
         /// 设 任意三角面上一点为 p 点，其uv坐标为(u, v)，令 p - p1  =  (u - u1)  * T  +  (v - v1) * B
         /// 确定切空间 T和B
@@ -329,7 +312,6 @@ namespace NullMesh
                 tangent = -tangent;
             }
         }
-
         public static void ComputeTengents(float thresHold, List<Vector3> vertices, int triangleCount, List<byte> smoothGroups,List<Vector2> uvs, List<Vector3> tangents, List<Vector3> binormals)
         {
             //re-culate facet-tangents
@@ -415,7 +397,6 @@ namespace NullMesh
             facetBinormals.Clear();
             usedTangents.Clear();
         }
-
         public bool DoRotateCalculation(float angle)
         {
             bool res = false;
@@ -444,59 +425,243 @@ namespace NullMesh
             }
             return res;
         }
-        
+        public static void Vector3RotateCalculation(float angle, Vector3 data, ref Vector3 newData, bool preMerge)
+        {
+            List<Vector3> tmp = new List<Vector3>() { data };
+            List<Vector3> result = new List<Vector3>();
+            Vector3RotateCalculation(angle, tmp, result, preMerge);
+            newData = result[0];
+        }
+        public static void Vector3RotateCalculation(float angle, List<Vector3> data, List<Vector3> newData, bool preMerge)
+        {
+            Quaternion q = Quaternion.AngleAxis(angle, Vector3.up);
+            newData.Clear();
+            int count = data.Count;
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 vec = q * data[i];
+                newData.Add(vec);
+            }
+        }
+        public static void QuaternionRotateCalculation(float angle, Quaternion data, ref Quaternion newData)
+        {
+            List<Quaternion> tmp = new List<Quaternion>() { data };
+            List<Quaternion> result = new List<Quaternion>();
+            QuaternionRotateCalculation(angle, tmp, result);
+            newData = result[0];
+        }
+        public static void QuaternionRotateCalculation(float angle, List<Quaternion> data, List<Quaternion> newData)
+        {
+            Quaternion q = Quaternion.AngleAxis(angle, Vector3.up);
+            newData.Clear();
+            int count = data.Count;
+            for (int i = 0; i < count; i++)
+            {
+                newData.Add(data[i] * q);
+            }
+        }
         protected bool RotateMeshObjects(NullMeshObjects meshObjects, float angle)
         {
-            return false;
+            if (meshObjects == null || meshObjects.GetVertexCount() == 0)
+            {
+                return false;
+            }
+            int triangleCount = meshObjects.GetTriangleCount();
+            if (triangleCount > 0)
+            {
+                //preparing data
+                List<Vector3> vertices = new List<Vector3>();
+                List<Vector3> newVertices = new List<Vector3>();
+                for (int i = 0; i < meshObjects.GetMeshObjectCount(); i++)
+                {
+                    NullMeshObject meshObject = meshObjects[i];
+                    int count = meshObject.GetTriangleCount();
+                    vertices.AddRange(meshObject.GetVertexData());
+                }
+
+                //do rotate calculation
+                Vector3RotateCalculation(angle, vertices, newVertices, false);
+
+                //update mesh objects vertices
+                int index = 0;
+                for (int i = 0; i < meshObjects.GetMeshObjectCount(); i++)
+                {
+                    NullMeshObject meshObject = meshObjects[i];
+                    int count = meshObject.GetTriangleCount();
+                    for (int j = 0; j < count; j++)
+                    {
+                        meshObject.SetVertex(j * 3 + 0, newVertices[index++]);
+                        meshObject.SetVertex(j * 3 + 1, newVertices[index++]);
+                        meshObject.SetVertex(j * 3 + 2, newVertices[index++]);
+                    }
+                }
+                //delete temp buffer
+                vertices.Clear();
+                newVertices.Clear();
+            }
+            return true;
         }
         protected bool RotateVertexMorphAnimations(NullVertexMorphAnimations vertexMorphAnimations, float angle)
         {
-            return false;
+            if (vertexMorphAnimations == null || vertexMorphAnimations.GetAnimationCount() == 0)
+            {
+                return false;
+            }
+            bool res = true;
+            for (int i = 0; i < vertexMorphAnimations.GetAnimationCount(); i++)
+            {
+                NullVertexMorphAnimation vertexMorphAnimation = vertexMorphAnimations[i];
+                res &= RotateVertexMorphAnimation(vertexMorphAnimation, angle);
+            }
+            return res;
         }
         protected bool RotateVertexMorphAnimation(NullVertexMorphAnimation vertexMorphAnimation, float angle)
         {
-            return false;
+            if (vertexMorphAnimation == null || vertexMorphAnimation.GetFrameCount() == 0)
+            {
+                return false;
+            }
+            bool res = true;
+            for (int i = 0; i < vertexMorphAnimation.GetFrameCount(); i++)
+            {
+                NullVertexMorphAnimationFrame animFrame = vertexMorphAnimation[i];
+                res &= RotateVertexMorphAnimationFrame(animFrame, angle);
+            }
+            return res;
         }
         protected bool RotateVertexMorphAnimationFrame(NullVertexMorphAnimationFrame vertexMorphAnimationFrame, float angle)
         {
-            return false;
+            if (vertexMorphAnimationFrame == null || vertexMorphAnimationFrame.GetMorphObjectCount() == 0)
+            {
+                return false;
+            }
+            bool res = true;
+            for (int i = 0; i < vertexMorphAnimationFrame.GetMorphObjectCount(); i++)
+            {
+                NullVertexMorphObject vertexMorphObject = vertexMorphAnimationFrame[i];
+                res &= RotateVertexMorphObject(vertexMorphObject, angle);
+            }
+            return res;
         }
         protected bool RotateVertexMorphObject(NullVertexMorphObject vertexMorphObject, float angle)
         {
-            return false;
+            if (vertexMorphObject == null || vertexMorphObject.GetVertexCount() == 0)
+            {
+                return false;
+            }
+            List<Vector3> posDataArray = vertexMorphObject.GetVertexData();
+            int vertexCount = GetTriangleCount() * 3;
+            List<Vector3> vertices = new List<Vector3>();
+            List<Vector3> nVertices = new List<Vector3>();
+            vertices.AddRange(posDataArray);
+            Vector3RotateCalculation(angle, vertices, nVertices, false);
+            for (int i = 0; i < vertexCount; i += 3)
+            {
+                vertexMorphObject.SetVertex(i + 0, nVertices[i]);
+                vertexMorphObject.SetVertex(i + 1, nVertices[i + 1]);
+                vertexMorphObject.SetVertex(i + 2, nVertices[i + 2]);
+
+                Vector3 normal = CalcPlaneNormal3f(nVertices[i], nVertices[i + 1], nVertices[i + 2]);
+                vertexMorphObject.SetNormal(i + 0, normal);
+                vertexMorphObject.SetNormal(i + 1, normal);
+                vertexMorphObject.SetNormal(i + 2, normal);
+            }
+            vertices.Clear();
+            nVertices.Clear();
+            return true;
         }
         protected bool RotateSocketNodes(NullSocketNodes socketNodes, float angle)
         {
-            return false;
+            if (socketNodes == null || socketNodes.GetSocketCount() == 0)
+            {
+                return false;
+            }
+            NullSocketNode rootSocketNode = socketNodes[0];
+            if (rootSocketNode != null)
+            {
+                Vector3 pos = rootSocketNode.GetPosition();
+                Quaternion quat = rootSocketNode.GetQuaternion();
+                Vector3 newPos = Vector3.zero;
+                Quaternion newQuat = Quaternion.identity;
+                Vector3RotateCalculation(angle, pos, ref newPos, false);
+                QuaternionRotateCalculation(angle, quat, ref newQuat);
+                rootSocketNode.SetPosition(newPos);
+                rootSocketNode.SetQuaternion(newQuat);
+            }
+            return true;
         }
         protected bool RotateNodeDummy(NullNodeDummy nodeDummy, float angle)
         {
-            return false;
+            if (nodeDummy == null || nodeDummy.GetNodeCount() == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < nodeDummy.GetNodeCount(); i++)
+            {
+                NullNodeDummyObject nodeDummyObject = nodeDummy[i];
+                Vector3 pos = nodeDummyObject.GetPosition();
+                Vector3 newPos = Vector3.zero;
+                Quaternion quat = nodeDummyObject.GetQuaternion();
+                Quaternion newQuat = Quaternion.identity;
+                Vector3RotateCalculation(angle, pos, ref newPos, false);
+                QuaternionRotateCalculation(angle, quat, ref newQuat);
+                nodeDummyObject.SetTransform(newPos.x, newPos.y, newPos.z, newQuat.x, newQuat.y, newQuat.z, newQuat.w);
+            }
+
+            return true;
         }
         protected bool RotateNodeTree(NullNodeTree nodeTree, float angle)
         {
-            return false;
+            if (nodeTree == null || nodeTree.GetNodeCount() == 0)
+            {
+                return false;
+            }
+            NullNodeTree rootNode = nodeTree;
+            if (rootNode != null)
+            {
+                Vector3 pos = rootNode.GetPosition();
+                Vector3 newPos = Vector3.zero;
+                Quaternion quat = rootNode.GetQuaternion();
+                Quaternion newQuat = Quaternion.identity;
+                Vector3RotateCalculation(angle, pos, ref newPos, false);
+                QuaternionRotateCalculation(angle, quat, ref newQuat);
+                rootNode.SetTransform(newPos.x, newPos.y, newPos.z, newQuat.x, newQuat.y, newQuat.z, newQuat.w);
+            }
+            return true;
         }
         protected bool RotateAnimation(NullSkeletonAnimation animation, float angle)
         {
-            return false;
+            if (animation == null || animation.GetFrameCount() == 0 || angle == 0.0f)
+            {
+                return false;
+            }
+            //rotate root node only
+            NullSkeletonNodeAnimation node = animation[0];
+            List<Vector3> poses = node.GetPosition();
+            List<Quaternion> quates = node.GetQuat();
+            for (int i = 0; i < animation.GetFrameCount(); i++)
+            {
+                Vector3 newPos = Vector3.zero;
+                Quaternion newQuat = Quaternion.identity;
+                Vector3RotateCalculation(angle, poses[i], ref newPos, false);
+                QuaternionRotateCalculation(angle, quates[i], ref newQuat);
+                node.SetPosition(i, newPos);
+                node.SetQuaternion(i, newQuat);
+            }
+            return true;
         }
 
     }
     public partial class NullMeshFile
     {
-
         public void SetWorkingFlag(NullWorkingFlag workingFlag)
         {
-            Clear();
-            mWorkingMode = workingFlag;
+            InitializeWorkingFlag(workingFlag);
         }
-
         public NullWorkingFlag GetWorkingFlag()
         {
             return mWorkingMode;
         }
-
         public int GetMeshObjectCount()
         {
             return mMeshObjectList.GetMeshObjectCount();
@@ -505,13 +670,24 @@ namespace NullMesh
         {
             return mSkinObjectList.GetMeshObjectCount();
         }
-
+        public int GetStaticTriangleCount()
+        {
+            return mMeshObjectList.GetTriangleCount();
+        }
+        public int GetSkinTriangleCount()
+        {
+            return mSkinObjectList.GetTriangleCount();
+        }
         public int GetVertexCount()
         {
             int count = 0;
             count += mMeshObjectList.GetVertexCount();
             count += mSkinObjectList.GetVertexCount();
             return count;
+        }
+        public int GetTriangleCount()
+        {
+            return GetStaticTriangleCount() + GetSkinTriangleCount();
         }
         public NullMeshObjects GetMeshObjects() { return mMeshObjectList; }
         public NullMeshObjects GetSkinObjects() { return mSkinObjectList; }
@@ -521,7 +697,6 @@ namespace NullMesh
         public NullSkeletonBinding GetSkeletonBinding() { return mSkeletonBinding; }
         public NullVertexMorphAnimations GetVertexMorphAnimations() { return mVertexMorphAnimations; }
         public NullSkeletonAnimations GetSkeletonAnimations() { return mSkeletonAnimations; }
-
         public int GetVersion() { return CurrentVersion; }
         public int GetSkeletonNodeCount() { return mNodeTree.GetNodeCount(); }
         public int GetDummyNodeCount() { return mNodeDummy.GetNodeCount(); }
@@ -551,7 +726,6 @@ namespace NullMesh
             mMeshObjectList.RemoveUVGroup(uvType);
             mSkinObjectList.RemoveUVGroup(uvType);
         }
-
     }
 
     public partial class NullMeshFile : INullStream
@@ -565,7 +739,6 @@ namespace NullMesh
         {
             return BitConverter.ToUInt32(Encoding.UTF8.GetBytes(four), 0);
         }
-
         public int CurrentVersion;
         protected NullWorkingFlag mWorkingMode;
         protected int mBlockSize;
@@ -580,7 +753,47 @@ namespace NullMesh
         protected NullSkeletonAnimations mSkeletonAnimations;
         //ertex morph animation
         protected NullVertexMorphAnimations mVertexMorphAnimations;
+        public NullMeshFile()
+        {
+            mWorkingMode = NullWorkingFlag.WF_AUTO_DETECT;
+            CurrentVersion = MESH_FILE_VERSION;
+            mBlockSize = 0;
+            //base mesh
+            mMeshObjectList = new NullMeshObjects();
+            mSkinObjectList = new NullMeshObjects();
+            //skeleton animation
+            mNodeTree = new NullNodeTree();
+            mSocketNodeList = new NullSocketNodes();
+            mNodeDummy = new NullNodeDummy();
+            mSkeletonBinding = new NullSkeletonBinding();
+            mSkeletonAnimations = new NullSkeletonAnimations();
+            //ertex morph animation
+            mVertexMorphAnimations = new NullVertexMorphAnimations();
 
+        }
+        public NullMeshFile(NullWorkingFlag workingFlag) : this()
+        {
+            InitializeWorkingFlag(workingFlag);
+        }
+        protected void InitializeWorkingFlag(NullWorkingFlag workingFlag)
+        {
+            Clear();
+            mWorkingMode = workingFlag;
+            switch (mWorkingMode)
+            {
+                case NullWorkingFlag.WF_STATIC_MESH:
+                    InitializeAsStaticMesh(MESH_FILE_VERSION);
+                    break;
+                case NullWorkingFlag.WF_SKELETON_MESHPIECE:
+                    InitializeAsSkeletonMesh(MESH_FILE_VERSION);
+                    break;
+                case NullWorkingFlag.WF_NODE_ANIM:
+                    InitializeAsSkeletonAnimation(MESH_FILE_VERSION);
+                    break;
+                default:
+                    return;
+            }
+        }
         public int SaveToStream(NullMemoryStream stream)
         {
             uint foucc = GenerateFouCC();
@@ -609,14 +822,12 @@ namespace NullMesh
             }
             return size;
         }
-
         public int SaveToStreamForStaticMesh(NullMemoryStream stream)
         {
             int size = mMeshObjectList.SaveToStream(stream);
             size += mVertexMorphAnimations.SaveToStream(stream);
             return size;
         }
-
         public int SaveToStreamForSkeletonMesh(NullMemoryStream stream)
         {
             int size = mMeshObjectList.SaveToStream(stream);
@@ -628,7 +839,6 @@ namespace NullMesh
             size += mSkeletonBinding.SaveToStream(stream);
             return size;
         }
-
         public int SaveToStreamForSkeletonAnimation(NullMemoryStream stream)
         {
             int size = mNodeTree.SaveToStream(stream, true);
@@ -637,7 +847,6 @@ namespace NullMesh
             size += mSkeletonAnimations.SaveToStream(stream);
             return size;
         }
-
         public bool LoadFromStream(NullMemoryStream stream)
         {
             uint foucc = 0;
@@ -664,7 +873,6 @@ namespace NullMesh
             }
             return true;
         }
-
         public uint GenerateFouCC()
         {
             uint fouCC = 0;
@@ -682,14 +890,12 @@ namespace NullMesh
             }
             return fouCC;
         }
-
         private bool LoadFromStreamForStaticMesh(NullMemoryStream stream)
         {
             bool res = mMeshObjectList.LoadFromStream(stream);
             res &= mVertexMorphAnimations.LoadFromStream(stream);
             return res;
         }
-
         private bool LoadFromStreamForSkeletonMesh(NullMemoryStream stream)
         {
             bool res = mMeshObjectList.LoadFromStream(stream);
@@ -701,7 +907,6 @@ namespace NullMesh
             res &= mSkeletonBinding.LoadFromStream(stream);
             return res;
         }
-
         private bool LoadFromStreamForSkeletonAnimation(NullMemoryStream stream)
         {
             bool res = mNodeTree.LoadFromStream(stream);
@@ -714,7 +919,6 @@ namespace NullMesh
             }
             return res;
         }
-
         private void ResolveBoneNames()
         {
             if (mNodeTree == null || mNodeTree.GetNodeCount() == 0 || mSkeletonAnimations == null)
@@ -738,7 +942,6 @@ namespace NullMesh
                 }
             }
         }
-
         private bool ValidateFileHeader(uint aType, int version)
         {
             if (aType == StaticMesh)
@@ -759,7 +962,6 @@ namespace NullMesh
             }
             return true;
         }
-
         private void Clear()
         {
             CurrentVersion = MESH_FILE_VERSION;
@@ -773,7 +975,6 @@ namespace NullMesh
             mSkeletonAnimations.Clear();
             mVertexMorphAnimations.Clear();
         }
-
         private void InitializeAsStaticMesh(int version)
         {
             Clear();
@@ -784,7 +985,6 @@ namespace NullMesh
             mMeshObjectList = new NullMeshObjects(CurrentVersion);
             mVertexMorphAnimations = new NullVertexMorphAnimations();
         }
-
         private void InitializeAsSkeletonMesh(int version)
         {
             Clear();
@@ -800,7 +1000,6 @@ namespace NullMesh
             mSkeletonBinding = new NullSkeletonBinding(CurrentVersion);
             mVertexMorphAnimations = new NullVertexMorphAnimations();
         }
-
         private void InitializeAsSkeletonAnimation(int version)
         {
             Clear();

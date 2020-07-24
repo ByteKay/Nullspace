@@ -15,7 +15,6 @@ namespace NullMesh
         public Vector3 Pos;
         public Quaternion Quat;
         public int GroupId;
-        public int TypeName;           // non-streamed data
         public List<NullNodeTree> Children;               // sub trees
 
         public NullNodeTree()
@@ -25,7 +24,6 @@ namespace NullMesh
             Pos = Vector3.zero;
             Quat = Quaternion.identity;
             Children = new List<NullNodeTree>();
-            TypeName = 0;
             GroupId = 0;
         }
 
@@ -33,6 +31,32 @@ namespace NullMesh
         {
             CurrentVersion = version;
         }
+        public void SetTransform(float v1, float v2, float v3, float v4, float v5, float v6, float v7)
+        {
+            Pos.Set(v1, v2, v3);
+            Quat.Set(v4, v5, v6, v7);
+        }
+
+        public void SetPosition(float v1, float v2, float v3)
+        {
+            Pos.Set(v1, v2, v3);
+        }
+
+        public void SetQuaternion(float v1, float v2, float v3, float v4)
+        {
+            Quat.Set(v1, v2, v3, v4);
+        }
+
+        public void SetPosition(Vector3 v)
+        {
+            Pos = v;
+        }
+
+        public void SetQuaternion(Quaternion q)
+        {
+            Quat = q;
+        }
+
         public Vector3 GetPosition()
         {
             return Pos;
@@ -42,7 +66,7 @@ namespace NullMesh
         {
             return Quat;
         }
-
+        
         public int NumChildren { get { return Children.Count; } }
 
         public NullNodeTree this[int idx]
@@ -142,7 +166,6 @@ namespace NullMesh
         {
             return NumChildren;
         }
-
 
         public NullNodeTree FindNode(int boneId)
         {

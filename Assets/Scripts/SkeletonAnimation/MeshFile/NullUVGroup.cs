@@ -21,7 +21,6 @@ namespace NullMesh
         protected double mUVScale;
         protected NullDataStructType mUVDataType;
         protected List<Vector2> mUVArray;
-        protected int mUVCount;
 
         public NullUVGroup()
         {
@@ -29,7 +28,6 @@ namespace NullMesh
             mUVType = UVType.UVT_DEFAULT;
             mUVDataType = NullDataStructType.DST_FLOAT;
             mUVArray = new List<Vector2>();
-            mUVCount = 0;
         }
 
         public NullUVGroup(int version, UVType type) : this()
@@ -42,7 +40,7 @@ namespace NullMesh
         {
             CurrentVersion = version;
             mUVType = type;
-            mUVCount = uvSize;
+            mUVArray = NullMeshFile.Make<Vector2>(uvSize);
         }
 
         public UVType GetUVType()
@@ -89,7 +87,6 @@ namespace NullMesh
         public void Clear()
         {
             mUVArray.Clear();
-            mUVCount = 0;
         }
 
         public int SaveToStream(NullMemoryStream stream)
@@ -133,19 +130,17 @@ namespace NullMesh
                 uvArray.Add(mUVArray[face.z]);
             }
             mUVArray = uvArray;
-            mUVCount = uvArray.Count;
             return true;
         }
 
         public bool BuildIndexedPrimitives(List<NullMergeIndex> indexMapping)
         {
-            if (mUVCount == 0)
+            if (mUVArray.Count == 0)
             {
                 return false;
             }
             List<Vector2> newData = NullMeshObject.ReCreateCompactData(mUVArray, indexMapping);
             mUVArray = newData;
-            mUVCount = newData.Count;
             return true;
         }
 
