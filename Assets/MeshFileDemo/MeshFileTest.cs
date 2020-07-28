@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Nullspace;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -13,7 +14,9 @@ namespace NullMesh
         private GameObject Target;
         private Mesh mMesh;
         private SkinnedMeshRenderer mSkinMeshRender;
-        private Animation mAnim;
+
+        private Animation mAnimation;
+        private Animator mAnimator;
 
         private Transform mRootBone;
         private Transform[] mBones;
@@ -48,26 +51,51 @@ namespace NullMesh
             mVertexPoses = mMesh.vertices;
             mVertexTriangles = mMesh.triangles;
 
-            mAnim = Target.GetComponent<Animation>();
-            
+            mAnimation = Target.GetComponent<Animation>();
+            mAnimator = Target.GetComponent<Animator>();
+
             CreateSkeletonMesh();
             CreateSkeletonAnimation();
+            CreateSkeletonAnimator();
+        }
+
+        private void CreateSkeletonAnimator()
+        {
+            if (mAnimator != null)
+            {
+                
+                Avatar avatar = mAnimator.avatar;
+                if (avatar != null)
+                {
+
+                }
+
+                if (mAnimator.applyRootMotion && mRootBone != null)
+                {
+                    CreateSkeletonOffset();
+                }
+            }
+        }
+
+        private void CreateSkeletonOffset()
+        {
+            // todo
         }
 
         private void CreateSkeletonAnimation()
         {
-            if (mAnim != null)
+            if (mAnimation != null)
             {
-                foreach (AnimationState anim in mAnim)
+                AnimationClip[] clips = AnimationUtility.GetAnimationClips(gameObject);
+                foreach (AnimationClip clip in clips)
                 {
-                    AnimationClip clip = anim.clip;
                     EditorCurveBinding[] bindings = AnimationUtility.GetCurveBindings(clip);
+                    DebugUtils.Info("CreateSkeletonAnimation", "length ", bindings.Length);
                     foreach (EditorCurveBinding binding in bindings)
                     {
                         AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, binding);
-                        Keyframe[] keys =  curve.keys;
-                        //binding.path;
-                        //binding.propertyName;
+                        Keyframe[] keys = curve.keys;
+                        DebugUtils.Info("CreateSkeletonAnimation", string.Format("(path,propertyName,length,start,end) : ({0}, {1}, {2}, {3}, {4})", binding.path, binding.propertyName, keys.Length, keys[0].time, keys[keys.Length-1].time));
                     }
                 }
             }
