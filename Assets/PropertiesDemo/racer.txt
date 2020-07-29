@@ -1,0 +1,2 @@
+  F:/Unity/Nullspace/Assets/PropertiesDemo 
+    material = textured

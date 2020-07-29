@@ -12,6 +12,69 @@ namespace NullMesh
 {
     public partial class NullMemoryStream
     {
+        public static NullMemoryStream ReadTextFromFile(string path)
+        {
+            StreamReader fileStream = new StreamReader(path, Encoding.UTF8);
+            NullMemoryStream stream = new NullMemoryStream(fileStream);
+            return stream;
+        }
+
+        public static NullMemoryStream WriteTextFromFile(string path, bool append)
+        {
+            StreamWriter fileStream = new StreamWriter(path, append, Encoding.UTF8);
+            NullMemoryStream stream = new NullMemoryStream(fileStream);
+            return stream;
+        }
+
+        public bool Eof()
+        {
+            return mTextReadStream.EndOfStream;
+        }
+
+        public int Read()
+        {
+            return mTextReadStream.Read();
+        }
+
+        public int Peek()
+        {
+            return mTextReadStream.Peek();
+        }
+
+        public string ReadLine()
+        {
+            return mTextReadStream.ReadLine();
+        }
+
+        public int Read(char[] buffer, int index, int count)
+        {
+            return mTextReadStream.Read(buffer, index, count);
+        }
+
+        public void Write(char[] buffer)
+        {
+            mTextWriteStream.Write(buffer);
+        }
+
+        public void Write(string value)
+        {
+            mTextWriteStream.Write(value);
+        }
+
+        public void Write(char value)
+        {
+            mTextWriteStream.Write(value);
+        }
+
+        public void Write(char[] buffer, int index, int count)
+        {
+            mTextWriteStream.Write(buffer, index, count);
+        }
+
+    }
+
+    public partial class NullMemoryStream
+    {
         private class ReadWriteAttribute : Attribute
         {
             public ReadWriteType ReadWriteType { get; set; }
@@ -136,18 +199,40 @@ namespace NullMesh
     public partial class NullMemoryStream : IDisposable
     { 
         private Stream mStream;
+        private StreamReader mTextReadStream;
+        private StreamWriter mTextWriteStream;
+
         private NullMemoryStream(Stream stream)
         {
             mStream = stream;
-            mStream.Seek(0, SeekOrigin.Begin);
+        }
+        
+        private NullMemoryStream(StreamWriter stream)
+        {
+            mTextWriteStream = stream;
         }
 
+        private NullMemoryStream(StreamReader stream)
+        {
+            mTextReadStream = stream;
+        }
+        
         public void Dispose()
         {
             if (mStream != null)
             {
                 mStream.Close();
                 mStream = null;
+            }
+            if (mTextReadStream != null)
+            {
+                mTextReadStream.Close();
+                mTextReadStream = null;
+            }
+            if (mTextWriteStream != null)
+            {
+                mTextWriteStream.Close();
+                mTextWriteStream = null;
             }
         }
         
@@ -156,10 +241,6 @@ namespace NullMesh
             return mStream.Position + size <= mStream.Length;
         }
 
-        public void Seek(long offset, SeekOrigin orgin)
-        {
-            mStream.Seek(offset, orgin);
-        }
 
         public int WriteMap<U, V>(Dictionary<U, V> values, bool ignoreWriteCount)
         {
