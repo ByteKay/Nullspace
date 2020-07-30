@@ -48,22 +48,18 @@ namespace Nullspace
                     DebugUtils.Warning("Create", "Failed to load properties from url '%s'.", url);
                     return null;
                 }
-                // If the loaded properties object is not the root namespace,
-                // then we have to clone it and delete the root namespace
-                // so that we don't leak memory.
                 if (p != properties)
                 {
                     p = p.Clone();
                 }
                 p.SetDirectoryPath(Path.GetDirectoryName(fileString));
+                p.Rewind();
                 return p;
             }
         }
-        // Utility functions (shared with SceneLoader).
+
         public static void CalculateNamespacePath(ref string urlString, ref string fileString, List<string> namespacePath)
         {
-            // If the url references a specific namespace within the file,
-            // calculate the full namespace path to the final namespace.
             int loc = urlString.IndexOf("#");
             if (loc != -1)
             {
@@ -84,8 +80,6 @@ namespace Nullspace
 
         public static Properties GetPropertiesFromNamespacePath(Properties properties, List<string> namespacePath)
         {
-            // If the url references a specific namespace within the file,
-            // return the specified namespace or notify the user if it cannot be found.
             if (namespacePath.Count > 0)
             {
                 int size = namespacePath.Count;
@@ -100,11 +94,12 @@ namespace Nullspace
                             DebugUtils.Warning("getPropertiesFromNamespacePath", "Failed to load properties object from url.");
                             return null;
                         }
-                        if (namespacePath[i].Equals(iter.GetId()))
+                        if (namespacePath[i].Equals(iter.GetId())) // id, not namespace
                         {
                             if (i != size - 1)
                             {
                                 properties = iter.GetNextNamespace();
+                                iter.Rewind();
                                 iter = properties;
                             }
                             else
@@ -117,6 +112,7 @@ namespace Nullspace
                         iter = properties.GetNextNamespace();
                     }
                 }
+                properties.Rewind();
                 return properties;
             }
             return properties;
@@ -232,7 +228,6 @@ namespace Nullspace
             } while (c != -1);
         }
 
-        //Reads the next character from the stream. Returns EOF if the end of the stream is reached.
         public static int ReadChar(NullMemoryStream stream)
         {
             if (stream.Eof())
@@ -314,7 +309,6 @@ namespace Nullspace
         private int mPropertiesItr;
         private int mNamespacesItr;
 
-        // Internal structure containing a single property.
         private class Property
         {
             public string Name;
@@ -371,8 +365,9 @@ namespace Nullspace
             Rewind();
         }
 
-        private Properties(NullMemoryStream stream, string name, string id, string parentID, Properties parent)
+        private Properties(NullMemoryStream stream, string name, string id, string parentID, Properties parent) : this()
         {
+            mNamespace = name;
             mVariables = null;
             mDirPath = null;
             mParent = parent;
@@ -849,49 +844,34 @@ namespace Nullspace
             }
         }
 
+        
+        /// <summary>
+        /// '{' 和 '}' 一定要 单独一行
+        /// </summary>
+        /// <param name="stream"></param>
         private void ReadProperties(NullMemoryStream stream)
         {
             Assert.IsTrue(stream != null, "");
-
-            string line = "";
-            string variable = "";
-
-            string name;
-            string value;
-            string parentID;
-            int c;
-            int rc;
-            int rcc;
-            int rccc;
+            string namesp = null;
+            string id = null;
+            string parentID = null;
             bool comment = false;
-            // name value
-            // name value {
-            // name value : parentID
-            // name value : parentID {
-            // name value : parentID { }
-            // {
-            // }
-            // \t
-            // \n
-            // \t\n
-            // name = value
-            // /*
-            // */
-            // /* */
-            // //
-
             while (true)
             {
                 // Stop when we have reached the end of the file.
-                if (stream.Eof())
+                if (stream.Eof())  // 最后如果以  property 结束，需要加上最后一行的数据
                 {
+                    if (namesp != null)
+                    {
+                        mProperties.Add(new Property(namesp, id == null ? "" : id));
+                    }
                     break;
                 }
 
                 // Read the next line.
-                line = stream.ReadLine();
+                string line = stream.ReadLine();
                 line = line.Trim();
-                // empty row
+                // Empty row
                 if (string.IsNullOrEmpty(line))
                 {
                     continue;
@@ -918,286 +898,36 @@ namespace Nullspace
                     {
                         // Start of multi-line comment (must be at start of line)
                         comment = true;
-                    }
-                    else
-                    {
-                        if (!line.StartsWith("//"))
-                        {
-                            // If an '=' appears on this line, parse it as a name/value pair.
-                            rc = line.IndexOf("=");
-                            if (rc != -1)
-                            {
-                                // First token should be the property name.
-                                name = StrTok(line, "=");
-                                if (name == null)
-                                {
-                                    DebugUtils.Error("ReadProperties", "Error parsing properties file: attribute without name.");
-                                    return;
-                                }
-                                // Remove white-space from name.
-                                name = name.Trim();
-                                // Scan for next token, the property's value.
-                                value = StrTok(null, "");
-                                if (value == null)
-                                {
-                                    DebugUtils.Error("ReadProperties", "Error parsing properties file: attribute with name ('%s') but no value.", name);
-                                    return;
-                                }
-                                // Remove white-space from value.
-                                value = value.Trim();
-
-                                // Is this a variable assignment?
-                                if (IsVariable(name, ref variable))
-                                {
-                                    SetVariable(variable, value);
-                                }
-                                else
-                                {
-                                    // Normal name/value pair
-                                    mProperties.Add(new Property(name, value));
-                                }
-                            }
-                            else
-                            {
-
-
-                                parentID = null;
-                                // Get the last character on the line (ignoring whitespace).
-                                int lineEnd = line.Length - 1;
-
-                                // This line might begin or end a namespace,
-                                // or it might be a key/value pair without '='.
-
-                                // Check for '{' on same line.
-                                rc = line.IndexOf("{");
-                                // Check for inheritance: ':'
-                                rcc = line.IndexOf(":");
-                                // Check for '}' on same line.
-                                rccc = line.IndexOf("}");
-                                // Get the name of the namespace.
-                                name = StrTok(line, " \t\n{");
-                                name = name != null ? name.Trim() : null;
-                                if (name == null)
-                                {
-                                    DebugUtils.Error("ReadProperties", "Error parsing properties file: failed to determine a valid token for line '%s'.", line);
-                                    return;
-                                }
-                                else
-                                {
-                                    if (name[0] == '}')
-                                    {
-                                        // End of namespace.
-                                        return;
-                                    }
-                                }
-                                value = StrTok(null, ":{");
-                                value = value != null ? value.Trim() : null;
-                                // Get its parent ID if it has one.
-                                if (rcc != -1)
-                                {
-                                    parentID = StrTok(null, "{");
-                                    parentID = parentID != null ? parentID.Trim() : null;
-                                }
-
-                                if (value != null && value[0] == '{')
-                                {
-                                    // If the namespace ends on this line, seek back to right before the '}' character.
-                                    if (rccc != -1 && rccc == lineEnd)
-                                    {
-                                        while (stream.Peek() != '}')
-                                        {
-                                            ReadChar(stream);
-                                            if (stream.Seek(-2, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                return;
-                                            }
-                                        }
-                                        if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                        {
-                                            DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                            return;
-                                        }
-                                    }
-
-                                    // New namespace without an ID.
-                                    Properties space = new Properties(stream, name, null, parentID, this);
-                                    mNamespaces.Add(space);
-
-                                    // If the namespace ends on this line, seek to right after the '}' character.
-                                    if (rccc != -1 && rccc == lineEnd)
-                                    {
-                                        if (stream.Seek(1, SeekOrigin.Current) < 0)
-                                        {
-                                            DebugUtils.Error("ReadProperties", "Failed to seek to immediately after a '}' character in properties file.");
-                                            return;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // If '{' appears on the same line.
-                                    if (rc != -1)
-                                    {
-                                        // If the namespace ends on this line, seek back to right before the '}' character.
-                                        if (rccc != -1 && rccc == lineEnd)
-                                        {
-                                            if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                return;
-                                            }
-                                            while (ReadChar(stream) != '}')
-                                            {
-                                                if (stream.Seek(-2, SeekOrigin.Current) < 0)
-                                                {
-                                                    DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                    return;
-                                                }
-                                            }
-                                            if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                return;
-                                            }
-                                        }
-
-                                        // Create new namespace.
-                                        Properties space = new Properties(stream, name, value, parentID, this);
-                                        mNamespaces.Add(space);
-
-                                        // If the namespace ends on this line, seek to right after the '}' character.
-                                        if (rccc != -1 && rccc == lineEnd)
-                                        {
-                                            if (stream.Seek(1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek to immediately after a '}' character in properties file.");
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // Find out if the next line starts with "{"
-                                        SkipWhiteSpace(stream);
-                                        c = ReadChar(stream);
-                                        if (c == '{')
-                                        {
-                                            // Create new namespace.
-                                            Properties space = new Properties(stream, name, value, parentID, this);
-                                            mNamespaces.Add(space);
-                                        }
-                                        else
-                                        {
-                                            // Back up from fgetc()
-                                            if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek backwards a single character after testing if the next line starts with '{'.");
-                                            }
-
-                                            // Store "name value" as a name/value pair, or even just "name".
-                                            if (value != null)
-                                            {
-                                                mProperties.Add(new Property(name, value));
-                                            }
-                                            else
-                                            {
-                                                mProperties.Add(new Property(name, ""));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        private void ReadProperties1(NullMemoryStream stream)
-        {
-            Assert.IsTrue(stream != null, "");
-
-            string line = "";
-            string variable = "";
-
-            string name;
-            string value;
-            string parentID;
-            int c;
-            int rc;
-            int rcc;
-            int rccc;
-            bool comment = false;
-
-            while (true)
-            {
-                // Stop when we have reached the end of the file.
-                if (stream.Eof())
-                {
-                    break;
-                }
-
-                // Read the next line.
-                line = stream.ReadLine();
-                if (line == null)
-                {
-                    DebugUtils.Warning("ReadProperties", "Error reading line from file.");
-                    return;
-                }
-                line = line.Trim();
-                // Ignore comments
-                if (comment)
-                {
-                    // Check for end of multi-line comment at either start or end of line
-                    if (line.StartsWith("/*"))
-                    {
-                        comment = false;
-                    }
-                    else
-                    {
-                        if (line.EndsWith("*/"))
+                        if (line.EndsWith("*/")) // same line
                         {
                             comment = false;
                         }
                     }
-                }
-                else
-                {
-                    if (line.StartsWith("/*"))
-                    {
-                        // Start of multi-line comment (must be at start of line)
-                        comment = true;
-                    }
                     else
                     {
-                        if (!line.StartsWith("//"))
+                        int cc = line.IndexOf("//");// get data before first '//'
+                        if (cc != -1)
+                        {
+                            line = line.Substring(0, cc);
+                        }
+                        if (!string.IsNullOrEmpty(line))
                         {
                             // If an '=' appears on this line, parse it as a name/value pair.
-                            rc = line.IndexOf("=");
+                            int rc = line.IndexOf("=");
                             if (rc != -1)
                             {
                                 // First token should be the property name.
-                                name = line.Substring(0, rc);
-                                if (name == null)
-                                {
-                                    DebugUtils.Error("ReadProperties", "Error parsing properties file: attribute without name.");
-                                    return;
-                                }
+  
+                                string[] strs = line.Split('=');
+                                string name = strs[0];
                                 // Remove white-space from name.
                                 name = name.Trim();
                                 // Scan for next token, the property's value.
-                                value = line.Substring(rc + 1);
-                                if (value == null || string.IsNullOrEmpty(value.Trim()))
-                                {
-                                    DebugUtils.Error("ReadProperties", "Error parsing properties file: attribute with name ('%s') but no value.", name);
-                                    return;
-                                }
+                                string value = strs[1];
                                 // Remove white-space from value.
                                 value = value.Trim();
-
                                 // Is this a variable assignment?
+                                string variable = "";
                                 if (IsVariable(name, ref variable))
                                 {
                                     SetVariable(variable, value);
@@ -1210,157 +940,80 @@ namespace Nullspace
                             }
                             else
                             {
-                                parentID = null;
-                                // Get the last character on the line (ignoring whitespace).
-                                int lineEnd = line.Length - 1;
-
                                 // This line might begin or end a namespace,
                                 // or it might be a key/value pair without '='.
 
                                 // Check for '{' on same line.
                                 rc = line.IndexOf("{");
-                                // Check for inheritance: ':'
-                                rcc = line.IndexOf(":");
-                                // Check for '}' on same line.
-                                rccc = line.IndexOf("}");
-                                // Get the name of the namespace.
-                                string[] strs = line.Split(new char[] { ' ', '\t', '\n', '{' });
-                                if (strs.Length == 0)
+                                if (rc != -1)
                                 {
-                                    DebugUtils.Error("ReadProperties", "Error parsing properties file: failed to determine a valid token for line '%s'.", line);
-                                    return;
-                                }
-                                else
-                                {
-                                    name = strs[0].Trim();
-                                    if (name[0] == '}')
+                                    if (line.Length > 1)
                                     {
-                                        // End of namespace.
+                                        DebugUtils.Error("ReadProperties", "Error parsing this line should be only '{' : " + line);
                                         return;
                                     }
                                 }
-                                line = line.Remove(0, strs[0].Length);
-                                // Get its ID if it has one.
-                                strs = line.Split(new char[] { ':', '{' });
-                                value = (strs.Length > 0) ? strs[0].Trim() : null;
-                                // Get its parent ID if it has one.
+
+                                // Check for '}' on same line.
+                                int rcc = line.IndexOf("}");
                                 if (rcc != -1)
                                 {
-                                    line = line.Remove(0, strs[0].Length);
-                                    strs = line.Split(new char[] { '{' });
-                                    parentID = (strs.Length > 0) ? strs[0].Trim() : null;
+                                    if (line.Length > 1)
+                                    {
+                                        DebugUtils.Error("ReadProperties", "Error parsing this line should be only '}' : " + line);
+                                        return;
+                                    }
+                                    // End of namespace.
+                                    return;
                                 }
 
-                                if (value != null && value[0] == '{')
+                                if (rc != -1)
                                 {
-                                    // If the namespace ends on this line, seek back to right before the '}' character.
-                                    if (rccc != -1 && rccc == lineEnd)
+                                    if (string.IsNullOrEmpty(namesp))
                                     {
-                                        if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                        {
-                                            DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                            return;
-                                        }
-                                        while (ReadChar(stream) != '}')
-                                        {
-                                            if (stream.Seek(-2, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                return;
-                                            }
-                                        }
-                                        if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                        {
-                                            DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                            return;
-                                        }
+                                        DebugUtils.Error("ReadProperties", "Error parsing  namespace");
+                                        return;
                                     }
-
                                     // New namespace without an ID.
-                                    Properties space = new Properties(stream, name, null, parentID, this);
+                                    Properties space = new Properties(stream, namesp, id, parentID, this);
                                     mNamespaces.Add(space);
-
-                                    // If the namespace ends on this line, seek to right after the '}' character.
-                                    if (rccc != -1 && rccc == lineEnd)
-                                    {
-                                        if (stream.Seek(1, SeekOrigin.Current) < 0)
-                                        {
-                                            DebugUtils.Error("ReadProperties", "Failed to seek to immediately after a '}' character in properties file.");
-                                            return;
-                                        }
-                                    }
+                                    // 重置
+                                    namesp = null;
+                                    id = null;
+                                    parentID = null;
                                 }
                                 else
                                 {
-                                    // If '{' appears on the same line.
-                                    if (rc != -1)
+                                    if (namesp != null)
                                     {
-                                        // If the namespace ends on this line, seek back to right before the '}' character.
-                                        if (rccc != -1 && rccc == lineEnd)
-                                        {
-                                            if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                return;
-                                            }
-                                            while (ReadChar(stream) != '}')
-                                            {
-                                                if (stream.Seek(-2, SeekOrigin.Current) < 0)
-                                                {
-                                                    DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                    return;
-                                                }
-                                            }
-                                            if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek back to before a '}' character in properties file.");
-                                                return;
-                                            }
-                                        }
-
-                                        // Create new namespace.
-                                        Properties space = new Properties(stream, name, value, parentID, this);
-                                        mNamespaces.Add(space);
-
-                                        // If the namespace ends on this line, seek to right after the '}' character.
-                                        if (rccc != -1 && rccc == lineEnd)
-                                        {
-                                            if (stream.Seek(1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek to immediately after a '}' character in properties file.");
-                                                return;
-                                            }
-                                        }
+                                        mProperties.Add(new Property(namesp, id == null ? "" : id));
                                     }
-                                    else
-                                    {
-                                        // Find out if the next line starts with "{"
-                                        SkipWhiteSpace(stream);
-                                        c = ReadChar(stream);
-                                        if (c == '{')
-                                        {
-                                            // Create new namespace.
-                                            Properties space = new Properties(stream, name, value, parentID, this);
-                                            mNamespaces.Add(space);
-                                        }
-                                        else
-                                        {
-                                            // Back up from fgetc()
-                                            if (stream.Seek(-1, SeekOrigin.Current) < 0)
-                                            {
-                                                DebugUtils.Error("ReadProperties", "Failed to seek backwards a single character after testing if the next line starts with '{'.");
-                                            }
+                                    // 记录上一行的信息
+                                    namesp = null;
+                                    id = null;
+                                    parentID = null;
 
-                                            // Store "name value" as a name/value pair, or even just "name".
-                                            if (value != null)
-                                            {
-                                                mProperties.Add(new Property(name, value));
-                                            }
-                                            else
-                                            {
-                                                mProperties.Add(new Property(name, ""));
-                                            }
-                                        }
+                                    string[] strs = line.Split(new char[] { ':' });
+                                    string namevalue = strs[0].Trim();
+                                    if (strs.Length == 2)
+                                    {
+                                        parentID = strs[1].Trim();
+                                    }
+                                    namesp = StrTok(namevalue, " ");
+                                    if (namesp != null)
+                                    {
+                                        namesp = namesp.Trim();
+                                    }
+                                    if (string.IsNullOrEmpty(namesp))
+                                    {
+                                        namesp = null;
+                                        DebugUtils.Error("ReadProperties", "Error parsing this line should be not null : " + line);
+                                        return;
+                                    }
+                                    id = StrTok(null, "");
+                                    if (id != null)
+                                    {
+                                        id = id.Trim();
                                     }
                                 }
                             }
@@ -1374,7 +1027,7 @@ namespace Nullspace
         private void ResolveInheritance(string id = null)
         {
             // Namespaces can be defined like so:
-            // "name id : parentID { }"
+            // "name id : parentID "
             // This method merges data from the parent namespace into the child.
 
             // Get a top-level namespace.
