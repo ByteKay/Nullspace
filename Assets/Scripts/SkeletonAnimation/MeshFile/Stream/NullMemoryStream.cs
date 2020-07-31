@@ -15,15 +15,20 @@ namespace NullMesh
         public static NullMemoryStream ReadTextFromFile(string path)
         {
             StreamReader fileStream = new StreamReader(path, Encoding.UTF8);
-            NullMemoryStream stream = new NullMemoryStream(fileStream);
-            return stream;
+            return new NullMemoryStream(fileStream);
+        }
+
+        public static NullMemoryStream ReadTextFromString(string content)
+        {
+            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+            StreamReader strStream = new StreamReader(stream, Encoding.UTF8);
+            return new NullMemoryStream(strStream);
         }
 
         public static NullMemoryStream WriteTextFromFile(string path, bool append)
         {
             StreamWriter fileStream = new StreamWriter(path, append, Encoding.UTF8);
-            NullMemoryStream stream = new NullMemoryStream(fileStream);
-            return stream;
+            return new NullMemoryStream(fileStream);
         }
 
         public bool Eof()

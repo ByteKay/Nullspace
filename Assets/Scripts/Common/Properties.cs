@@ -25,6 +25,47 @@ namespace Nullspace
     public partial class Properties
     {
         private static Regex RegexVector = new Regex("-?\\d+\\.\\d+");
+
+
+        public static Properties CreateFromContent(string content, string urlString = null)
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                DebugUtils.Info("Create", "Attempting to create a Properties object from an empty URL!");
+                return null;
+            }
+            // Calculate the file and full namespace path from the specified url.
+            string fileString = null;
+            List<string> namespacePath = new List<string>();
+            if (urlString != null)
+            {
+                CalculateNamespacePath(ref urlString, ref fileString, namespacePath);
+            }
+            using (NullMemoryStream stream = NullMemoryStream.ReadTextFromString(content))
+            {
+                Properties properties = new Properties(stream);
+                properties.ResolveInheritance();
+                // Get the specified properties object.
+                Properties p = GetPropertiesFromNamespacePath(properties, namespacePath);
+                if (p == null)
+                {
+                    DebugUtils.Warning("Create", string.Format("Failed to load properties from url {0}.", urlString));
+                    return null;
+                }
+                if (p != properties)
+                {
+                    p = p.Clone();
+                }
+                if (fileString != null)
+                {
+                    p.SetDirectoryPath(Path.GetDirectoryName(fileString));
+                }
+                p.Rewind();
+                return p;
+            }
+        }
+
+
         public static Properties Create(string url)
         {
             if (string.IsNullOrEmpty(url))

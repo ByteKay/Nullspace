@@ -1,0 +1,4 @@
+   
+    u_inverseTransposeWorldViewMatrix = INVERSE_TRANSPOSE_WORLD_VIEW_MATRIX
+    u_worldViewProjectionMatrix = WORLD_VIEW_PROJECTION_MATRIX
+    Matrix = 1,2,3
