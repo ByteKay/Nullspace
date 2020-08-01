@@ -1,0 +1,14 @@
+<TestDatas>
+  <TestData id="0" testIds="0;1;1;2;1;0;3;1;2;2;1;1">
+    <extDatas>a:42ba8c0c0c0c0c</extDatas>
+  </TestData>
+  <TestData>
+    <name>kk</name>
+	<extDatas>a:46b38c0606060c</extDatas>
+  </TestData>
+  <TestData id="2" testIds="0;1;1;2;1;0;3;1;2;2;1;1">
+    <extDatas id="4" >
+		<name>kk2</name>
+	</extDatas>
+  </TestData>
+</TestDatas>
