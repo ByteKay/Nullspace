@@ -3,13 +3,13 @@ namespace Nullspace
 {
     public enum DataTypeEnum
     {
+        None,
         Bool,
         Byte,
         Short,
         Int,
         Long,
         Float,
-        Double,
         UShort,
         UInt,
         ULong,
@@ -19,7 +19,6 @@ namespace Nullspace
         IntList,
         LongList,
         FloatList,
-        DoubleList,
         UShortList,
         UIntList,
         ULongList

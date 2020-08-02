@@ -5,8 +5,8 @@ namespace Nullspace
     {
         c,
         s,
+        cs,
         skip,
-        cs
     }
 
 }

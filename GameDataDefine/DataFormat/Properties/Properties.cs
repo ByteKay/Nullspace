@@ -5,30 +5,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using System.Diagnostics;
-using System.Security;
 
 namespace Nullspace
 {
     public partial class Properties
     {
         private static Regex RegexVector = new Regex("-?\\d+\\.\\d+");
-
-        public static SecurityElement ConvertPropertiesToXML(Properties prop)
-        {
-            SecurityElement xml = new SecurityElement(prop.mNamespace);
-            prop.WriteProperties(xml);
-            return xml;
-        }
-
-        public static Properties CreateFromXml(SecurityElement root, string urlString = null)
-        {
-            if (root == null)
-            {
-                return null;
-            }
-            Properties properties = new Properties(root);
-            return properties;
-        }
 
         public static Properties CreateFromContent(string content, string urlString = null)
         {
@@ -236,42 +218,6 @@ namespace Nullspace
             return false;
         }
 
-        public static void SkipWhiteSpace(NullMemoryStream stream)
-        {
-            int c;
-            do
-            {
-                c = stream.Peek();
-                if (c == -1)
-                {
-                    break;
-                }
-                if (char.IsWhiteSpace((char)c))
-                {
-                    stream.Read();
-                }
-            } while (c != -1);
-        }
-
-        public static int ReadChar(NullMemoryStream stream)
-        {
-            if (stream.Eof())
-            {
-                return -1;
-            }
-            int ch = stream.Read();
-            return ch;
-        }
-
-        public static string TrimWhiteSpace(string str)
-        {
-            if (str == null)
-            {
-                return null;
-            }
-            return str.Trim();
-        }
-
         private static string Activestring = null;
         private static int Activeposition = 0;
         private static string StrTok(string stringtotokenize, string delimiters)
@@ -333,7 +279,6 @@ namespace Nullspace
         private bool mVisited;
         private int mPropertiesItr;
         private int mNamespacesItr;
-
         private class Property
         {
             public string Name;
@@ -350,7 +295,6 @@ namespace Nullspace
                 Value = other.Value;
             }
         }
-
         private Properties()
         {
             mVariables = null;
@@ -360,13 +304,11 @@ namespace Nullspace
             mProperties = new List<Property>();
             mNamespaces = new List<Properties>();
         }
-
         private Properties(NullMemoryStream stream) : this()
         {
             ReadProperties(stream);
             Rewind();
         }
-
         private Properties(Properties copy)
         {
             mNamespace = copy.mNamespace;
@@ -389,7 +331,6 @@ namespace Nullspace
             }
             Rewind();
         }
-
         private Properties(NullMemoryStream stream, string name, string id, string parentID, Properties parent) : this()
         {
             mNamespace = name;
@@ -406,11 +347,6 @@ namespace Nullspace
                 mParentID = parentID;
             }
             ReadProperties(stream);
-            Rewind();
-        }
-        private Properties (SecurityElement root) : this()
-        {
-            ReadProperties(root);
             Rewind();
         }
 
@@ -842,73 +778,6 @@ namespace Nullspace
                     mVariables = new List<Property>();
                 }
                 mVariables.Add(new Property(name, value != null ? value : ""));
-            }
-        }
-        private void WriteProperties(SecurityElement xml)
-        {
-            WriteAttributes(xml);
-            for (int i = 0; i < mNamespaces.Count; ++i)
-            {
-                Properties child =  mNamespaces[i];
-                SecurityElement xmlChild = new SecurityElement(child.mNamespace);
-                child.WriteProperties(xmlChild);
-                xml.AddChild(xmlChild);
-            }
-        }
-
-        private void WriteAttributes(SecurityElement node)
-        {
-            if (mProperties != null)
-            {
-                foreach (Property prop in mProperties)
-                {
-                    node.AddAttribute(prop.Name, prop.Value);
-                }
-            }
-        }
-
-        private void ReadProperties(SecurityElement xml)
-        {
-            mNamespace = xml.Tag;
-            mId = xml.Tag;
-            int count = xml.Children.Count;
-            ReadAttributes(xml);
-            ReadTextValue(xml);
-            for (int i = 0; i < count; ++i)
-            {
-                SecurityElement child = xml.Children[i] as SecurityElement;
-                if (child.Children == null && child.Attributes == null)
-                {
-                    // property
-                    ReadTextValue(child);
-                }
-                else
-                {
-                    // namespace
-                    Properties childProp = new Properties(child);
-                    mNamespaces.Add(childProp);
-                }
-            }
-        }
-
-        private void ReadTextValue(SecurityElement node)
-        {
-            if (!string.IsNullOrEmpty(node.Text))
-            {
-                string value = node.Text.Trim();
-                mProperties.Add(new Property(node.Tag, value));
-            }
-        }
-
-        private void ReadAttributes(SecurityElement node)
-        {
-            if (node.Attributes != null)
-            {
-                foreach (string key in node.Attributes.Keys)
-                {
-                    string value = node.Attributes[key].ToString();
-                    mProperties.Add(new Property(key, value));
-                }
             }
         }
 

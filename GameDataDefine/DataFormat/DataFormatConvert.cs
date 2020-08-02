@@ -46,5 +46,20 @@ namespace Nullspace
             Properties prop = Properties.Create(filePath);
             return Properties.ConvertPropertiesToXML(prop);
         }
+
+        public static Properties ConvertXlsxToProperties(Xlsx excel)
+        {
+            return Properties.CreateFromXlsx(excel);
+        }
+
+        public static void ExportXlsxDir(string dir, bool recursive = true)
+        {
+
+        }
+
+        public static void ExportXlsxFile(string file)
+        {
+
+        }
     }
 }
