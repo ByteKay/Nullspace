@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="DataFileTypeEnum.cs" />
     <Compile Include="DataFormat\Properties.cs" />
-    <Compile Include="DataFormat\XMLConvertToProperties.cs" />
+    <Compile Include="DataFormat\DataFormatConvert.cs" />
     <Compile Include="DataFormat\XML\MiniParser.cs" />
     <Compile Include="DataFormat\XML\SecurityParser.cs" />
     <Compile Include="DataFormat\XML\SmallXmlParser.cs" />

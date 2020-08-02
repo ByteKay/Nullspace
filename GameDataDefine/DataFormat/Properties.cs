@@ -13,6 +13,13 @@ namespace Nullspace
     {
         private static Regex RegexVector = new Regex("-?\\d+\\.\\d+");
 
+        public static SecurityElement ConvertPropertiesToXML(Properties prop)
+        {
+            SecurityElement xml = new SecurityElement(prop.mNamespace);
+            prop.WriteProperties(xml);
+            return xml;
+        }
+
         public static Properties CreateFromXml(SecurityElement root, string urlString = null)
         {
             if (root == null)
@@ -835,6 +842,28 @@ namespace Nullspace
                     mVariables = new List<Property>();
                 }
                 mVariables.Add(new Property(name, value != null ? value : ""));
+            }
+        }
+        private void WriteProperties(SecurityElement xml)
+        {
+            WriteAttributes(xml);
+            for (int i = 0; i < mNamespaces.Count; ++i)
+            {
+                Properties child =  mNamespaces[i];
+                SecurityElement xmlChild = new SecurityElement(child.mNamespace);
+                child.WriteProperties(xmlChild);
+                xml.AddChild(xmlChild);
+            }
+        }
+
+        private void WriteAttributes(SecurityElement node)
+        {
+            if (mProperties != null)
+            {
+                foreach (Property prop in mProperties)
+                {
+                    node.AddAttribute(prop.Name, prop.Value);
+                }
             }
         }
 
