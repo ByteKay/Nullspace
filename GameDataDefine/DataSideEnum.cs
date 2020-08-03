@@ -3,10 +3,10 @@ namespace Nullspace
 {
     public enum DataSideEnum
     {
-        c,
-        s,
-        cs,
-        skip,
+        C,
+        S,
+        CS,
+        SKIP,
     }
 
 }

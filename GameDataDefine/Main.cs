@@ -10,6 +10,11 @@ namespace Nullspace
     {
         public static void Main(string[] argvs)
         {
+            TestXlsx();
+        }
+
+        private static void TestXmlAndProperties()
+        {
             string filePath = "test_data.xml";
             Properties prop = DataFormatConvert.ConvertXMLToPropertiesFromFile(filePath);
             StringBuilder sb = new StringBuilder();
@@ -20,7 +25,17 @@ namespace Nullspace
             // 格式化
             XElement element = XElement.Parse(root.ToString());
             File.WriteAllText("properties_2_xml.xml", element.ToString());
+        }
 
+        private static void TestXlsx()
+        {
+            string filePath = "test.xlsx";
+            Xlsx xlsx = Xlsx.Create(filePath);
+            Properties prop = Properties.CreateFromXlsx(xlsx);
+            SecurityElement root = Properties.ConvertPropertiesToXML(prop);
+            // 格式化
+            XElement element = XElement.Parse(root.ToString());
+            File.WriteAllText("xlsx_2_properties_2_xml.xml", element.ToString());
         }
     }
 }

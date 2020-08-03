@@ -47,7 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataFileTypeEnum.cs" />
-    <Compile Include="DataFormat\Properties.cs" />
+    <Compile Include="DataFormat\Properties\Properties.cs" />
+    <Compile Include="DataFormat\Properties\PropertiesXlsx.cs" />
+    <Compile Include="DataFormat\Properties\PropertiesXML.cs" />
     <Compile Include="DataFormat\DataFormatConvert.cs" />
     <Compile Include="DataFormat\XML\MiniParser.cs" />
     <Compile Include="DataFormat\XML\SecurityParser.cs" />
@@ -55,7 +57,10 @@
     <Compile Include="DataSideEnum.cs" />
     <Compile Include="DataTypeEnum.cs" />
     <Compile Include="EnumUtils.cs" />
-    <Compile Include="Excel\XlsxConvert.cs" />
+    <Compile Include="Excel\IExportCSharp.cs" />
+	<Compile Include="Excel\Xlsx.cs" />
+	<Compile Include="Excel\XlsxRow.cs" />
+	<Compile Include="Excel\XlsxSheet.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataFormat\Stream\INullStream.cs" />

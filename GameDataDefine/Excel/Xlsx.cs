@@ -26,7 +26,8 @@ namespace Nullspace
                         while (enumerator.MoveNext())
                         {
                             ExcelWorksheet tDS = enumerator.Current;
-                            excel.AddSeet(XlsxSheet.Create(tDS, excel));
+                            XlsxSheet sheet = XlsxSheet.Create(tDS, excel);
+                            excel.AddSeet(sheet);
                         }
                     }
                 }
