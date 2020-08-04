@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
-using UnityEngine;
 using System.Diagnostics;
 
 namespace Nullspace
 {
     public partial class Properties
     {
-        private static Regex RegexVector = new Regex("-?\\d+\\.\\d+");
-
         public static Properties CreateFromContent(string content, string urlString = null)
         {
             if (string.IsNullOrEmpty(content))
@@ -49,7 +45,6 @@ namespace Nullspace
                 return p;
             }
         }
-
         public static Properties Create(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -64,7 +59,6 @@ namespace Nullspace
             CalculateNamespacePath(ref urlString, ref fileString, namespacePath);
             return CreateFromContent(File.ReadAllText(fileString), url);
         }
-
         public static void CalculateNamespacePath(ref string urlString, ref string fileString, List<string> namespacePath)
         {
             int loc = urlString.IndexOf("#");
@@ -84,7 +78,6 @@ namespace Nullspace
                 fileString = urlString;
             }
         }
-
         public static Properties GetPropertiesFromNamespacePath(Properties properties, List<string> namespacePath)
         {
             if (namespacePath.Count > 0)
@@ -124,89 +117,6 @@ namespace Nullspace
             }
             return properties;
         }
-
-        public static bool ParseVector2(string str, out Vector2 v)
-        {
-            v = Vector2.zero;
-            MatchCollection collection = MatchVector(str);
-            if (collection.Count == 2)
-            {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ParseVector3(string str, out Vector3 v)
-        {
-            v = Vector3.zero;
-            MatchCollection collection = MatchVector(str);
-            if (collection.Count == 3)
-            {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
-                v.z = float.Parse(collection[2].Value);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ParseVector4(string str, out Vector4 v)
-        {
-            v = Vector4.zero;
-            MatchCollection collection = MatchVector(str);
-            if (collection.Count == 4)
-            {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
-                v.z = float.Parse(collection[2].Value);
-                v.w = float.Parse(collection[3].Value);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ParseAxisAngle(string str, out Quaternion v)
-        {
-            v = Quaternion.identity;
-            float angle;
-            if (float.TryParse(str, out angle))
-            {
-                v = Quaternion.AngleAxis(angle, Vector3.up);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ParseColor(string str, out Color v)
-        {
-            v = Color.black;
-            MatchCollection collection = MatchVector(str);
-            if (collection.Count == 3)
-            {
-                v.r = float.Parse(collection[0].Value);
-                v.g = float.Parse(collection[1].Value);
-                v.b = float.Parse(collection[2].Value);
-                v.a = 1;
-                return true;
-            }
-            if (collection.Count == 4)
-            {
-                v.r = float.Parse(collection[0].Value);
-                v.g = float.Parse(collection[1].Value);
-                v.b = float.Parse(collection[2].Value);
-                v.a = float.Parse(collection[3].Value);
-                return true;
-            }
-            return false;
-        }
-
-        public static MatchCollection MatchVector(string inputString)
-        {
-            return RegexVector.Matches(inputString);
-        }
-
         public static bool IsVariable(string str, ref string outName)
         {
             int len = str.Length;
@@ -217,7 +127,6 @@ namespace Nullspace
             }
             return false;
         }
-
         private static string Activestring = null;
         private static int Activeposition = 0;
         private static string StrTok(string stringtotokenize, string delimiters)
@@ -350,6 +259,8 @@ namespace Nullspace
             Rewind();
         }
 
+        private Properties Parent { get { return mParent; } }
+
         // Clones the Properties object.
         private Properties Clone()
         {
@@ -467,7 +378,29 @@ namespace Nullspace
             }
             return null;
         }
+        public void GetNamespaces(string id, ref List<Properties> allList, bool searchNames = false, bool recurse = true)
+        {
+            Debug.Assert(id != null, "");
 
+            for (int i = 0; i < mNamespaces.Count; ++i)
+            {
+                Properties p = mNamespaces[i];
+                if (id.Equals(searchNames ? p.mNamespace : p.mId))
+                {
+                    allList.Add(p);
+                }
+
+                if (recurse)
+                {
+                    // Search recursively.
+                    p = p.GetNamespace(id, searchNames, true);
+                    if (p != null)
+                    {
+                        allList.Add(p);
+                    }
+                }
+            }
+        }
         public string GetNamespace()
         {
             return mNamespace;
@@ -621,63 +554,6 @@ namespace Nullspace
             }
 
             return 0;
-        }
-
-        public bool GetMatrix(string name, out Matrix4x4 v)
-        {
-            string valueString = GetString(name);
-            v = Matrix4x4.zero;
-            if (valueString != null)
-            {
-                MatchCollection mc = MatchVector(valueString);
-                if (mc.Count == 16)
-                {
-                    v.m00 = float.Parse(mc[0].Value);
-                    v.m01 = float.Parse(mc[1].Value);
-                    v.m02 = float.Parse(mc[2].Value);
-                    v.m03 = float.Parse(mc[3].Value);
-                    v.m10 = float.Parse(mc[4].Value);
-                    v.m11 = float.Parse(mc[5].Value);
-                    v.m12 = float.Parse(mc[6].Value);
-                    v.m13 = float.Parse(mc[7].Value);
-                    v.m20 = float.Parse(mc[8].Value);
-                    v.m21 = float.Parse(mc[9].Value);
-                    v.m22 = float.Parse(mc[10].Value);
-                    v.m23 = float.Parse(mc[11].Value);
-                    v.m30 = float.Parse(mc[12].Value);
-                    v.m31 = float.Parse(mc[13].Value);
-                    v.m32 = float.Parse(mc[14].Value);
-                    v.m33 = float.Parse(mc[15].Value);
-                    return true;
-                }
-                Debug.Assert(false, string.Format("Error attempting to parse property {0} as an Matrix4x4.", name));
-            }
-            return false;
-        }
-
-        public bool GetVector2(string name, out Vector2 v)
-        {
-            return ParseVector2(GetString(name), out v);
-        }
-
-        public bool GetVector3(string name, out Vector3 v)
-        {
-            return ParseVector3(GetString(name), out v);
-        }
-
-        public bool GetVector4(string name, out Vector4 v)
-        {
-            return ParseVector4(GetString(name), out v);
-        }
-
-        public bool GetQuaternionFromAxisAngle(string name, out Quaternion v)
-        {
-            return ParseAxisAngle(GetString(name), out v);
-        }
-
-        public bool GetColor(string name, out Color v)
-        {
-            return ParseColor(GetString(name), out v);
         }
 
         public bool GetPath(string name, string path)

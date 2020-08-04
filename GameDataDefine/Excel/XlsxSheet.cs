@@ -9,11 +9,12 @@ namespace Nullspace
     public class XlsxSheet : IExportCSharp
     {
         private const string SKIP_ROW = "(#SKIP)";
-        private const int VARIABLE_NAME_ROW = 0;
-        private const int VARIABLE_TYPE_ROW = 1;
-        private const int VARIABLE_SIDE_ROW = 2;
-        private const int VARIABLE_DESCRIPTION_ROW = 3;
-        private const int VALUE_START_ROW = 4;
+        private const int SHEET_DATA_MANAGER = 0;
+        private const int VARIABLE_NAME_ROW = 1;
+        private const int VARIABLE_TYPE_ROW = 2;
+        private const int VARIABLE_SIDE_ROW = 3;
+        private const int VARIABLE_DESCRIPTION_ROW = 4;
+        private const int VALUE_START_ROW = 5;
 
         public static XlsxSheet Create(ExcelWorksheet tDS, Xlsx parent)
         {
@@ -21,15 +22,21 @@ namespace Nullspace
             List<string> variableNames;
             List<DataTypeEnum> variableTypes;
             List<DataSideEnum> variableSides;
-            List<XlsxRow> datas = CleanRowAndCols(tDS, sheet, out variableNames, out variableTypes, out variableSides);
-            sheet.Set(variableNames, variableTypes, variableSides, datas);
-            return sheet;
+            Dictionary<string, string> sheetAttribute;
+            List<XlsxRow> datas = CleanRowAndCols(tDS, sheet, out sheetAttribute, out variableNames, out variableTypes, out variableSides);
+            if (datas != null)
+            {
+                sheet.Set(sheetAttribute, variableNames, variableTypes, variableSides, datas);
+                return sheet;
+            }
+            return null;
         }
-        private static List<XlsxRow> CleanRowAndCols(ExcelWorksheet tDS, XlsxSheet sheet, out List<string> variableNames, out List<DataTypeEnum> variableTypes, out List<DataSideEnum> variableSides)
+        private static List<XlsxRow> CleanRowAndCols(ExcelWorksheet tDS, XlsxSheet sheet, out Dictionary<string, string> sheetAttribute, out List<string> variableNames, out List<DataTypeEnum> variableTypes, out List<DataSideEnum> variableSides)
         {
             variableNames = new List<string>();
             variableTypes = new List<DataTypeEnum>();
             variableSides = new List<DataSideEnum>();
+            sheetAttribute = null;
 
             ExcelRange range = tDS.Cells;
             object[,] values = (object[,])range.Value;
@@ -37,6 +44,14 @@ namespace Nullspace
             int cols = values.GetLength(1);
             HashSet<int> skipCols = new HashSet<int>();
             HashSet<int> skipRows = new HashSet<int>();
+            if (rows > 0 && cols > 0)
+            {
+                bool isTrue = GameDataUtils.ParseMap((string)values[SHEET_DATA_MANAGER, 0], out sheetAttribute);
+                if (!isTrue)
+                {
+                    return null;
+                }
+            }
             for (int i = 0; i < cols; ++i)
             {
                 if (values[VARIABLE_SIDE_ROW, i] == null)
@@ -108,6 +123,9 @@ namespace Nullspace
             return originalDatas;
         }
         public string SheetName { get; set; }
+        private string Manager { get; set; }
+        private bool Delay { get; set; }
+        private string Keys { get; set; }
         private List<string> mVariableNames { get; set; }
         private List<DataTypeEnum> mVariableTypes { get; set; }
         private List<DataSideEnum> mVariableSides { get; set; }
@@ -120,12 +138,13 @@ namespace Nullspace
             Parent = parent;
             SheetName = sheetName;
         }
-        private void Set(List<string> variableNames, List<DataTypeEnum> variableTypes, List<DataSideEnum> variableSides, List<XlsxRow> datas)
+        private void Set(Dictionary<string, string> sheetAttribute, List<string> variableNames, List<DataTypeEnum> variableTypes, List<DataSideEnum> variableSides, List<XlsxRow> datas)
         {
             mVariableNames = variableNames;
             mVariableTypes = variableTypes;
             mVariableSides = variableSides;
             mDatas = datas;
+            ParseSheetAttribute(sheetAttribute);
             SplitCS();
         }
         private void SplitCS()
@@ -187,19 +206,81 @@ namespace Nullspace
                     throw new Exception("wrong");
             }
         }
-
         public void ExportCSharp(StringBuilder builder)
         {
             ExportCSharp(builder, DataSideEnum.C);
+        }
+
+        private string GetKeyNames()
+        {
+            if (!string.IsNullOrEmpty(Keys))
+            {
+                List<string> keys = new List<string>(Keys.Split('#'));
+                string v = "new List<string>(){";
+                foreach (string key in keys)
+                {
+                    v += string.Format(" \"{0}\",", key);
+                }
+                v = v.Substring(0, v.Length - 1);
+                v += " }";
+                return v;
+            }
+            return null;
+        }
+
+        private string GetDataManager()
+        {
+            GameDataManagerType type = GameDataManagerType.LIST;
+            if (Manager != null)
+            {
+                type = EnumUtils.StringToEnum<GameDataManagerType>(Manager.ToUpper());
+            }
+            switch (type)
+            {
+                case GameDataManagerType.LIST:
+                    return "GameDataList";
+                case GameDataManagerType.ONE_MAP:
+                    return "GameDataOneMap";
+                case GameDataManagerType.TWO_MAP:
+                    return "GameDataTwoMap";
+                case GameDataManagerType.GROUP_MAP:
+                    return "GameDataGroupMap";
+            }
+            return "GameDataList";
+        }
+
+        private void ParseSheetAttribute(Dictionary<string, string> data)
+        {
+            Keys = null;
+            Delay = true;
+            Manager = null;
+            if (data.ContainsKey("keys"))
+            {
+                Keys = data["keys"];
+            }
+            if (data.ContainsKey("delay"))
+            {
+                bool b;
+                if (bool.TryParse(data["delay"], out b))
+                {
+                    Delay = b;
+                }
+            }
+            if (data.ContainsKey("manager"))
+            {
+                Manager = data["manager"];
+            }
         }
 
         public void ExportCSharp(StringBuilder builder, DataSideEnum side)
         {
             string tab = "    ";
             string doubleTab = tab + tab;
-            builder.Append(tab).Append("[GameData(\"").Append(SheetName + "\"]").AppendLine();
-            builder.Append(tab).Append("public class ").Append(SheetName).Append(" : XmlData<").Append(SheetName).Append(">").Append(", INullStream").AppendLine();
+            builder.Append(tab).Append(string.Format("public class {0} : {1}<{2}>, INullStream", SheetName, GetDataManager(), SheetName)).AppendLine();
             builder.Append(tab).AppendLine("{");
+            builder.Append(doubleTab).Append(string.Format("protected static string FileUrl = \"{0}#{1}\";", Parent.FileName, SheetName)).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("protected static bool IsDelayInitialized = {0};", Delay.ToString().ToLower())).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("protected static List<string> KeyNameList = {0};", GetKeyNames())).AppendLine();
 
             string dataTypeString = "";
             string readString = "";
@@ -212,7 +293,7 @@ namespace Nullspace
             {
                 DataTypeEnum dt = mVariableTypes[cols[i]];
                 GetType(dt, ref dataTypeString, ref readString, ref writeString);
-                builder.Append(doubleTab).Append(string.Format("public {0} {1 }{ get; set; }", dataTypeString, mVariableNames[cols[i]])).AppendLine();
+                builder.Append(doubleTab).Append(string.Format("public {0} {1} ", dataTypeString, mVariableNames[cols[i]])).Append("{ get; set; }").AppendLine();
 
                 // List 需要初始化
                 if (dt > DataTypeEnum.LIST)
@@ -236,11 +317,11 @@ namespace Nullspace
 
             builder.Append(doubleTab).Append("public int SaveToStream(NullMemoryStream stream)").AppendLine();
             builder.Append(doubleTab).Append("{").AppendLine();
-            builder.Append(doubleTab).Append(tab).Append("int size = stream.WriteInt(id);").AppendLine();
+            builder.Append(doubleTab).Append(tab).Append("int size = 0;").AppendLine();
             for (int i = 0; i < count; ++i)
             {
                 GetType(mVariableTypes[cols[i]], ref dataTypeString, ref readString, ref writeString);
-                builder.Append(doubleTab).Append(tab).Append(string.Format("size += {0}({1})", readString, mVariableNames[cols[i]])).AppendLine();
+                builder.Append(doubleTab).Append(tab).Append(string.Format("size += GameDataUtils.{0}(stream, {1})", writeString, mVariableNames[cols[i]])).AppendLine();
             }
             builder.Append(doubleTab).Append(tab).Append("return size;").AppendLine();
             builder.Append(doubleTab).Append("}").AppendLine();
@@ -248,19 +329,16 @@ namespace Nullspace
             builder.AppendLine();
             builder.Append(doubleTab).Append("public bool LoadFromStream(NullMemoryStream stream)").AppendLine();
             builder.Append(doubleTab).Append("{").AppendLine();
-            builder.Append(doubleTab).Append(tab).Append("bool res = stream.ReadInt(out id);").AppendLine();
+            builder.Append(doubleTab).Append(tab).Append("bool res = true;").AppendLine();
             for (int i = 0; i < count; ++i)
             {
                 GetType(mVariableTypes[cols[i]], ref dataTypeString, ref readString, ref writeString);
-                builder.Append(doubleTab).Append(tab).Append(string.Format("res &= {0}({1})", writeString, mVariableNames[cols[i]])).AppendLine();
+                builder.Append(doubleTab).Append(tab).Append(string.Format("res &= GameDataUtils.{0}(stream, out {1})", readString, mVariableNames[cols[i]])).AppendLine();
             }
             builder.Append(doubleTab).Append(tab).Append("return res;").AppendLine();
             builder.Append(doubleTab).Append("}").AppendLine();
             builder.Append(tab).Append("}").AppendLine();
         }
-
-
-
         public static void GetType(DataTypeEnum dt, ref string dataTypeString, ref string readString, ref string writeString)
         {
             switch (dt)

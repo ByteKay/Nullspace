@@ -11,13 +11,14 @@ namespace Nullspace
     {
         public static Xlsx Create(string filePath)
         {
-            string name = Path.GetFileName(filePath);
-            Xlsx excel = new Xlsx(name);
             FileInfo newFile = new FileInfo(filePath);
             using (ExcelPackage pck = new ExcelPackage(newFile))
             {
                 try
                 {
+                    string name = Path.GetFileNameWithoutExtension(filePath);
+                    name = name.Substring(0, 1).ToUpper() + name.Substring(1);
+                    Xlsx excel = new Xlsx(name);
                     ExcelWorkbook workBook = pck.Workbook;
                     if (workBook != null)
                     {
@@ -30,13 +31,13 @@ namespace Nullspace
                             excel.AddSeet(sheet);
                         }
                     }
+                    return excel;
                 }
                 catch (Exception e)
                 {
                     throw e;
                 }
             }
-            return excel;
         }
 
         private List<XlsxSheet> mSheets;
@@ -53,13 +54,14 @@ namespace Nullspace
 
         public string FileName { get; set; }
 
-        public void ExportCSharp(StringBuilder sb)
+        public void ExportCSharp(StringBuilder builder)
         {
-            StringBuilder builder = new StringBuilder();
             builder.AppendLine("using System;");
             builder.AppendLine("using System.Collections.Generic;");
             builder.AppendLine("using System.Text;");
-            builder.AppendLine("namespace Nullspace");
+            builder.AppendLine("using Nullspace;");
+            builder.AppendLine("using UnityEngine;");
+            builder.AppendLine("namespace GameData");
             builder.AppendLine("{");
             foreach (XlsxSheet sheet in this)
             {

@@ -10,9 +10,9 @@ namespace Nullspace
     {
         public static void Main(string[] argvs)
         {
-            TestXlsx();
+            DataFormatConvert.ExportXlsx("config.txt");
         }
-
+        
         private static void TestXmlAndProperties()
         {
             string filePath = "test_data.xml";
@@ -31,6 +31,10 @@ namespace Nullspace
         {
             string filePath = "test.xlsx";
             Xlsx xlsx = Xlsx.Create(filePath);
+            StringBuilder sb = new StringBuilder();
+            xlsx.ExportCSharp(sb);
+            File.WriteAllText(string.Format("GameData/{0}.cs", xlsx.FileName), sb.ToString());
+
             Properties prop = Properties.CreateFromXlsx(xlsx);
             SecurityElement root = Properties.ConvertPropertiesToXML(prop);
             // 格式化
