@@ -276,7 +276,13 @@ namespace Nullspace
         {
             string tab = "    ";
             string doubleTab = tab + tab;
-            builder.Append(tab).Append(string.Format("public class {0} : {1}<{2}>, INullStream", SheetName, GetDataManager(), SheetName)).AppendLine();
+            builder.Append(tab).Append(string.Format("public class {0} : {1}<{2}>", SheetName, GetDataManager(), SheetName));
+            bool export_nullstream = DataFormatConvert.Config.GetBool("export_nullstream", false);
+            if (export_nullstream)
+            {
+                builder.Append(", INullStream");
+            }
+            builder.AppendLine();
             builder.Append(tab).AppendLine("{");
             builder.Append(doubleTab).Append(string.Format("protected static string FileUrl = \"{0}#{1}\";", Parent.FileName, SheetName)).AppendLine();
             builder.Append(doubleTab).Append(string.Format("protected static bool IsDelayInitialized = {0};", Delay.ToString().ToLower())).AppendLine();
@@ -303,7 +309,6 @@ namespace Nullspace
                 }
             }
             builder.AppendLine();
-
             if (listNames.Count > 0)
             {
                 builder.Append(doubleTab).Append(string.Format("public {0}()", SheetName)).AppendLine();
@@ -314,29 +319,32 @@ namespace Nullspace
                 }
                 builder.Append(doubleTab).Append("}").AppendLine();
             }
-
-            builder.Append(doubleTab).Append("public int SaveToStream(NullMemoryStream stream)").AppendLine();
-            builder.Append(doubleTab).Append("{").AppendLine();
-            builder.Append(doubleTab).Append(tab).Append("int size = 0;").AppendLine();
-            for (int i = 0; i < count; ++i)
+            if (export_nullstream)
             {
-                GetType(mVariableTypes[cols[i]], ref dataTypeString, ref readString, ref writeString);
-                builder.Append(doubleTab).Append(tab).Append(string.Format("size += GameDataUtils.{0}(stream, {1})", writeString, mVariableNames[cols[i]])).AppendLine();
-            }
-            builder.Append(doubleTab).Append(tab).Append("return size;").AppendLine();
-            builder.Append(doubleTab).Append("}").AppendLine();
+                builder.Append(doubleTab).Append("public int SaveToStream(NullMemoryStream stream)").AppendLine();
+                builder.Append(doubleTab).Append("{").AppendLine();
+                builder.Append(doubleTab).Append(tab).Append("int size = 0;").AppendLine();
+                for (int i = 0; i < count; ++i)
+                {
+                    GetType(mVariableTypes[cols[i]], ref dataTypeString, ref readString, ref writeString);
+                    builder.Append(doubleTab).Append(tab).Append(string.Format("size += GameDataUtils.{0}(stream, {1})", writeString, mVariableNames[cols[i]])).AppendLine();
+                }
+                builder.Append(doubleTab).Append(tab).Append("return size;").AppendLine();
+                builder.Append(doubleTab).Append("}").AppendLine();
 
-            builder.AppendLine();
-            builder.Append(doubleTab).Append("public bool LoadFromStream(NullMemoryStream stream)").AppendLine();
-            builder.Append(doubleTab).Append("{").AppendLine();
-            builder.Append(doubleTab).Append(tab).Append("bool res = true;").AppendLine();
-            for (int i = 0; i < count; ++i)
-            {
-                GetType(mVariableTypes[cols[i]], ref dataTypeString, ref readString, ref writeString);
-                builder.Append(doubleTab).Append(tab).Append(string.Format("res &= GameDataUtils.{0}(stream, out {1})", readString, mVariableNames[cols[i]])).AppendLine();
+                builder.AppendLine();
+                builder.Append(doubleTab).Append("public bool LoadFromStream(NullMemoryStream stream)").AppendLine();
+                builder.Append(doubleTab).Append("{").AppendLine();
+                builder.Append(doubleTab).Append(tab).Append("bool res = true;").AppendLine();
+                for (int i = 0; i < count; ++i)
+                {
+                    GetType(mVariableTypes[cols[i]], ref dataTypeString, ref readString, ref writeString);
+                    builder.Append(doubleTab).Append(tab).Append(string.Format("res &= GameDataUtils.{0}(stream, out {1})", readString, mVariableNames[cols[i]])).AppendLine();
+                }
+                builder.Append(doubleTab).Append(tab).Append("return res;").AppendLine();
+                builder.Append(doubleTab).Append("}").AppendLine();
             }
-            builder.Append(doubleTab).Append(tab).Append("return res;").AppendLine();
-            builder.Append(doubleTab).Append("}").AppendLine();
+
             builder.Append(tab).Append("}").AppendLine();
         }
         public static void GetType(DataTypeEnum dt, ref string dataTypeString, ref string readString, ref string writeString)

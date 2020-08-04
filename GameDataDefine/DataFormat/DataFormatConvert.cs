@@ -82,10 +82,12 @@ namespace Nullspace
         public static void ExportXlsxFile(string filePath)
         {
             Xlsx xlsx = Xlsx.Create(filePath);
-            StringBuilder builder = new StringBuilder();
-            xlsx.ExportCSharp(builder);
-            File.WriteAllText(string.Format("{0}/{1}.cs", MakeDir(Config.GetString("cs_dir")), xlsx.FileName), builder.ToString());
-
+            if (Config.GetBool("export_cs", false))
+            {
+                StringBuilder builder = new StringBuilder();
+                xlsx.ExportCSharp(builder);
+                File.WriteAllText(string.Format("{0}/{1}.cs", MakeDir(Config.GetString("cs_dir")), xlsx.FileName), builder.ToString());
+            }
             Properties prop = Properties.CreateFromXlsx(xlsx);
             SecurityElement clientRoot;
             SecurityElement serverRoot;
