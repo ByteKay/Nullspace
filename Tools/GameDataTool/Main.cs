@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Nullspace
             DataFormatConvert.ExportXlsx("config.txt");
             DataFormatConvert.BuildDll();
             DataFormatConvert.CheckData();
+            Console.ReadLine();
         }
         
         private static void TestXmlAndProperties()

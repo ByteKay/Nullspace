@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -23,13 +25,18 @@ namespace Nullspace
             if (Config.GetBool("export_cs", false))
             {
                 string csDir = Config.GetString("cs_dir");
-                string batFilePath = string.Format("{0}/compile_runtime.bat", csDir);
-                StringBuilder sb = new StringBuilder();
-                sb.Append("set UnityEngine=../UnityEngine.CoreModule.dll").AppendLine();
-                sb.Append("set GameDataRuntime=../GameDataRuntime.dll").AppendLine();
-                sb.Append("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%UnityEngine% /r:%GameDataRuntime% /out:GameDataDefine.dll *.cs /recurse:*.cs").AppendLine();
-                File.WriteAllText(batFilePath, sb.ToString());
-                RunCmd(string.Format("cd /d {0} &exit", csDir) , "\"cmd.exe\" /c \"compile_runtime.bat\" &exit");
+                string refDll = Path.GetFullPath(".");
+                csDir = Path.GetFullPath(csDir);
+                List<string> cmdList = new List<string>()
+                {
+                    string.Format("cd /d {0}", csDir),
+                    string.Format("set UnityEngine={0}/UnityEngine.CoreModule.dll", refDll),
+                    string.Format("set GameDataRuntime={0}/GameDataRuntime.dll", refDll),
+                    string.Format("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%UnityEngine% /r:%GameDataRuntime% /out:{0}/GameDataDefine.dll *.cs /recurse:*.cs", refDll),
+                    "exit"
+                };
+                string result = RunCmd(cmdList);
+                Console.WriteLine(result);
             }
         }
 
@@ -44,9 +51,9 @@ namespace Nullspace
         /// </summary>
         /// <param name="cmdExe">指定应用程序的完整路径</param>
         /// <param name="cmdStr">执行命令行参数</param>
-        private static bool RunCmd(string cdDir, string cmdStr)
+        private static string RunCmd(List<string> cmdList)
         {
-            bool result = false;
+            string result = null;
             try
             {
                 using (Process myPro = new Process())
@@ -59,11 +66,12 @@ namespace Nullspace
                     myPro.StartInfo.CreateNoWindow = true;
                     myPro.Start();
                     myPro.StandardInput.AutoFlush = true;
-                    myPro.StandardInput.WriteLine(cdDir);
+                    for (int i = 0; i < cmdList.Count; ++i)
+                    {
+                        myPro.StandardInput.WriteLine(cmdList[i]);
+                    }
+                    result = myPro.StandardOutput.ReadToEnd();
                     myPro.WaitForExit();
-                    myPro.StandardInput.WriteLine(cmdStr);
-                    myPro.WaitForExit();
-                    result = true;
                 }
             }
             catch
