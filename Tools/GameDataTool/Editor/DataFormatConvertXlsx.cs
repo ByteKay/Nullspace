@@ -20,7 +20,17 @@ namespace Nullspace
 
         public static void BuildDll()
         {
-            
+            if (Config.GetBool("export_cs", false))
+            {
+                string csDir = Config.GetString("cs_dir");
+                string batFilePath = string.Format("{0}/compile_runtime.bat", csDir);
+                StringBuilder sb = new StringBuilder();
+                sb.Append("set UnityEngine=../UnityEngine.CoreModule.dll").AppendLine();
+                sb.Append("set GameDataRuntime=../GameDataRuntime.dll").AppendLine();
+                sb.Append("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%UnityEngine% /r:%GameDataRuntime% /out:GameDataDefine.dll *.cs /recurse:*.cs").AppendLine();
+                File.WriteAllText(batFilePath, sb.ToString());
+                RunCmd(string.Format("cd /d {0} &exit", csDir) , "\"cmd.exe\" /c \"compile_runtime.bat\" &exit");
+            }
         }
 
         public static void CheckData()
@@ -34,7 +44,7 @@ namespace Nullspace
         /// </summary>
         /// <param name="cmdExe">指定应用程序的完整路径</param>
         /// <param name="cmdStr">执行命令行参数</param>
-        private static bool RunCmd(string cmdExe, string cmdStr)
+        private static bool RunCmd(string cdDir, string cmdStr)
         {
             bool result = false;
             try
@@ -48,11 +58,10 @@ namespace Nullspace
                     myPro.StartInfo.RedirectStandardError = true;
                     myPro.StartInfo.CreateNoWindow = true;
                     myPro.Start();
-                    //如果调用程序路径中有空格时，cmd命令执行失败，可以用双引号括起来 ，在这里两个引号表示一个引号（转义）
-                    string str = string.Format(@"""{0}"" {1} {2}", cmdExe, cmdStr, "&exit");
-
-                    myPro.StandardInput.WriteLine(str);
                     myPro.StandardInput.AutoFlush = true;
+                    myPro.StandardInput.WriteLine(cdDir);
+                    myPro.WaitForExit();
+                    myPro.StandardInput.WriteLine(cmdStr);
                     myPro.WaitForExit();
                     result = true;
                 }
@@ -75,7 +84,7 @@ namespace Nullspace
             builder.AppendLine("namespace GameData");
             builder.AppendLine("{");
             string tab = "    ";
-            builder.Append(tab).Append("public class EmptyGameData {}");
+            builder.Append(tab).Append("public class EmptyGameData {}").AppendLine();
             builder.AppendLine("}");
             File.WriteAllText(string.Format("{0}/EmptyGameData.cs", MakeDir(Config.GetString("cs_dir"))), builder.ToString());
         }

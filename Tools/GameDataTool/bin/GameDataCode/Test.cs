@@ -7,9 +7,9 @@ namespace GameData
 {
     public class MonsterProperty : GameDataTwoMap<MonsterProperty>
     {
-        protected static string FileUrl = "Test#MonsterProperty";
-        protected static bool IsDelayInitialized = true;
-        protected static List<string> KeyNameList = new List<string>(){ "Index", "ModelId" };
+        protected static new string FileUrl = "Test#MonsterProperty";
+        protected static new bool IsDelayInitialized = true;
+        protected static new List<string> KeyNameList = new List<string>(){ "Index", "ModelId" };
         public uint Index { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }
@@ -35,9 +35,9 @@ namespace GameData
 
     public class MonsterGroup : GameDataList<MonsterGroup>
     {
-        protected static string FileUrl = "Test#MonsterGroup";
-        protected static bool IsDelayInitialized = true;
-        protected static List<string> KeyNameList = ;
+        protected static new string FileUrl = "Test#MonsterGroup";
+        protected static new bool IsDelayInitialized = true;
+        protected static new List<string> KeyNameList = null;
         public uint Index { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }
