@@ -1,1 +1,0 @@
-F:\Unity\Nullspace\Tools\ExcelToXml\obj\Debug\XlsxToXml.exe
