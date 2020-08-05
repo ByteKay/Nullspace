@@ -11,6 +11,8 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             DataFormatConvert.ExportXlsx("config.txt");
+            DataFormatConvert.BuildDll();
+            DataFormatConvert.CheckData();
         }
         
         private static void TestXmlAndProperties()

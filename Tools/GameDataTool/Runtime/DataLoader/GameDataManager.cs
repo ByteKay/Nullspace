@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Security;
-
+using GameData;
 namespace Nullspace
 {
     // public
@@ -66,7 +66,7 @@ namespace Nullspace
         }
         private static void LoadGameDataTypes()
         {
-            Assembly ass = typeof(GameDataManager).Assembly;
+            Assembly ass = typeof(EmptyGameData).Assembly;
             Type[] types = ass.GetTypes();
             foreach (Type item in types)
             {

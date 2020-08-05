@@ -1,6 +1,5 @@
-F:\Unity\Nullspace\Tools\GameDataTool\bin\Release\GameDataTool.exe
-F:\Unity\Nullspace\Tools\GameDataTool\bin\Release\GameDataTool.pdb
-F:\Unity\Nullspace\Tools\GameDataTool\bin\Release\EPPlus.dll
-F:\Unity\Nullspace\Tools\GameDataTool\bin\Release\UnityEngine.CoreModule.dll
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.exe
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.pdb
+F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
+F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
