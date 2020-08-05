@@ -224,7 +224,7 @@ namespace Nullspace
                 v += " }";
                 return v;
             }
-            return null;
+            return "null";
         }
         private string GetDataManager()
         {
@@ -280,9 +280,9 @@ namespace Nullspace
             }
             builder.AppendLine();
             builder.Append(tab).AppendLine("{");
-            builder.Append(doubleTab).Append(string.Format("protected static string FileUrl = \"{0}#{1}\";", Parent.FileName, SheetName)).AppendLine();
-            builder.Append(doubleTab).Append(string.Format("protected static bool IsDelayInitialized = {0};", Delay.ToString().ToLower())).AppendLine();
-            builder.Append(doubleTab).Append(string.Format("protected static List<string> KeyNameList = {0};", GetKeyNames())).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("protected static new string FileUrl = \"{0}#{1}\";", Parent.FileName, SheetName)).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("protected static new bool IsDelayInitialized = {0};", Delay.ToString().ToLower())).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("protected static new List<string> KeyNameList = {0};", GetKeyNames())).AppendLine();
 
             string dataTypeString = "";
             string readString = "";
