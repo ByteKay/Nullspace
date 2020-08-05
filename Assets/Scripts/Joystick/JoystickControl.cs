@@ -22,7 +22,7 @@ namespace Nullspace
 
     public class JoystickEvent : UnityEvent<Vector2>
     {
-
+        
     }
 
     public class JoystickControl : EventTrigger

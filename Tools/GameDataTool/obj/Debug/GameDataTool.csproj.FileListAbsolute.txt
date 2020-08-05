@@ -1,0 +1,5 @@
+F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\GameDataTool\bin\Debug\GameDataTool.exe
+F:\Unity\Nullspace\Tools\GameDataTool\bin\Debug\GameDataTool.pdb
+F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.exe
+F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.pdb

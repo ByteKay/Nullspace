@@ -1,5 +1,0 @@
-F:\Unity\Nullspace\GameDataDefine\obj\Debug\GameDataDefine.csprojResolveAssemblyReference.cache
-F:\Unity\Nullspace\GameDataDefine\bin\Debug\GameDataDefine.exe
-F:\Unity\Nullspace\GameDataDefine\bin\Debug\GameDataDefine.pdb
-F:\Unity\Nullspace\GameDataDefine\obj\Debug\GameDataDefine.exe
-F:\Unity\Nullspace\GameDataDefine\obj\Debug\GameDataDefine.pdb

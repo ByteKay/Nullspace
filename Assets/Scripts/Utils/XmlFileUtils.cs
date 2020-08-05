@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.IO;
 using System.Security;
 using System.Text.RegularExpressions;
+using System.Collections;
 
 namespace Nullspace
 {
