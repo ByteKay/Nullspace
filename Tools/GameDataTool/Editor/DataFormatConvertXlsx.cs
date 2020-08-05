@@ -42,7 +42,7 @@ namespace Nullspace
 
         public static void CheckData()
         {
-
+            GameDataManager.CheckData();
         }
 
         /// <summary>

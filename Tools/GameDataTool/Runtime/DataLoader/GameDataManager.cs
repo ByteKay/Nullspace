@@ -66,6 +66,8 @@ namespace Nullspace
         }
         private static void LoadGameDataTypes()
         {
+            mGameDataTypes.Clear();
+            ClearAllData();
             Assembly ass = typeof(EmptyGameData).Assembly;
             Type[] types = ass.GetTypes();
             foreach (Type item in types)

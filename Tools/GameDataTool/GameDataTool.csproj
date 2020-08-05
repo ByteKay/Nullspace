@@ -60,6 +60,7 @@
     <Compile Include="Editor\Excel\Xlsx.cs" />
     <Compile Include="Editor\Excel\XlsxRow.cs" />
     <Compile Include="Editor\Excel\XlsxSheet.cs" />
+    <Compile Include="Editor\GameDataManagerXlsx.cs" />
     <Compile Include="Editor\PropertiesXlsx.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
