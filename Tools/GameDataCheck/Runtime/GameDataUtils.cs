@@ -37,14 +37,14 @@ namespace Nullspace
             {
                 if (type.GetGenericTypeDefinition() == typeof(List<>))
                 {
-                    object ret = typeof(GameDataUtils).GetMethod("ToListString")
+                    object ret = typeof(GameDataUtils).GetMethod("ToListString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                         .MakeGenericMethod(type.GetGenericArguments())
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
                 }
                 else if (type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
-                    object ret = typeof(GameDataUtils).GetMethod("ToMapString")
+                    object ret = typeof(GameDataUtils).GetMethod("ToMapString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                         .MakeGenericMethod(type.GetGenericArguments())
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
