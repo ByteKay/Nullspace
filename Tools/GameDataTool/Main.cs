@@ -9,20 +9,20 @@ namespace Nullspace
 {
     public class MainEntry
     {
+        public static Properties Config;
         public static void Main(string[] argvs)
         {
-            DataFormatConvert.ExportXlsx("config.txt");
+            Config = Properties.Create("config.txt");
+            DataFormatConvert.ExportXlsx();
             DataFormatConvert.BuildDll();
-            DataFormatConvert.CheckData();
             Console.ReadLine();
         }
-        
         private static void TestXmlAndProperties()
         {
             string filePath = "test_data.xml";
             Properties prop = DataFormatConvert.ConvertXMLToPropertiesFromFile(filePath);
             StringBuilder sb = new StringBuilder();
-            prop.PrintAll(sb);
+            prop.PrintAll(sb, 0);
             File.WriteAllText("xml_2_properties.txt", sb.ToString());
 
             SecurityElement root = Properties.ConvertPropertiesToXML(prop);
@@ -30,7 +30,6 @@ namespace Nullspace
             XElement element = XElement.Parse(root.ToString());
             File.WriteAllText("properties_2_xml.xml", element.ToString());
         }
-
         private static void TestXlsx()
         {
             string filePath = "test.xlsx";

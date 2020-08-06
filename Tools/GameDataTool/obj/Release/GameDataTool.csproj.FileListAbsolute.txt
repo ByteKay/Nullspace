@@ -3,3 +3,4 @@ F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.pdb
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.csprojResolveAssemblyReference.cache
 F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
 F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
+F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataRuntime.dll

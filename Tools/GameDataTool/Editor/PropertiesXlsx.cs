@@ -12,9 +12,9 @@ namespace Nullspace
         public static bool ConvertXlsxPropertiesToXML(Properties prop, out SecurityElement client, out SecurityElement server)
         {
             List<Properties> clientProps = new List<Properties>();
-            prop.GetNamespaces(CLIENT_XLSX_NODE_TAG, ref clientProps);
+            prop.GetNamespaces(CLIENT_XLSX_NODE_TAG, ref clientProps, false, true);
             List<Properties> serverProps = new List<Properties>();
-            prop.GetNamespaces(SERVER_XLSX_NODE_TAG, ref serverProps);
+            prop.GetNamespaces(SERVER_XLSX_NODE_TAG, ref serverProps, false, true);
 
             client = new SecurityElement(prop.mNamespace);
             foreach (Properties clientProp in clientProps)

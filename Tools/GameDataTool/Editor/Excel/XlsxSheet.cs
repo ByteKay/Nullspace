@@ -46,8 +46,8 @@ namespace Nullspace
             HashSet<int> skipRows = new HashSet<int>();
             if (rows > 0 && cols > 0)
             {
-                bool isTrue = GameDataUtils.ParseMap((string)values[SHEET_DATA_MANAGER, 0], out sheetAttribute);
-                if (!isTrue)
+                sheetAttribute = GameDataUtils.ToObject<Dictionary<string, string>>((string)values[SHEET_DATA_MANAGER, 0]);
+                if (sheetAttribute == null)
                 {
                     return null;
                 }
@@ -273,16 +273,17 @@ namespace Nullspace
             string tab = "    ";
             string doubleTab = tab + tab;
             builder.Append(tab).Append(string.Format("public class {0} : {1}<{2}>", SheetName, GetDataManager(), SheetName));
-            bool export_nullstream = DataFormatConvert.Config.GetBool("export_nullstream", false);
+            bool export_nullstream = MainEntry.Config.GetBool("export_nullstream", false);
             if (export_nullstream)
             {
                 builder.Append(", INullStream");
             }
             builder.AppendLine();
             builder.Append(tab).AppendLine("{");
-            builder.Append(doubleTab).Append(string.Format("protected static new string FileUrl = \"{0}#{1}\";", Parent.FileName, SheetName)).AppendLine();
-            builder.Append(doubleTab).Append(string.Format("protected static new bool IsDelayInitialized = {0};", Delay.ToString().ToLower())).AppendLine();
-            builder.Append(doubleTab).Append(string.Format("protected static new List<string> KeyNameList = {0};", GetKeyNames())).AppendLine();
+
+            builder.Append(doubleTab).Append(string.Format("public static readonly string FileUrl = \"{0}#{1}s\";", Parent.FileName, SheetName)).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("public static readonly bool IsDelayInitialized = {0};", Delay.ToString().ToLower())).AppendLine();
+            builder.Append(doubleTab).Append(string.Format("public static readonly List<string> KeyNameList = {0};", GetKeyNames())).AppendLine();
 
             string dataTypeString = "";
             string readString = "";
@@ -458,62 +459,62 @@ namespace Nullspace
                     writeString = "WriteList";
                     return;
                 case DataTypeEnum.VECTOR2:
-                    dataTypeString = "Vector2";
+                    dataTypeString = "UnityEngine.Vector2";
                     readString = "ReadVector2";
                     writeString = "WriteVector2";
                     return;
                 case DataTypeEnum.VECTOR2LIST:
-                    dataTypeString = "List<Vector2>";
+                    dataTypeString = "List<UnityEngine.Vector2>";
                     readString = "ReadList";
                     writeString = "WriteList";
                     return;
                 case DataTypeEnum.VECTOR3:
-                    dataTypeString = "Vector3";
+                    dataTypeString = "UnityEngine.Vector3";
                     readString = "ReadVector3";
                     writeString = "WriteVector3";
                     return;
                 case DataTypeEnum.VECTOR3LIST:
-                    dataTypeString = "List<Vector3>";
+                    dataTypeString = "List<UnityEngine.Vector3>";
                     readString = "ReadList";
                     writeString = "WriteList";
                     return;
                 case DataTypeEnum.VECTOR4:
-                    dataTypeString = "Vector4";
+                    dataTypeString = "UnityEngine.Vector4";
                     readString = "ReadVector4";
                     writeString = "WriteVector4";
                     return;
                 case DataTypeEnum.VECTOR4LIST:
-                    dataTypeString = "List<Vector4>";
+                    dataTypeString = "List<UnityEngine.Vector4>";
                     readString = "ReadList";
                     writeString = "WriteList";
                     return;
                 case DataTypeEnum.QUATERNION:
-                    dataTypeString = "Quaternion";
+                    dataTypeString = "UnityEngine.Quaternion";
                     readString = "ReadQuaternion";
                     writeString = "WriteQuaternion";
                     return;
                 case DataTypeEnum.QUATERNIONLIST:
-                    dataTypeString = "List<Quaternion>";
+                    dataTypeString = "List<UnityEngine.Quaternion>";
                     readString = "ReadList";
                     writeString = "WriteList";
                     return;
                 case DataTypeEnum.COLOR:
-                    dataTypeString = "Color";
+                    dataTypeString = "UnityEngine.Color";
                     readString = "ReadColor";
                     writeString = "WriteColor";
                     return;
                 case DataTypeEnum.COLORLIST:
-                    dataTypeString = "List<Color>";
+                    dataTypeString = "List<UnityEngine.Color>";
                     readString = "ReadList";
                     writeString = "WriteList";
                     return;
                 case DataTypeEnum.VECTOR3INT:
-                    dataTypeString = "Vector3Int";
+                    dataTypeString = "UnityEngine.Vector3Int";
                     readString = "ReadVector3Int";
                     writeString = "WriteVector3Int";
                     return;
                 case DataTypeEnum.VECTOR3INTLIST:
-                    dataTypeString = "List<Vector3Int>";
+                    dataTypeString = "List<UnityEngine.Vector3Int>";
                     readString = "ReadList";
                     writeString = "WriteList";
                     return;

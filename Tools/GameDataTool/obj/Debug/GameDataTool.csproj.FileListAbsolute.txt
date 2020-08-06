@@ -1,6 +1,3 @@
-F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.csprojResolveAssemblyReference.cache
-F:\Unity\Nullspace\Tools\GameDataTool\bin\Debug\GameDataTool.exe
-F:\Unity\Nullspace\Tools\GameDataTool\bin\Debug\GameDataTool.pdb
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.exe
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.exe
@@ -9,3 +6,6 @@ G:\UnityWorkspace\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
 G:\UnityWorkspace\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.csprojResolveAssemblyReference.cache
 G:\UnityWorkspace\Nullspace\Tools\GameDataTool\bin\GameDataRuntime.dll
+F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
+F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
+F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.csprojResolveAssemblyReference.cache

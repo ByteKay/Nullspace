@@ -81,8 +81,10 @@
     <Compile Include="Runtime\DataLoader\GameDataOneMap.cs" />
     <Compile Include="Runtime\DataLoader\GameDataTwoMap.cs" />
     <Compile Include="Runtime\DataTypeEnum.cs" />
+    <Compile Include="Runtime\DateTimeUtils.cs" />
     <Compile Include="Runtime\EnumUtils.cs" />
     <Compile Include="Runtime\GameDataUtils.cs" />
+    <Compile Include="Runtime\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,20 +11,19 @@ namespace Nullspace
 {
     public partial class DataFormatConvert
     {
-
-        public static Properties Config;
-        public static void ExportXlsx(string config)
+        public static void ExportXlsx()
         {
-            Config = Properties.Create(config);
             ExportEmpty();
-            ExportXlsxDir(Config.GetString("xlsx_dir"), Config.GetBool("recursive", false));
+
+            ExportXlsxDir(MainEntry.Config.GetString("xlsx_dir", null), MainEntry.Config.GetBool("recursive", false));
         }
 
         public static void BuildDll()
         {
-            if (Config.GetBool("export_cs", false))
+            if (MainEntry.Config.GetBool("export_cs", false))
             {
-                string csDir = Config.GetString("cs_dir");
+                string csDir = MainEntry.Config.GetString("cs_dir", null);
+                string dllMode = MainEntry.Config.GetString("define_dll", " -debug ");
                 string refDll = Path.GetFullPath(".");
                 csDir = Path.GetFullPath(csDir);
                 List<string> cmdList = new List<string>()
@@ -32,17 +31,12 @@ namespace Nullspace
                     string.Format("cd /d {0}", csDir),
                     string.Format("set UnityEngine={0}/UnityEngine.CoreModule.dll", refDll),
                     string.Format("set GameDataRuntime={0}/GameDataRuntime.dll", refDll),
-                    string.Format("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%UnityEngine% /r:%GameDataRuntime% /out:{0}/GameDataDefine.dll *.cs /recurse:*.cs", refDll),
+                    string.Format("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%UnityEngine% /r:%GameDataRuntime% /out:{0}/GameDataDefine.dll /recurse:*.cs", refDll),
                     "exit"
                 };
                 string result = RunCmd(cmdList);
                 Console.WriteLine(result);
             }
-        }
-
-        public static void CheckData()
-        {
-            GameDataManager.CheckData();
         }
 
         /// <summary>
@@ -94,7 +88,7 @@ namespace Nullspace
             string tab = "    ";
             builder.Append(tab).Append("public class EmptyGameData {}").AppendLine();
             builder.AppendLine("}");
-            File.WriteAllText(string.Format("{0}/EmptyGameData.cs", MakeDir(Config.GetString("cs_dir"))), builder.ToString());
+            File.WriteAllText(string.Format("{0}/EmptyGameData.cs", MakeDir(MainEntry.Config.GetString("cs_dir", null))), builder.ToString());
         }
 
         private static void ExportXlsxDir(string rootDir, bool recursive = true)
@@ -121,20 +115,20 @@ namespace Nullspace
             {
                 throw new System.Exception("data format wrong");
             }
-            if (Config.GetBool("export_cs", false))
+            if (MainEntry.Config.GetBool("export_cs", false))
             {
                 StringBuilder builder = new StringBuilder();
                 xlsx.ExportCSharp(builder);
-                File.WriteAllText(string.Format("{0}/{1}.cs", MakeDir(Config.GetString("cs_dir")), xlsx.FileName), builder.ToString());
+                File.WriteAllText(string.Format("{0}/{1}.cs", MakeDir(MainEntry.Config.GetString("cs_dir", null)), xlsx.FileName), builder.ToString());
             }
             Properties prop = Properties.CreateFromXlsx(xlsx);
             SecurityElement clientRoot;
             SecurityElement serverRoot;
             Properties.ConvertXlsxPropertiesToXML(prop, out clientRoot, out serverRoot);
             XElement element = XElement.Parse(clientRoot.ToString());
-            File.WriteAllText(string.Format("{0}/{1}_client.xml", MakeDir(Config.GetString("xml_dir")), xlsx.FileName), element.ToString());
+            File.WriteAllText(string.Format("{0}/{1}_client.xml", MakeDir(MainEntry.Config.GetString("xml_dir", null)), xlsx.FileName), element.ToString());
             element = XElement.Parse(serverRoot.ToString());
-            File.WriteAllText(string.Format("{0}/{1}_server.xml", MakeDir(Config.GetString("xml_dir")), xlsx.FileName), element.ToString());
+            File.WriteAllText(string.Format("{0}/{1}_server.xml", MakeDir(MainEntry.Config.GetString("xml_dir", null)), xlsx.FileName), element.ToString());
         }
 
         private static string MakeDir(string dir)

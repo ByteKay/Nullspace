@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Nullspace;
-using UnityEngine;
 namespace GameData
 {
     public class MonsterProperty : GameDataTwoMap<MonsterProperty>
     {
-        protected static new string FileUrl = "Test#MonsterProperty";
-        protected static new bool IsDelayInitialized = true;
-        protected static new List<string> KeyNameList = new List<string>(){ "Index", "ModelId" };
+        public static readonly string FileUrl = "Test#MonsterPropertys";
+        public static readonly bool IsDelayInitialized = true;
+        public static readonly List<string> KeyNameList = new List<string>(){ "Index", "ModelId" };
         public uint Index { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }
@@ -35,9 +34,9 @@ namespace GameData
 
     public class MonsterGroup : GameDataList<MonsterGroup>
     {
-        protected static new string FileUrl = "Test#MonsterGroup";
-        protected static new bool IsDelayInitialized = true;
-        protected static new List<string> KeyNameList = null;
+        public static readonly string FileUrl = "Test#MonsterGroups";
+        public static readonly bool IsDelayInitialized = true;
+        public static readonly List<string> KeyNameList = null;
         public uint Index { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }

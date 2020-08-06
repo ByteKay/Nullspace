@@ -67,7 +67,6 @@ namespace Nullspace
             builder.AppendLine("using System.Collections.Generic;");
             builder.AppendLine("using System.Text;");
             builder.AppendLine("using Nullspace;");
-            builder.AppendLine("using UnityEngine;");
             builder.AppendLine("namespace GameData");
             builder.AppendLine("{");
             foreach (XlsxSheet sheet in this)
