@@ -6,10 +6,10 @@ namespace Nullspace
 {
 
     // 管理器：按key分组
-    public class GameDataGroupMap<T> : GameData<T> where T : GameDataGroupMap<T>, new()
+    public class GameDataGroupMap<M, T> : GameData<T> where T : GameDataGroupMap<M, T>, new()
     {
-        protected static Dictionary<uint, List<T>> mDataMapList;
-        public static Dictionary<uint, List<T>> Data
+        protected static Dictionary<M, List<T>> mDataMapList;
+        public static Dictionary<M, List<T>> Data
         {
             get
             {
@@ -26,8 +26,8 @@ namespace Nullspace
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMapList = new Dictionary<uint, List<T>>();
-            uint key1 = uint.MaxValue;
+            mDataMapList = new Dictionary<M, List<T>>();
+            M key1 = default(M);
             uint key2 = uint.MaxValue;
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
             bool isImmediateInitialized = IsImmediateLoad();

@@ -3,3 +3,8 @@ F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.pdb
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.csprojResolveAssemblyReference.cache
 F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
 F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
+G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.exe
+G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.pdb
+G:\UnityWorkspace\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
+G:\UnityWorkspace\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
+G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.csprojResolveAssemblyReference.cache

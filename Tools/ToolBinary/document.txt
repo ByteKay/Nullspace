@@ -1,0 +1,12 @@
+1. 执行 GameDataTool.exe
+	1. 解析 Excel 文件，生成 xml文件和csharp文件
+	2. 如果有csharp文件存在更改，则创建 GameDataDefine.dll
+	3. xlsx_info_record.txt 此文件记录 excel文件的hash以及cs相关属性构造的hash。
+		1. 如果cs相关信息无改变，则不导出csharp
+		2. 如果excel文件无改变，则不创建新的xml
+
+2. 执行 GameDataCheck.exe
+	1. 解析所有的 xml。如果存在解析问题，在控制台打印错误信息
+	
+3. 配置 见 config.txt
+	

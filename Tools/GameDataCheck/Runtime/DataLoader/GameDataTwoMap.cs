@@ -5,10 +5,10 @@ using System.Text;
 namespace Nullspace
 {
     // 管理器：两个索引
-    public class GameDataTwoMap<T> : GameData<T> where T : GameDataTwoMap<T>, new()
+    public class GameDataTwoMap<M, N, T> : GameData<T> where T : GameDataTwoMap<M, N, T>, new()
     {
-        protected static Dictionary<uint, Dictionary<uint, T>> mDataMapMap;
-        public static Dictionary<uint, Dictionary<uint, T>> Data
+        protected static Dictionary<M, Dictionary<N, T>> mDataMapMap;
+        public static Dictionary<M, Dictionary<N, T>> Data
         {
             get
             {
@@ -25,9 +25,9 @@ namespace Nullspace
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMapMap = new Dictionary<uint, Dictionary<uint, T>>();
-            uint key1 = uint.MaxValue;
-            uint key2 = uint.MaxValue;
+            mDataMapMap = new Dictionary<M, Dictionary<N, T>>();
+            M key1 = default(M);
+            N key2 = default(N);
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
             bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
@@ -39,7 +39,7 @@ namespace Nullspace
                 }
                 if (!mDataMapMap.ContainsKey(key1))
                 {
-                    mDataMapMap.Add(key1, new Dictionary<uint, T>());
+                    mDataMapMap.Add(key1, new Dictionary<N, T>());
                 }
                 if (!mDataMapMap[key1].ContainsKey(key2))
                 {

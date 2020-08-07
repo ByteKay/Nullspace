@@ -302,11 +302,49 @@ namespace Nullspace
                 Manager = data["manager"];
             }
         }
+
+        private string MakeClassDefine()
+        {
+            GameDataManagerType type = GameDataManagerType.LIST;
+            if (Manager != null)
+            {
+                type = EnumUtils.StringToEnum<GameDataManagerType>(Manager.ToUpper());
+            }
+            string baseName = GetDataManager();
+            if (type == GameDataManagerType.LIST)
+            {
+                return string.Format("public class {0} : {1}<{2}>", SheetName, baseName, SheetName);
+            }
+            DebugUtils.Assert(!string.IsNullOrEmpty(Keys), "Wrong Keys");
+            List<string> keys = new List<string>(Keys.Split('#'));
+            string dataTypeString = null;
+            string readString = null;
+            string writeString = null;
+            string generic = string.Format("public class {0} : {1}<", SheetName, baseName);
+            for (int j = 0; j < keys.Count; ++j)
+            {
+                string key = keys[j];
+                int i = 0;
+                for (i = 0; i < mVariableNames.Count; ++i)
+                {
+                    if (mVariableNames[i] == key)
+                    {
+                        break;
+                    }
+                }
+                DebugUtils.Assert(i < mVariableNames.Count, string.Format("{0} KeyName Not Found", key));
+                GetType(mVariableTypes[i], ref dataTypeString, ref readString, ref writeString);
+                generic += dataTypeString + ", ";
+            }
+            generic += SheetName + ">";
+            return generic;
+        }
+
         public void ExportCSharp(StringBuilder builder, DataSideEnum side)
         {
             string tab = "    ";
             string doubleTab = tab + tab;
-            builder.Append(tab).Append(string.Format("public class {0} : {1}<{2}>", SheetName, GetDataManager(), SheetName));
+            builder.Append(tab).Append(MakeClassDefine());
             bool export_nullstream = MainEntry.Config.GetBool("export_nullstream", false);
             if (export_nullstream)
             {
@@ -378,6 +416,7 @@ namespace Nullspace
 
             builder.Append(tab).Append("}").AppendLine();
         }
+
         public static void GetType(DataTypeEnum dt, ref string dataTypeString, ref string readString, ref string writeString)
         {
             switch (dt)

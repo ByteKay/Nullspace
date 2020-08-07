@@ -23,7 +23,7 @@ namespace Nullspace
 
     public partial class GameData<T> : GameData where T : GameData<T>, new()
     {
-        protected static int AssignKeyProp<U>(U instance, List<string> keyNameList, ref uint key1, ref uint key2) where U : GameData<T>
+        protected static int AssignKeyProp<M, N, U>(U instance, List<string> keyNameList, ref M key1, ref N key2) where U : GameData<T>
         {
             if (instance.mOriginData.Attributes != null)
             {
@@ -37,17 +37,17 @@ namespace Nullspace
                     string key = keyNameList[i];
                     DebugUtils.Assert(instance.mOriginData.Attributes.ContainsKey(key), "Not Contain Key: " + key);
                     string nodeV = instance.mOriginData.Attributes[key].ToString();
-                    uint value = GameDataUtils.ToObject<uint>(nodeV);
                     PropertyInfo info = typeof(U).GetProperty(key);
-                    DebugUtils.Assert(info != null, "");
-                    info.SetValue(instance, value, null);
+                    object obj = GameDataUtils.ToObject(nodeV, info.PropertyType);
+                    DebugUtils.Assert(obj != null, "not right key: " + key);
+                    info.SetValue(instance, obj, null);
                     if (i == 0)
                     {
-                        key1 = value;
+                        key1 = (M)obj;
                     }
                     else if (i == 1)
                     {
-                        key2 = value;
+                        key2 = (N)obj;
                     }
                 }
                 GameDataManager.Log(string.Format("{0} {1}", key1, key2));

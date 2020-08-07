@@ -1,7 +1,7 @@
 /****************************************
 * The Class Is Generated Automatically By GameDataTool, 
 * Don't Modify It Manually.
-* DateTime: 0001-01-02 20:21:20.
+* DateTime: 0001-01-02 20:21:21.
 ****************************************/
 
 using System;
@@ -20,7 +20,7 @@ namespace GameData
         public string Name { get; private set; }
         public string Title { get; private set; }
         public uint ModelId { get; private set; }
-        public uint Zoom { get; private set; }
+        public uint Zoom1 { get; private set; }
         public uint Chartlet { get; private set; }
         public uint Head { get; private set; }
         public uint Color { get; private set; }
