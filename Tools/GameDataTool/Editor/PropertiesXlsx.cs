@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.Reflection;
 using System.Security;
 
 namespace Nullspace
@@ -8,6 +9,25 @@ namespace Nullspace
     {
         public const string CLIENT_XLSX_NODE_TAG = "client_xlsx_datas";
         public const string SERVER_XLSX_NODE_TAG = "server_xlsx_datas";
+
+        public static Properties CreateProperties<T>(T target, string id, Properties parent)
+        {
+            Properties prop = new Properties();
+            prop.mNamespace = typeof(T).Name;
+            prop.mId = id;
+            PropertyInfo[] infos = typeof(T).GetProperties();
+            foreach (PropertyInfo info in infos)
+            {
+                object o = info.GetValue(target, null);
+                if (o != null)
+                {
+                    string v = GameDataUtils.ToString(o);
+                    prop.SetString(info.Name, v);
+                }
+            }
+            parent.mNamespaces.Add(prop);
+            return prop;
+        }
 
         public static bool ConvertXlsxPropertiesToXML(Properties prop, out SecurityElement client, out SecurityElement server)
         {
@@ -81,7 +101,10 @@ namespace Nullspace
                 DataTypeEnum varType = DataTypeEnum.NONE;
                 sheet.GetCol(colIndex, ref varName, ref varType);
                 string value = sheet[row, colIndex];
-                mProperties.Add(new Property(varName, value));
+                if (value != null)
+                {
+                    mProperties.Add(new Property(varName, value));
+                }
             }
         }
 

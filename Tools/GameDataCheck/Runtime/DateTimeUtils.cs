@@ -36,12 +36,19 @@ namespace Nullspace
             dtStr = dtStr.Trim();
             dtStr = dtStr.Replace("/", "-");
             string[] strs = dtStr.Split(new char[] { '-', ':', ' ' });
-            Debug.Assert(strs.Length == 3 || strs.Length == 6, ""); // yyyy-MM-dd HH:mm:ss
             if (strs.Length == 3)
             {
                 dtStr = string.Format("{0} 00:00:00", dtStr);
             }
-            return Convert.ToDateTime(dtStr);
+            try
+            {
+                return Convert.ToDateTime(dtStr);
+            }
+            catch (Exception e)
+            {
+                DebugUtils.Assert(false, string.Format("Error: {0}, {1} Please Use 'yyyy-MM-dd[| HH:mm:ss]'", e.Message, dtStr)); // yyyy-MM-dd HH:mm:ss
+            }
+            return default(DateTime);
         }
 
         // 0.1 um  100nm
@@ -64,6 +71,10 @@ namespace Nullspace
         {
             TimeSpan ts = DateTime.UtcNow - ZERO;
             return Convert.ToInt64(ts.TotalMilliseconds).ToString();
+        }
+        public static string GetDateTimeString()
+        {
+            return FormatTime(GetTimeStampI());
         }
     }
 }

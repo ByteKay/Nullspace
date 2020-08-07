@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Nullspace
 {
@@ -7,8 +8,8 @@ namespace Nullspace
     // 管理器：按key分组
     public class GameDataGroupMap<T> : GameData<T> where T : GameDataGroupMap<T>, new()
     {
-        protected static Dictionary<int, List<T>> mDataMapList;
-        public static Dictionary<int, List<T>> Data
+        protected static Dictionary<uint, List<T>> mDataMapList;
+        public static Dictionary<uint, List<T>> Data
         {
             get
             {
@@ -25,15 +26,15 @@ namespace Nullspace
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMapList = new Dictionary<int, List<T>>();
-            int key1 = -1;
-            int key2 = -2;
+            mDataMapList = new Dictionary<uint, List<T>>();
+            uint key1 = uint.MaxValue;
+            uint key2 = uint.MaxValue;
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
-            bool isDelayInitialized = (bool)typeof(T).GetField("IsDelayInitialized").GetValue(null);
+            bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
             {
                 int cnt = AssignKeyProp(t, keyNameList, ref key1, ref key2);
-                if (!isDelayInitialized)
+                if (isImmediateInitialized)
                 {
                     t.IsInitialized();
                 }
@@ -43,13 +44,21 @@ namespace Nullspace
                 }
                 mDataMapList[key1].Add(t);
             }
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in mDataMapList)
+            {
+                sb.AppendFormat("(Key:{0}, Count:{1}) ", item.Key, item.Value.Count);
+            }
+            LogLoadedEnd(sb.ToString());
         }
+
         protected static void Clear()
         {
             if (mDataMapList != null)
             {
                 mDataMapList.Clear();
                 mDataMapList = null;
+                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }

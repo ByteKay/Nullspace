@@ -10,19 +10,30 @@ namespace Nullspace
     public class MainEntry
     {
         public static Properties Config;
+        public static Properties XlsxHistory;
         public static void Main(string[] argvs)
         {
             Config = Properties.Create("config.txt");
+            XlsxHistory = Properties.Create("xlsx_info_record.txt#xlsx_info_record");
             DataFormatConvert.ExportXlsx();
             DataFormatConvert.BuildDll();
+            StringBuilder sb = new StringBuilder();
+            XlsxHistory.WriteString(sb, 0);
+            File.WriteAllText("xlsx_info_record.txt", sb.ToString());
             Console.ReadLine();
         }
+
+        public static void Log(string str)
+        {
+            Console.WriteLine(str);
+        }
+
         private static void TestXmlAndProperties()
         {
             string filePath = "test_data.xml";
             Properties prop = DataFormatConvert.ConvertXMLToPropertiesFromFile(filePath);
             StringBuilder sb = new StringBuilder();
-            prop.PrintAll(sb, 0);
+            prop.WriteString(sb, 0);
             File.WriteAllText("xml_2_properties.txt", sb.ToString());
 
             SecurityElement root = Properties.ConvertPropertiesToXML(prop);

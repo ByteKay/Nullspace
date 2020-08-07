@@ -21,7 +21,7 @@ namespace Nullspace
         {
             if (string.IsNullOrEmpty(content))
             {
-                Debug.Assert(false, "Attempting to create a Properties object from an empty URL!");
+                DebugUtils.Assert(false, "Attempting to create a Properties object from an empty URL!");
                 return null;
             }
             SecurityParser securityParser = new SecurityParser();

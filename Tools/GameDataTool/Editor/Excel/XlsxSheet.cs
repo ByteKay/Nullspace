@@ -23,12 +23,15 @@ namespace Nullspace
             List<DataTypeEnum> variableTypes;
             List<DataSideEnum> variableSides;
             Dictionary<string, string> sheetAttribute;
+            MainEntry.Log(string.Format("-------------------SheetName: {0} Begin", tDS.Name));
             List<XlsxRow> datas = CleanRowAndCols(tDS, sheet, out sheetAttribute, out variableNames, out variableTypes, out variableSides);
             if (datas != null)
             {
                 sheet.Set(sheetAttribute, variableNames, variableTypes, variableSides, datas);
+                MainEntry.Log(string.Format("-------------------SheetName: {0} End", tDS.Name));
                 return sheet;
             }
+            MainEntry.Log(string.Format("*******************SheetName: {0} failed", tDS.Name));
             return null;
         }
         private static List<XlsxRow> CleanRowAndCols(ExcelWorksheet tDS, XlsxSheet sheet, out Dictionary<string, string> sheetAttribute, out List<string> variableNames, out List<DataTypeEnum> variableTypes, out List<DataSideEnum> variableSides)
@@ -49,6 +52,7 @@ namespace Nullspace
                 sheetAttribute = GameDataUtils.ToObject<Dictionary<string, string>>((string)values[SHEET_DATA_MANAGER, 0]);
                 if (sheetAttribute == null)
                 {
+                    MainEntry.Log(string.Format("****************SheetName: {0} End", tDS.Name));
                     return null;
                 }
             }
@@ -56,6 +60,7 @@ namespace Nullspace
             {
                 if (values[VARIABLE_SIDE_ROW, i] == null)
                 {
+                    MainEntry.Log(string.Format("skip null col: [{0}, {1}], maybe last col", VARIABLE_SIDE_ROW, i));
                     skipCols.Add(i);
                     continue;
                 }
@@ -63,13 +68,21 @@ namespace Nullspace
                 DataSideEnum side = EnumUtils.StringToEnum<DataSideEnum>(v);
                 if (side == DataSideEnum.SKIP)
                 {
+                    MainEntry.Log(string.Format("skip flag col: [{0}, {1}]", VARIABLE_SIDE_ROW, i));
                     skipCols.Add(i);
                     continue;
                 }
-                if (values[VARIABLE_NAME_ROW, i] == null || values[VARIABLE_TYPE_ROW, i] == null)
+                if (values[VARIABLE_NAME_ROW, i] == null)
                 {
                     // log
-                    throw new Exception("not right data");
+                    MainEntry.Log(string.Format("Not Define Variable Name: [{0}, {1}]", VARIABLE_NAME_ROW, i));
+                    return null;
+                }
+                if (values[VARIABLE_TYPE_ROW, i] == null)
+                {
+                    // log
+                    MainEntry.Log(string.Format("Not Define Variable Type: [{0}, {1}]", VARIABLE_TYPE_ROW, i));
+                    return null;
                 }
                 variableSides.Add(side);
                 v = values[VARIABLE_NAME_ROW, i].ToString().Trim();
@@ -82,7 +95,8 @@ namespace Nullspace
                 }
                 catch (Exception e)
                 {
-                    throw e;
+                    MainEntry.Log(string.Format("Not Define Variable Side: [{0}, {1}] = {2}, Error: {3}", VARIABLE_TYPE_ROW, i, v, e.Message));
+                    return null;
                 }
             }
             for (int i = VALUE_START_ROW; i < rows; ++i)
@@ -92,11 +106,13 @@ namespace Nullspace
                     string v = values[i, 0].ToString().Trim();
                     if (v.StartsWith(SKIP_ROW))
                     {
+                        MainEntry.Log(string.Format("skip flag row: [{0}, 0]", i));
                         skipRows.Add(i);
                     }
                 }
                 else
                 {
+                    MainEntry.Log(string.Format("skip null row: [{0}, 0], maybe last row", i));
                     skipRows.Add(i);
                 }
             }
@@ -117,7 +133,7 @@ namespace Nullspace
                     {
                         continue;
                     }
-                    rowData.Add(values[i, j] != null ? values[i, j].ToString() : "");
+                    rowData.Add(values[i, j] != null ? values[i, j].ToString() : null);
                 }
             }
             return originalDatas;
@@ -133,6 +149,7 @@ namespace Nullspace
         private List<int> mClientColumns { get; set; }
         private List<int> mServerColumns { get; set; }
         public Xlsx Parent { get; set; }
+        public string RecordSheet { get; set; }
         private XlsxSheet(Xlsx parent, string sheetName)
         {
             Parent = parent;
@@ -146,7 +163,24 @@ namespace Nullspace
             mDatas = datas;
             ParseSheetAttribute(sheetAttribute);
             SplitCS();
+            GeneratorRecord();
         }
+
+        private void GeneratorRecord()
+        {
+            string varNames = GameDataUtils.ToString(mVariableNames);
+            string varTypes = GameDataUtils.ToString(mVariableTypes);
+            string varSides = GameDataUtils.ToString(mVariableSides);
+            Dictionary<string, string> record = new Dictionary<string, string>();
+            record.Add("varNames", varNames);
+            record.Add("varTypes", varTypes);
+            record.Add("varSides", varSides);
+            record.Add("Manager", Manager);
+            record.Add("Delay", Delay.ToString());
+            record.Add("Keys", Keys);
+            RecordSheet = GameDataUtils.ToString(record);
+        }
+
         private void SplitCS()
         {
             mClientColumns = new List<int>();
@@ -175,7 +209,7 @@ namespace Nullspace
         {
             get
             {
-                Debug.Assert(row < RowCount && col < ColCount);
+                DebugUtils.Assert(row < RowCount && col < ColCount, "");
                 return mDatas[row][col];
             }
         }
@@ -296,7 +330,7 @@ namespace Nullspace
             {
                 DataTypeEnum dt = mVariableTypes[cols[i]];
                 GetType(dt, ref dataTypeString, ref readString, ref writeString);
-                builder.Append(doubleTab).Append(string.Format("public {0} {1} ", dataTypeString, mVariableNames[cols[i]])).Append("{ get; set; }").AppendLine();
+                builder.Append(doubleTab).Append(string.Format("public {0} {1} ", dataTypeString, mVariableNames[cols[i]])).Append("{ get; private set; }").AppendLine();
 
                 // List 需要初始化
                 if (dt > DataTypeEnum.LIST)
@@ -522,7 +556,6 @@ namespace Nullspace
             
 
         }
-
         public bool CheckData()
         {
             return true;

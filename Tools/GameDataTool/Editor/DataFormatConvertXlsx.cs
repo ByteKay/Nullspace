@@ -14,10 +14,8 @@ namespace Nullspace
         public static void ExportXlsx()
         {
             ExportEmpty();
-
             ExportXlsxDir(MainEntry.Config.GetString("xlsx_dir", null), MainEntry.Config.GetBool("recursive", false));
         }
-
         public static void BuildDll()
         {
             if (MainEntry.Config.GetBool("export_cs", false))
@@ -38,7 +36,6 @@ namespace Nullspace
                 Console.WriteLine(result);
             }
         }
-
         /// <summary>
         /// 运行cmd命令
         /// 不显示命令窗口
@@ -74,12 +71,10 @@ namespace Nullspace
             }
             return result;
         }
-
         private static Properties ConvertXlsxToProperties(Xlsx excel)
         {
             return Properties.CreateFromXlsx(excel);
         }
-
         private static void ExportEmpty()
         {
             StringBuilder builder = new StringBuilder();
@@ -90,47 +85,85 @@ namespace Nullspace
             builder.AppendLine("}");
             File.WriteAllText(string.Format("{0}/EmptyGameData.cs", MakeDir(MainEntry.Config.GetString("cs_dir", null))), builder.ToString());
         }
-
-        private static void ExportXlsxDir(string rootDir, bool recursive = true)
+        private static bool ExportXlsxDir(string rootDir, bool recursive = true)
         {
             string[] files = Directory.GetFiles(rootDir, "*.xlsx");
             foreach (string file in files)
             {
-                ExportXlsxFile(file);
+                if (!ExportXlsxFile(file))
+                {
+                    return false;
+                }
             }
             if (recursive)
             {
                 string[] dirs = Directory.GetDirectories(rootDir);
                 foreach (string dir in dirs)
                 {
-                    ExportXlsxDir(dir, recursive);
+                    return ExportXlsxDir(dir, recursive);
                 }
+            }
+            return true;
+        }
+        private static bool ExportXlsxFile(string filePath)
+        {
+            Xlsx xlsx = Xlsx.Create(filePath);
+            if (xlsx != null)
+            {
+                xlsx.InitializeRecord();
+                bool res = ExportCS(xlsx);
+                res &= ExportXml(xlsx);
+                return res;
+            }
+            else
+            {
+                MainEntry.Log(string.Format("ExportXlsxFile Wrong: {0}", filePath));
+                return false;
             }
         }
 
-        private static void ExportXlsxFile(string filePath)
+        private static bool ExportCS(Xlsx xlsx)
         {
-            Xlsx xlsx = Xlsx.Create(filePath);
-            if (!xlsx.CheckData())
+            Properties historyProp = MainEntry.XlsxHistory.GetNamespace(xlsx.FileName, false, false);
+            if (historyProp == null)
             {
-                throw new System.Exception("data format wrong");
+                historyProp = MainEntry.XlsxHistory.Append(xlsx.FileName, xlsx.FileName);
+                historyProp.SetString("FilePath", xlsx.RecordInfo.FilePath);
             }
-            if (MainEntry.Config.GetBool("export_cs", false))
+            string sheetHash = historyProp.GetString("SheetHash", null);
+            if (sheetHash != xlsx.RecordInfo.SheetHash)
             {
+                historyProp.SetString("SheetHash", xlsx.RecordInfo.SheetHash);
+                MainEntry.Config.SetString("export_cs", "true");
                 StringBuilder builder = new StringBuilder();
                 xlsx.ExportCSharp(builder);
                 File.WriteAllText(string.Format("{0}/{1}.cs", MakeDir(MainEntry.Config.GetString("cs_dir", null)), xlsx.FileName), builder.ToString());
             }
-            Properties prop = Properties.CreateFromXlsx(xlsx);
-            SecurityElement clientRoot;
-            SecurityElement serverRoot;
-            Properties.ConvertXlsxPropertiesToXML(prop, out clientRoot, out serverRoot);
-            XElement element = XElement.Parse(clientRoot.ToString());
-            File.WriteAllText(string.Format("{0}/{1}_client.xml", MakeDir(MainEntry.Config.GetString("xml_dir", null)), xlsx.FileName), element.ToString());
-            element = XElement.Parse(serverRoot.ToString());
-            File.WriteAllText(string.Format("{0}/{1}_server.xml", MakeDir(MainEntry.Config.GetString("xml_dir", null)), xlsx.FileName), element.ToString());
+            return true;
         }
-
+        private static bool ExportXml(Xlsx xlsx)
+        {
+            Properties historyProp = MainEntry.XlsxHistory.GetNamespace(xlsx.FileName, false, false);
+            if (historyProp == null)
+            {
+                historyProp = MainEntry.XlsxHistory.Append(xlsx.FileName, xlsx.FileName);
+                historyProp.SetString("FilePath", xlsx.RecordInfo.FilePath);
+            }
+            string fileHash = historyProp.GetString("FileHash", null);
+            if (fileHash != xlsx.RecordInfo.FileHash)
+            {
+                historyProp.SetString("FileHash", xlsx.RecordInfo.FileHash);
+                Properties prop = Properties.CreateFromXlsx(xlsx);
+                SecurityElement clientRoot;
+                SecurityElement serverRoot;
+                Properties.ConvertXlsxPropertiesToXML(prop, out clientRoot, out serverRoot);
+                XElement element = XElement.Parse(clientRoot.ToString());
+                File.WriteAllText(string.Format("{0}/{1}_client.xml", MakeDir(MainEntry.Config.GetString("xml_dir", null)), xlsx.FileName), element.ToString());
+                element = XElement.Parse(serverRoot.ToString());
+                File.WriteAllText(string.Format("{0}/{1}_server.xml", MakeDir(MainEntry.Config.GetString("xml_dir", null)), xlsx.FileName), element.ToString());
+            }
+            return true;
+        }
         private static string MakeDir(string dir)
         {
             if (!Directory.Exists(dir))

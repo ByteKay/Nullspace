@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Nullspace
 {
     // 管理器：两个索引
     public class GameDataTwoMap<T> : GameData<T> where T : GameDataTwoMap<T>, new()
     {
-        protected static Dictionary<int, Dictionary<int, T>> mDataMapMap;
-        public static Dictionary<int, Dictionary<int, T>> Data
+        protected static Dictionary<uint, Dictionary<uint, T>> mDataMapMap;
+        public static Dictionary<uint, Dictionary<uint, T>> Data
         {
             get
             {
@@ -24,24 +25,40 @@ namespace Nullspace
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMapMap = new Dictionary<int, Dictionary<int, T>>();
-            int key1 = -1;
-            int key2 = -2;
+            mDataMapMap = new Dictionary<uint, Dictionary<uint, T>>();
+            uint key1 = uint.MaxValue;
+            uint key2 = uint.MaxValue;
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
-            bool isDelayInitialized = (bool)typeof(T).GetField("IsDelayInitialized").GetValue(null);
+            bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
             {
                 int cnt = AssignKeyProp(t, keyNameList, ref key1, ref key2);
-                if (!isDelayInitialized)
+                if (isImmediateInitialized)
                 {
                     t.IsInitialized();
                 }
                 if (!mDataMapMap.ContainsKey(key1))
                 {
-                    mDataMapMap.Add(key1, new Dictionary<int, T>());
+                    mDataMapMap.Add(key1, new Dictionary<uint, T>());
                 }
-                mDataMapMap[key1].Add(key2, t);
+                if (!mDataMapMap[key1].ContainsKey(key2))
+                {
+                    mDataMapMap[key1].Add(key2, t);
+                }
+                else
+                {
+                    GameDataManager.Log(string.Format("duplicated key: {0} {1}", key1, key2));
+                }
             }
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in mDataMapMap)
+            {
+                var data = item.Value.GetEnumerator();
+                data.MoveNext();
+                var key = data.Current.Key;
+                sb.AppendFormat("(Key:({0}, {1}), Count:{2}) ", item.Key, key, item.Value.Count);
+            }
+            LogLoadedEnd(sb.ToString());
         }
         protected static void Clear()
         {
@@ -49,6 +66,7 @@ namespace Nullspace
             {
                 mDataMapMap.Clear();
                 mDataMapMap = null;
+                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }

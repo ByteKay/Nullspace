@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -30,6 +31,35 @@ namespace Nullspace
 
     public partial class GameDataUtils
     {
+        /// <summary>
+        /// 不支持 List 嵌套 其他 集合 类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static string ToXml<T>(List<T> target)
+        {
+            string name = typeof(T).Name;
+            SecurityElement root = new SecurityElement(name + "s");
+            PropertyInfo[] infos = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            foreach (T t in target)
+            {
+                SecurityElement child = new SecurityElement(name);
+                root.AddChild(child);
+                foreach (PropertyInfo info in infos)
+                {
+                    object value = info.GetValue(t, null);
+                    object defaultV = GetDefault(info.PropertyType);
+                    if (value != null && !value.Equals(defaultV))
+                    {
+                        string v = ToString(value);
+                        child.AddAttribute(info.Name, v);
+                    }
+                }
+            }
+            return root.ToString();
+        }
+
         public static string ToString<T>(T target)
         {
             Type type = typeof(T);
@@ -49,6 +79,7 @@ namespace Nullspace
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
                 }
+                DebugUtils.Assert(false, "ToString Not Found Type: " + typeof(T).FullName);
                 return null;
             }
             else if (type.BaseType == typeof(Enum))
@@ -56,7 +87,7 @@ namespace Nullspace
                 return EnumUtils.EnumToString(target);
             }
             MethodInfo info = GetToStringMethod<T>();
-            Debug.Assert(info != null, "");
+            DebugUtils.Assert(info != null, "GetToStringMethod Not Found Type: " + typeof(T).FullName);
             GenericParametersObjectOne[0] = target;
             object result = info.Invoke(null, GenericParametersObjectOne);
             return result != null ? result.ToString() : null;
@@ -97,6 +128,8 @@ namespace Nullspace
                     }
                     return result;
                 }
+                DebugUtils.Assert(false, "ToObject Not Found Type: " + type.FullName);
+                return null;
             }
             else if (type.BaseType == typeof(Enum))
             {
@@ -104,12 +137,13 @@ namespace Nullspace
             }
             GenericParameterTypesOne[0] = type;
             MethodInfo keyMethod = typeof(GameDataUtils).GetMethod("GetToObjectMethod", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).MakeGenericMethod(GenericParameterTypesOne);
-            Debug.Assert(keyMethod != null, "");
+            DebugUtils.Assert(keyMethod != null, "GetToObjectMethod Not Found Type1: " + type.FullName);
             MethodInfo method = (MethodInfo)keyMethod.Invoke(null, null);
-            Debug.Assert(method != null, "");
+            DebugUtils.Assert(method != null, "GetToObjectMethod Not Found Type2: " + type.FullName);
             GenericParametersObjectTwo[0] = str;
             GenericParametersObjectTwo[1] = GetDefault(type);
-            method.Invoke(null, GenericParametersObjectTwo);
+            bool res = (bool)method.Invoke(null, GenericParametersObjectTwo);
+            DebugUtils.Assert(res, string.Format("Data {0} Not Right Type {1}", str, type.FullName));
             return GenericParametersObjectTwo[1];
         }
     }
@@ -250,7 +284,7 @@ namespace Nullspace
             for (int i = 0; i < pairs.Length; ++i)
             {
                 string[] pair = pairs[i].Split(KEY_VALUE_SPRITER);
-                Debug.Assert(pair.Length == 2, "");
+                DebugUtils.Assert(pair.Length == 2, "");
                 map.Add(pair[0].Trim(), pair[1].Trim());
             }
             return map;
@@ -348,25 +382,26 @@ namespace Nullspace
                 MatchCollection mc = MatchVector(str);
                 if (mc.Count == 16)
                 {
-                    v.m00 = float.Parse(mc[0].Value);
-                    v.m01 = float.Parse(mc[1].Value);
-                    v.m02 = float.Parse(mc[2].Value);
-                    v.m03 = float.Parse(mc[3].Value);
-                    v.m10 = float.Parse(mc[4].Value);
-                    v.m11 = float.Parse(mc[5].Value);
-                    v.m12 = float.Parse(mc[6].Value);
-                    v.m13 = float.Parse(mc[7].Value);
-                    v.m20 = float.Parse(mc[8].Value);
-                    v.m21 = float.Parse(mc[9].Value);
-                    v.m22 = float.Parse(mc[10].Value);
-                    v.m23 = float.Parse(mc[11].Value);
-                    v.m30 = float.Parse(mc[12].Value);
-                    v.m31 = float.Parse(mc[13].Value);
-                    v.m32 = float.Parse(mc[14].Value);
-                    v.m33 = float.Parse(mc[15].Value);
-                    return true;
+
+                    bool res = float.TryParse(mc[0].Value, out v.m00);
+                    res &= float.TryParse(mc[1].Value, out v.m01);
+                    res &= float.TryParse(mc[2].Value, out v.m02);
+                    res &= float.TryParse(mc[3].Value, out v.m03);
+                    res &= float.TryParse(mc[4].Value, out v.m10);
+                    res &= float.TryParse(mc[5].Value, out v.m11);
+                    res &= float.TryParse(mc[6].Value, out v.m12);
+                    res &= float.TryParse(mc[7].Value, out v.m13);
+                    res &= float.TryParse(mc[8].Value, out v.m20);
+                    res &= float.TryParse(mc[9].Value, out v.m21);
+                    res &= float.TryParse(mc[10].Value, out v.m22);
+                    res &= float.TryParse(mc[11].Value, out v.m23);
+                    res &= float.TryParse(mc[12].Value, out v.m30);
+                    res &= float.TryParse(mc[13].Value, out v.m31);
+                    res &= float.TryParse(mc[14].Value, out v.m32);
+                    res &= float.TryParse(mc[15].Value, out v.m33);
+                    return res;
                 }
-                Debug.Assert(false, string.Format("Error attempting to parse property {0} as an Matrix4x4.", str));
+                DebugUtils.Assert(false, string.Format("Error attempting to parse property {0} as an Matrix4x4.", str));
             }
             return false;
         }
@@ -378,8 +413,8 @@ namespace Nullspace
             MatchCollection collection = MatchVector(str);
             if (collection.Count == 2)
             {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
+                bool res = float.TryParse(collection[0].Value, out v.x);
+                res &= float.TryParse(collection[1].Value, out v.y);
                 return true;
             }
             return false;
@@ -392,9 +427,9 @@ namespace Nullspace
             MatchCollection collection = MatchVector(str);
             if (collection.Count == 3)
             {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
-                v.z = float.Parse(collection[2].Value);
+                bool res = float.TryParse(collection[0].Value, out v.x);
+                res &= float.TryParse(collection[1].Value, out v.y);
+                res &= float.TryParse(collection[2].Value, out v.z);
                 return true;
             }
             return false;
@@ -407,9 +442,11 @@ namespace Nullspace
             MatchCollection collection = MatchVector(str);
             if (collection.Count == 3)
             {
-                v.x = int.Parse(collection[0].Value);
-                v.y = int.Parse(collection[1].Value);
-                v.z = int.Parse(collection[2].Value);
+                int m,n,p;
+                bool res = int.TryParse(collection[0].Value, out m);
+                res &= int.TryParse(collection[1].Value, out n);
+                res &= int.TryParse(collection[2].Value, out p);
+                v.Set(m, n, p);
                 return true;
             }
             return false;
@@ -422,10 +459,10 @@ namespace Nullspace
             MatchCollection collection = MatchVector(str);
             if (collection.Count == 4)
             {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
-                v.z = float.Parse(collection[2].Value);
-                v.w = float.Parse(collection[3].Value);
+                bool res = float.TryParse(collection[0].Value, out v.x);
+                res &= float.TryParse(collection[1].Value, out v.y);
+                res &= float.TryParse(collection[2].Value, out v.z);
+                res &= float.TryParse(collection[3].Value, out v.w);
                 return true;
             }
             return false;
@@ -438,10 +475,10 @@ namespace Nullspace
             MatchCollection collection = MatchVector(str);
             if (collection.Count == 4)
             {
-                v.x = float.Parse(collection[0].Value);
-                v.y = float.Parse(collection[1].Value);
-                v.z = float.Parse(collection[2].Value);
-                v.w = float.Parse(collection[3].Value);
+                bool res = float.TryParse(collection[0].Value, out v.x);
+                res &= float.TryParse(collection[1].Value, out v.y);
+                res &= float.TryParse(collection[2].Value, out v.z);
+                res &= float.TryParse(collection[3].Value, out v.w);
                 return true;
             }
             return false;
@@ -454,18 +491,18 @@ namespace Nullspace
             MatchCollection collection = MatchVector(str);
             if (collection.Count == 3)
             {
-                v.r = float.Parse(collection[0].Value);
-                v.g = float.Parse(collection[1].Value);
-                v.b = float.Parse(collection[2].Value);
+                bool res = float.TryParse(collection[0].Value, out v.r);
+                res &= float.TryParse(collection[1].Value, out v.g);
+                res &= float.TryParse(collection[2].Value, out v.b);
                 v.a = 1;
                 return true;
             }
             if (collection.Count == 4)
             {
-                v.r = float.Parse(collection[0].Value);
-                v.g = float.Parse(collection[1].Value);
-                v.b = float.Parse(collection[2].Value);
-                v.a = float.Parse(collection[3].Value);
+                bool res = float.TryParse(collection[0].Value, out v.r);
+                res &= float.TryParse(collection[1].Value, out v.g);
+                res &= float.TryParse(collection[2].Value, out v.b);
+                res &= float.TryParse(collection[3].Value, out v.a);
                 return true;
             }
             return false;
@@ -630,7 +667,7 @@ namespace Nullspace
             }
             MethodInfo keyMethod = GetReadMethod<U>();
             MethodInfo valueMethod = GetReadMethod<V>();
-            Debug.Assert(keyMethod != null && valueMethod != null, "ReadMap");
+            DebugUtils.Assert(keyMethod != null && valueMethod != null, string.Format("ReadMap Not Found Type U:{0},V:{1}", typeof(U).FullName, typeof(V).FullName));
             bool res = false;
             int count = useCount;
             // 处理 -1 和 大于0 的情况
@@ -657,7 +694,7 @@ namespace Nullspace
         {
             MethodInfo keyMethod = GetWriteMethod<U>();
             MethodInfo valueMethod = GetWriteMethod<V>();
-            Debug.Assert(keyMethod != null && valueMethod != null, "WriteMap");
+            DebugUtils.Assert(keyMethod != null && valueMethod != null, string.Format("WriteMap Not Found Type U:{0},V:{1}", typeof(U).FullName, typeof(V).FullName));
             int size = ignoreWriteCount ? 0 : WriteInt(stream, values.Count);
             GenericParametersObjectTwo[0] = stream;
             foreach (var pair in values)
@@ -690,7 +727,7 @@ namespace Nullspace
                 values.Capacity = count;
                 T v = IsStreamType<T>() ? new T() : default(T);
                 MethodInfo info = GetReadMethod<T>();
-                Debug.Assert(info != null, "" + typeof(T).FullName);
+                DebugUtils.Assert(info != null, "" + typeof(T).FullName);
                 GenericParametersObjectTwo[0] = stream;
                 GenericParametersObjectTwo[1] = v;
                 for (int i = 0; i < count; ++i)
@@ -707,7 +744,7 @@ namespace Nullspace
         {
             int size = ignoreWriteCount ? 0 : WriteInt(stream, values.Count);
             MethodInfo info = GetWriteMethod<T>();
-            Debug.Assert(info != null, "" + typeof(T).FullName);
+            DebugUtils.Assert(info != null, "" + typeof(T).FullName);
             GenericParametersObjectTwo[0] = stream;
             for (int i = 0; i < values.Count; ++i)
             {

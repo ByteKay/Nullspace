@@ -45,10 +45,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameDataCode\EmptyGameData.cs" />
+    <Compile Include="GameDataCode\Test.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GameDataCode\Test.cs" />
-    <Compile Include="GameDataCode\EmptyGameData.cs" />
     <Compile Include="Runtime\DataFileTypeEnum.cs" />
     <Compile Include="Runtime\DataFormatConvert.cs" />
     <Compile Include="Runtime\DataFormat\Properties\Properties.cs" />
@@ -67,8 +67,10 @@
     <Compile Include="Runtime\DataLoader\GameDataTwoMap.cs" />
     <Compile Include="Runtime\DataTypeEnum.cs" />
     <Compile Include="Runtime\DateTimeUtils.cs" />
+    <Compile Include="Runtime\DebugUtils.cs" />
     <Compile Include="Runtime\EnumUtils.cs" />
     <Compile Include="Runtime\GameDataUtils.cs" />
+    <Compile Include="Runtime\MD5HashUtils.cs" />
     <Compile Include="Runtime\StringUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -25,8 +25,7 @@ namespace Nullspace
 
         protected static void SetData(List<T> allDatas)
         {
-            bool isDelayInitialized = (bool)typeof(T).GetField("IsDelayInitialized").GetValue(null);
-            if (!isDelayInitialized)
+            if (IsImmediateLoad())
             {
                 foreach (T t in allDatas)
                 {
@@ -35,6 +34,7 @@ namespace Nullspace
             }
             mDataList = new List<T>();
             mDataList.AddRange(allDatas);
+            LogLoadedEnd("" + mDataList.Count);
         }
 
         protected static void Clear()
@@ -43,6 +43,7 @@ namespace Nullspace
             {
                 mDataList.Clear();
                 mDataList = null;
+                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }

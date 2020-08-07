@@ -2,8 +2,4 @@ xml_dir = GameDataXml
 cs_dir = GameDataCode
 xlsx_dir = ./Excel
 recursive = true
-
-export_cs = true // build dll
 export_nullstream = false
-
-define_dll = -debug

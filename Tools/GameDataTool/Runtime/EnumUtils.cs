@@ -1,5 +1,4 @@
 ﻿
-using Object = System.Object;
 using System;
 
 namespace Nullspace
@@ -22,7 +21,7 @@ namespace Nullspace
 
         public static U EnumToBaseType<T, U>(T value)
         {
-            return (U)(System.Object)value;
+            return (U)(object)value;
         }
 
         public static int EnumToInt<T>(T value)
@@ -40,7 +39,7 @@ namespace Nullspace
             return Enum.GetNames(enumType);
         }
 
-        public static bool IsDefined(Type enumType, Object value)
+        public static bool IsDefined(Type enumType, object value)
         {
             return Enum.IsDefined(enumType, value);
         }

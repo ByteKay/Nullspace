@@ -1,0 +1,5 @@
+F:\Unity\Nullspace\Tools\GameDataCheckBinary\bin\GameDataCheck.exe
+F:\Unity\Nullspace\Tools\GameDataCheckBinary\bin\GameDataCheck.pdb
+F:\Unity\Nullspace\Tools\GameDataCheckBinary\obj\Release\GameDataCheckBinary.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\GameDataCheckBinary\obj\Release\GameDataCheck.exe
+F:\Unity\Nullspace\Tools\GameDataCheckBinary\obj\Release\GameDataCheck.pdb

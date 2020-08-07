@@ -17,7 +17,7 @@ namespace Nullspace
         public static void InitByFile<T>(string fileUrl) where T : GameData<T>, new()
         {
             string[] strs = fileUrl.Split('#');
-            Debug.Assert(strs.Length == 2, "wrong url: " + fileUrl);
+            DebugUtils.Assert(strs.Length == 2, "wrong url: " + fileUrl);
             InitByFile<T>(strs[0].Trim(), strs[1].Trim());
         }
         
@@ -91,6 +91,14 @@ namespace Nullspace
             }
         }
 
+        public static void Log(string info)
+        {
+            if (LogAction != null)
+            {
+                LogAction(info);
+            }
+        }
+
         /// <summary>
         /// 删除一个文件下的某一个类型数据
         /// </summary>
@@ -105,10 +113,44 @@ namespace Nullspace
             return mGameDataTypes.Count;
         }
 
-        public static void SetDir(string dir, bool isAssetbundle)
+        public static void InitData(Type type)
+        {
+            MethodInfo info = type.GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            info.Invoke(null, null);
+        }
+
+        public static void InitData<T>()
+        {
+            InitData(typeof(T));
+        }
+
+        public static void InitFileData(string fileName)
+        {
+            ClearFileData(fileName);
+            if (mGameDataTypes.ContainsKey(fileName))
+            {
+                foreach (var type in mGameDataTypes[fileName])
+                {
+                    InitData(type);
+                }
+            }
+            ClearXmlData();
+        }
+
+        public static void InitAllData()
+        {
+            foreach (var t in mGameDataTypes)
+            {
+                InitFileData(t.Key);
+            }
+        }
+
+        public static void SetDir(string dir, bool isAssetbundle, bool forceImmediate, Action<string> logAction)
         {
             FileDir = dir;
             IsAssetBundle = isAssetbundle;
+            ForceImmediate = forceImmediate;
+            LogAction = logAction;
         }
     }
 
@@ -119,8 +161,8 @@ namespace Nullspace
         private const string GameDataNamespaceName = "GameData";
         private static bool IsAssetBundle = false;
         private static string FileDir = ".";
-
-
+        public static bool ForceImmediate = false;
+        private static Action<string> LogAction = null;
         private static Dictionary<string, List<Type>> mGameDataTypes = new Dictionary<string, List<Type>>();
         private static Dictionary<string, SecurityElement> FileLoaded = new Dictionary<string, SecurityElement>();
 

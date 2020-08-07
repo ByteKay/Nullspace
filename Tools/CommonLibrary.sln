@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataTool", "GameDataToo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataCheck", "GameDataCheck\GameDataCheck.csproj", "{7BA96655-468A-45F5-AE46-7F62E706BBF3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataCheckBinary", "GameDataCheckBinary\GameDataCheckBinary.csproj", "{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7BA96655-468A-45F5-AE46-7F62E706BBF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BA96655-468A-45F5-AE46-7F62E706BBF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BA96655-468A-45F5-AE46-7F62E706BBF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

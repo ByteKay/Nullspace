@@ -12,7 +12,7 @@ namespace Nullspace
         {
             if (string.IsNullOrEmpty(content))
             {
-                Debug.Assert(false, "Attempting to create a Properties object from an empty URL!");
+                DebugUtils.Assert(false, "Attempting to create a Properties object from an empty URL!");
                 return null;
             }
             // Calculate the file and full namespace path from the specified url.
@@ -30,7 +30,7 @@ namespace Nullspace
                 Properties p = GetPropertiesFromNamespacePath(properties, namespacePath);
                 if (p == null)
                 {
-                    Debug.Assert(false, string.Format("Failed to load properties from url {0}.", urlString));
+                    DebugUtils.Assert(false, string.Format("Failed to load properties from url {0}.", urlString));
                     return null;
                 }
                 if (p != properties)
@@ -49,7 +49,7 @@ namespace Nullspace
         {
             if (string.IsNullOrEmpty(url))
             {
-                Debug.Assert(false, "Attempting to create a Properties object from an empty URL!");
+                DebugUtils.Assert(false, "Attempting to create a Properties object from an empty URL!");
                 return null;
             }
             // Calculate the file and full namespace path from the specified url.
@@ -57,7 +57,19 @@ namespace Nullspace
             string fileString = null;
             List<string> namespacePath = new List<string>();
             CalculateNamespacePath(ref urlString, ref fileString, namespacePath);
-            return CreateFromContent(File.ReadAllText(fileString), url);
+            if (File.Exists(fileString))
+            {
+                return CreateFromContent(File.ReadAllText(fileString), url);
+            }
+            else
+            {
+                Properties p = new Properties();
+                p.mNamespace = fileString;
+                p.mId = Path.GetFileNameWithoutExtension(fileString);
+                p.SetDirectoryPath(fileString);
+                return p;
+            }
+            
         }
         public static void CalculateNamespacePath(ref string urlString, ref string fileString, List<string> namespacePath)
         {
@@ -91,7 +103,7 @@ namespace Nullspace
                     {
                         if (iter == null)
                         {
-                            Debug.Assert(false, "Failed to load properties object from url.");
+                            DebugUtils.Assert(false, "Failed to load properties object from url.");
                             return null;
                         }
                         if (namespacePath[i].Equals(iter.GetId())) // id, not namespace
@@ -229,7 +241,7 @@ namespace Nullspace
 
             for (int i = 0, count = mNamespaces.Count; i < count; i++)
             {
-                Debug.Assert(mNamespaces[i] != null, "");
+                DebugUtils.Assert(mNamespaces[i] != null, "");
                 Properties child = mNamespaces[i].Clone();
                 p.mNamespaces.Add(child);
                 child.mParent = p;
@@ -238,14 +250,17 @@ namespace Nullspace
 
             return p;
         }
-        public void PrintAll(StringBuilder sb, int ident)
+
+        public void WriteString(StringBuilder sb, int ident)
         {
+            Rewind();
             string space = "";
             for (int i = 0; i < ident; ++i)
             {
                 space += "    ";
             }
-            sb.Append(space).AppendFormat("{0} {1} {2} {3}", mNamespace, mId, mDirPath, mParentID).AppendLine();
+            sb.Append(space).AppendFormat("{0} {1}", mNamespace, mId).AppendLine();
+            sb.Append(space).AppendLine("{");
             foreach (Property prop in mProperties)
             {
                 sb.Append(space).Append("    ").AppendFormat("{0} = {1}", prop.Name, prop.Value).AppendLine();
@@ -257,13 +272,24 @@ namespace Nullspace
                     sb.Append(space).Append("    ").AppendFormat("{0} = {1}", variable.Name, variable.Value).AppendLine();
                 }
             }
-
             Properties p = null;
             while ((p = GetNextNamespace()) != null)
             {
-                p.PrintAll(sb, ident + 1);
+                p.WriteString(sb, ident + 1);
                 sb.AppendLine();
             }
+            sb.Append(space).AppendLine("}");
+        }
+        public Properties Append(string namespaceName, string id)
+        {
+            Properties prop = new Properties();
+            prop.mVisited = false;
+            prop.mVariables = null;
+            prop.mNamespace = namespaceName;
+            prop.mParent = this;
+            prop.mId = id;
+            mNamespaces.Add(prop);
+            return prop;
         }
         public string GetNextProperty()
         {
@@ -305,7 +331,7 @@ namespace Nullspace
         }
         public Properties GetNamespace(string id, bool searchNames, bool recurse)
         {
-            Debug.Assert(id != null, "");
+            DebugUtils.Assert(id != null, "");
 
             for (int i = 0; i < mNamespaces.Count; ++i)
             {
@@ -329,7 +355,7 @@ namespace Nullspace
         }
         public void GetNamespaces(string id, ref List<Properties> allList, bool searchNames, bool recurse)
         {
-            Debug.Assert(id != null, "");
+            DebugUtils.Assert(id != null, "");
 
             for (int i = 0; i < mNamespaces.Count; ++i)
             {
@@ -461,7 +487,7 @@ namespace Nullspace
                 {
                     return value;
                 }
-                Debug.Assert(false, string.Format("Error attempting to parse property {0} as an integer.", name));
+                DebugUtils.Assert(false, string.Format("Error attempting to parse property {0} as an integer.", name));
             }
 
             return 0;
@@ -476,7 +502,7 @@ namespace Nullspace
                 {
                     return value;
                 }
-                Debug.Assert(false, string.Format("Error attempting to parse property {0} as an integer.", name));
+                DebugUtils.Assert(false, string.Format("Error attempting to parse property {0} as an integer.", name));
             }
 
             return 0;
@@ -491,14 +517,14 @@ namespace Nullspace
                 {
                     return value;
                 }
-                Debug.Assert(false, string.Format("Error attempting to parse property {0} as an integer.", name));
+                DebugUtils.Assert(false, string.Format("Error attempting to parse property {0} as an integer.", name));
             }
 
             return 0;
         }
         public bool GetPath(string name, string path)
         {
-            Debug.Assert(name != null && path != null, "");
+            DebugUtils.Assert(name != null && path != null, "");
 
             string valueString = GetString(name, null);
             if (valueString != null)
@@ -557,7 +583,7 @@ namespace Nullspace
         }
         public void SetVariable(string name, string value)
         {
-            Debug.Assert(name != null, "");
+            DebugUtils.Assert(name != null, "");
 
             Property prop = null;
 
@@ -600,7 +626,7 @@ namespace Nullspace
         /// <param name="stream"></param>
         private void ReadProperties(NullMemoryStream stream)
         {
-            Debug.Assert(stream != null, "");
+            DebugUtils.Assert(stream != null, "");
             string namesp = null;
             string id = null;
             string parentID = null;
@@ -698,7 +724,7 @@ namespace Nullspace
                                 {
                                     if (line.Length > 1)
                                     {
-                                        Debug.Assert(false, "Error parsing this line should be only '{' : " + line);
+                                        DebugUtils.Assert(false, "Error parsing this line should be only '{' : " + line);
                                         return;
                                     }
                                 }
@@ -709,7 +735,7 @@ namespace Nullspace
                                 {
                                     if (line.Length > 1)
                                     {
-                                        Debug.Assert(false, "Error parsing this line should be only '}' : " + line);
+                                        DebugUtils.Assert(false, "Error parsing this line should be only '}' : " + line);
                                         return;
                                     }
                                     // End of namespace.
@@ -720,7 +746,7 @@ namespace Nullspace
                                 {
                                     if (string.IsNullOrEmpty(namesp))
                                     {
-                                        Debug.Assert(false, "ReadProperties Error parsing  namespace");
+                                        DebugUtils.Assert(false, "ReadProperties Error parsing  namespace");
                                         return;
                                     }
                                     // New namespace without an ID.
@@ -756,7 +782,7 @@ namespace Nullspace
                                     if (string.IsNullOrEmpty(namesp))
                                     {
                                         namesp = null;
-                                        Debug.Assert(false, "Error parsing this line should be not null : " + line);
+                                        DebugUtils.Assert(false, "Error parsing this line should be not null : " + line);
                                         return;
                                     }
                                     id = StringUtils.StrTok(null, "");
@@ -797,7 +823,7 @@ namespace Nullspace
                     Properties parent = GetNamespace(derived.mParentID, false, true);
                     if (parent != null)
                     {
-                        Debug.Assert(!parent.mVisited, "");
+                        DebugUtils.Assert(!parent.mVisited, "");
                         ResolveInheritance(parent.GetId());
 
                         // Copy the child.
@@ -814,7 +840,7 @@ namespace Nullspace
                         derived.mNamespaces = new List<Properties>();
                         for (int itt = 0; itt < parent.mNamespaces.Count; ++itt)
                         {
-                            Debug.Assert(parent.mNamespaces[itt] != null, "");
+                            DebugUtils.Assert(parent.mNamespaces[itt] != null, "");
                             derived.mNamespaces.Add(new Properties(parent.mNamespaces[itt]));
                         }
                         derived.Rewind();
@@ -842,7 +868,7 @@ namespace Nullspace
         // Called by resolveInheritance().
         private void MergeWith(Properties overrides)
         {
-            Debug.Assert(overrides != null, "");
+            DebugUtils.Assert(overrides != null, "");
 
             // Overwrite or add each property found in child.
             overrides.Rewind();

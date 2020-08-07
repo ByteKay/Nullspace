@@ -7,8 +7,8 @@ namespace Nullspace
     // 管理器：唯一索引
     public class GameDataOneMap<T> : GameData<T> where T : GameDataOneMap<T>, new()
     {
-        protected static Dictionary<int, T> mDataMap;
-        public static Dictionary<int, T> Data
+        protected static Dictionary<uint, T> mDataMap;
+        public static Dictionary<uint, T> Data
         {
             get
             {
@@ -25,20 +25,29 @@ namespace Nullspace
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMap = new Dictionary<int, T>();
-            int key1 = -1;
-            int key2 = -2;
+            mDataMap = new Dictionary<uint, T>();
+            uint key1 = uint.MaxValue;
+            uint key2 = uint.MaxValue;
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
-            bool isDelayInitialized = (bool)typeof(T).GetField("IsDelayInitialized").GetValue(null);
+            bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
             {
                 int cnt = AssignKeyProp(t, keyNameList, ref key1, ref key2);
-                if (!isDelayInitialized)
+                if (isImmediateInitialized)
                 {
                     t.IsInitialized();
                 }
-                mDataMap.Add(key1, t);
+                if (!mDataMap.ContainsKey(key1))
+                {
+                    mDataMap.Add(key1, t);
+                }
+                else
+                {
+                    GameDataManager.Log(string.Format("duplicated key: {0} ", key1));
+                }
+                
             }
+            LogLoadedEnd("" + mDataMap.Count);
         }
         protected static void Clear()
         {
@@ -46,6 +55,7 @@ namespace Nullspace
             {
                 mDataMap.Clear();
                 mDataMap = null;
+                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }
