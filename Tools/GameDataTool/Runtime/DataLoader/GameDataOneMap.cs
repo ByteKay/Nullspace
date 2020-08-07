@@ -5,10 +5,10 @@ namespace Nullspace
 {
 
     // 管理器：唯一索引
-    public class GameDataOneMap<T> : GameData<T> where T : GameDataOneMap<T>, new()
+    public class GameDataOneMap<M, T> : GameData<T> where T : GameDataOneMap<M, T>, new()
     {
-        protected static Dictionary<uint, T> mDataMap;
-        public static Dictionary<uint, T> Data
+        protected static Dictionary<M, T> mDataMap;
+        public static Dictionary<M, T> Data
         {
             get
             {
@@ -25,8 +25,8 @@ namespace Nullspace
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMap = new Dictionary<uint, T>();
-            uint key1 = uint.MaxValue;
+            mDataMap = new Dictionary<M, T>();
+            M key1 = default(M);
             uint key2 = uint.MaxValue;
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
             bool isImmediateInitialized = IsImmediateLoad();
