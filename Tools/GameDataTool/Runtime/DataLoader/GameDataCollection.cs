@@ -4,6 +4,29 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
+    //var test = Data;
+    //IEnumerator itr = test.GetEnumerator();
+    //while (itr.MoveNext())
+    //{
+    //    var group = test.Current;
+    //    DebugUtils.Log("" + group.Color);
+    //}
+
+    //var test = Data;
+    //foreach (var t in test)
+    //{
+    //    var group = test.Current;
+    //    DebugUtils.Log("" + group.Color);
+    //}
+
+    //var test = Data;
+    //test.Reset();
+    //while (test.MoveNext())
+    //{
+    //    var group = test.Current;
+    //    DebugUtils.Log("" + group.Color);
+    //}
+
     public class GameDataCollection<T> : IEnumerator<T> where T : GameData<T>, new()
     {
         private List<T> mDatas;
@@ -32,7 +55,10 @@ namespace Nullspace
             get
             {
                 T t = (T)mItr.Current;
-                t.Initialize();
+                if (t != null)
+                {
+                    t.Initialize();
+                }
                 return t;
             }
         }
@@ -59,6 +85,12 @@ namespace Nullspace
         public void Reset()
         {
             mItr = mDatas.GetEnumerator();
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            Reset();
+            return mItr;
         }
     }
 
