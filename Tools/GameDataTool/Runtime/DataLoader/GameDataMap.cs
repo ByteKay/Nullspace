@@ -44,7 +44,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    GameDataManager.Log(string.Format("duplicated key: {0} ", key1));
+                    DebugUtils.Log(string.Format("duplicated key: {0} ", key1));
                 }
                 
             }
@@ -56,7 +56,7 @@ namespace Nullspace
             {
                 mDataMap.Clear();
                 mDataMap = null;
-                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }
@@ -104,7 +104,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    GameDataManager.Log(string.Format("duplicated key: {0} {1}", key1, key2));
+                    DebugUtils.Log(string.Format("duplicated key: {0} {1}", key1, key2));
                 }
             }
             StringBuilder sb = new StringBuilder();
@@ -123,7 +123,7 @@ namespace Nullspace
             {
                 mDataMapMap.Clear();
                 mDataMapMap = null;
-                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }

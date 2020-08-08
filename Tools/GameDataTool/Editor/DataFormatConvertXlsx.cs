@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace Nullspace
 {
-    public partial class DataFormatConvert
+    public partial class DataFormatConvertUtils
     {
         public static void ExportXlsx()
         {

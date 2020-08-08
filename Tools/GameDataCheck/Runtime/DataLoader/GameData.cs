@@ -50,7 +50,7 @@ namespace Nullspace
                         key2 = (N)obj;
                     }
                 }
-                GameDataManager.Log(string.Format("{0} {1}", key1, key2));
+                DebugUtils.Log(string.Format("{0} {1}", key1, key2));
                 return keyNameList.Count;
             }
             return 0;
@@ -69,12 +69,12 @@ namespace Nullspace
 
         protected static void LogLoadedBegin(string fileUrl)
         {
-            GameDataManager.Log(string.Format("***** GameDataTypeName: {0} FileUrl: {1} Begin ***** ", typeof(T).FullName, fileUrl));
+            DebugUtils.Log(string.Format("***** GameDataTypeName: {0} FileUrl: {1} Begin ***** ", typeof(T).FullName, fileUrl));
         }
 
         protected static void LogLoadedEnd(string dataInfo)
         {
-            GameDataManager.Log(string.Format("***** GameDataTypeName: {0}, IsImmediateLoad: {1}, Info: {2} End ***** ", typeof(T).FullName, IsImmediateLoad(), dataInfo));
+            DebugUtils.Log(string.Format("***** GameDataTypeName: {0}, IsImmediateLoad: {1}, Info: {2} End ***** ", typeof(T).FullName, IsImmediateLoad(), dataInfo));
         }
 
         public bool IsInitialized()

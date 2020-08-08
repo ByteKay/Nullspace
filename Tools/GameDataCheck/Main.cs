@@ -9,7 +9,9 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             Config = Properties.Create("config.txt");
-            GameDataManager.SetDir(Config.GetString("xml_dir", "."), false, true, LogAction);
+            GameDataManager.SetDir(Config.GetString("xml_dir", "."), false, true);
+            DebugUtils.SetLogAction(LogAction);
+
             LogAction("Check Start ...");
             GameDataManager.InitAllData();
             GameDataManager.ClearAllData();

@@ -91,14 +91,6 @@ namespace Nullspace
             }
         }
 
-        public static void Log(string info)
-        {
-            if (LogAction != null)
-            {
-                LogAction(info);
-            }
-        }
-
         /// <summary>
         /// 删除一个文件下的某一个类型数据
         /// </summary>
@@ -145,12 +137,11 @@ namespace Nullspace
             }
         }
 
-        public static void SetDir(string dir, bool isAssetbundle, bool forceImmediate, Action<string> logAction)
+        public static void SetDir(string dir, bool isAssetbundle, bool forceImmediate)
         {
             FileDir = dir;
             IsAssetBundle = isAssetbundle;
             ForceImmediate = forceImmediate;
-            LogAction = logAction;
         }
     }
 
@@ -162,7 +153,7 @@ namespace Nullspace
         private static bool IsAssetBundle = false;
         private static string FileDir = ".";
         public static bool ForceImmediate = false;
-        private static Action<string> LogAction = null;
+
         private static Dictionary<string, List<Type>> mGameDataTypes = new Dictionary<string, List<Type>>();
         private static Dictionary<string, SecurityElement> FileLoaded = new Dictionary<string, SecurityElement>();
 
@@ -175,6 +166,7 @@ namespace Nullspace
         {
             t.GetMethod("Clear", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Invoke(null, null);
         }
+
         private static void LoadGameDataTypes()
         {
             ClearAllData();

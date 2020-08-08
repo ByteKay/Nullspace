@@ -7,7 +7,6 @@ using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
 
 namespace Nullspace
 {

@@ -58,7 +58,7 @@ namespace Nullspace
             {
                 mDataMapList.Clear();
                 mDataMapList = null;
-                GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }

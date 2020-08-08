@@ -14,13 +14,19 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             Config = Properties.Create("config.txt");
+            DebugUtils.SetLogAction(LogAction);
             XlsxHistory = Properties.Create("xlsx_info_record.txt#xlsx_info_record");
-            DataFormatConvert.ExportXlsx();
-            DataFormatConvert.BuildDll();
+            DataFormatConvertUtils.ExportXlsx();
+            DataFormatConvertUtils.BuildDll();
             StringBuilder sb = new StringBuilder();
             XlsxHistory.WriteString(sb, 0);
             File.WriteAllText("xlsx_info_record.txt", sb.ToString());
             Console.ReadLine();
+        }
+
+        private static void LogAction(string info)
+        {
+            Console.WriteLine(info);
         }
 
         public static void Log(string str)
@@ -31,7 +37,7 @@ namespace Nullspace
         private static void TestXmlAndProperties()
         {
             string filePath = "test_data.xml";
-            Properties prop = DataFormatConvert.ConvertXMLToPropertiesFromFile(filePath);
+            Properties prop = DataFormatConvertUtils.ConvertXMLToPropertiesFromFile(filePath);
             StringBuilder sb = new StringBuilder();
             prop.WriteString(sb, 0);
             File.WriteAllText("xml_2_properties.txt", sb.ToString());

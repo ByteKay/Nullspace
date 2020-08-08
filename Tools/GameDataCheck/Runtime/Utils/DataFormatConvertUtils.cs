@@ -1,11 +1,10 @@
 ﻿
-using System.Diagnostics;
 using System.IO;
 using System.Security;
 
 namespace Nullspace
 {
-    public partial class DataFormatConvert
+    public partial class DataFormatConvertUtils
     {
         public static Properties ConvertXMLToPropertiesFromFile(string filePath)
         {
