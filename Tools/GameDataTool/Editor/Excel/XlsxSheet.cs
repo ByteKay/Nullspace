@@ -9,6 +9,8 @@ namespace Nullspace
 {
     public class XlsxSheet : IExportCSharp
     {
+
+        private static char KeySplitChar = ',';
         private const string SKIP_ROW = "(#SKIP)";
         private const int SHEET_DATA_MANAGER = 0;
         private const int VARIABLE_NAME_ROW = 1;
@@ -22,25 +24,42 @@ namespace Nullspace
             List<string> variableNames;
             List<DataTypeEnum> variableTypes;
             List<DataSideEnum> variableSides;
-            Dictionary<string, string> sheetAttribute;
+            string managerName = null;
+            string keys = null;
             MainEntry.Log(string.Format("-------------------SheetName: {0} Begin", tDS.Name));
-            List<XlsxRow> datas = CleanRowAndCols(tDS, sheet, out sheetAttribute, out variableNames, out variableTypes, out variableSides);
+            List<XlsxRow> datas = CleanRowAndCols(tDS, sheet, out managerName, out keys, out variableNames, out variableTypes, out variableSides);
             if (datas != null)
             {
-                sheet.Set(sheetAttribute, variableNames, variableTypes, variableSides, datas);
+                sheet.Set(managerName, keys, variableNames, variableTypes, variableSides, datas);
                 MainEntry.Log(string.Format("-------------------SheetName: {0} End", tDS.Name));
                 return sheet;
             }
             MainEntry.Log(string.Format("*******************SheetName: {0} failed", tDS.Name));
             return null;
         }
-        private static List<XlsxRow> CleanRowAndCols(ExcelWorksheet tDS, XlsxSheet sheet, out Dictionary<string, string> sheetAttribute, out List<string> variableNames, out List<DataTypeEnum> variableTypes, out List<DataSideEnum> variableSides)
+
+        private static void ParseManagerType(string value, ref string managerName, ref string keys)
+        {
+            string leftValue = StringUtils.StrTok(value, ">"); 
+            managerName = StringUtils.StrTok(leftValue, "<");
+            if (managerName == null)
+            {
+                return;
+            }
+            managerName = managerName.Replace(" ", "").ToUpper();
+            keys = StringUtils.StrTok(null, "");
+            if (keys != null)
+            {
+                keys = keys.Replace(" ", "").Replace("，", ",");
+            }
+        }
+        private static List<XlsxRow> CleanRowAndCols(ExcelWorksheet tDS, XlsxSheet sheet, out string managerName, out string keys, out List<string> variableNames, out List<DataTypeEnum> variableTypes, out List<DataSideEnum> variableSides)
         {
             variableNames = new List<string>();
             variableTypes = new List<DataTypeEnum>();
             variableSides = new List<DataSideEnum>();
-            sheetAttribute = null;
-
+            managerName = null;
+            keys = null;
             ExcelRange range = tDS.Cells;
             object[,] values = (object[,])range.Value;
             int rows = values.GetLength(0);
@@ -49,10 +68,17 @@ namespace Nullspace
             HashSet<int> skipRows = new HashSet<int>();
             if (rows > 0 && cols > 0)
             {
-                sheetAttribute = GameDataUtils.ToObject<Dictionary<string, string>>((string)values[SHEET_DATA_MANAGER, 0]);
-                if (sheetAttribute == null)
+                // List,Group<ColName>,Map<ColName>,Map<ColName1, ColName2>
+                string value = (string)values[SHEET_DATA_MANAGER, 0];
+                if (value == null)
                 {
-                    MainEntry.Log(string.Format("****************SheetName: {0} End", tDS.Name));
+                    MainEntry.Log(string.Format("****************SheetName: {0} Wrong At [0, 0] End", tDS.Name));
+                    return null;
+                }
+                ParseManagerType(value, ref managerName, ref keys);
+                if (managerName == null)
+                {
+                    MainEntry.Log(string.Format("****************SheetName: {0} Wrong ManagerName {1} End", tDS.Name, value));
                     return null;
                 }
             }
@@ -155,13 +181,13 @@ namespace Nullspace
             Parent = parent;
             SheetName = sheetName;
         }
-        private void Set(Dictionary<string, string> sheetAttribute, List<string> variableNames, List<DataTypeEnum> variableTypes, List<DataSideEnum> variableSides, List<XlsxRow> datas)
+        private void Set(string managerName, string keys, List<string> variableNames, List<DataTypeEnum> variableTypes, List<DataSideEnum> variableSides, List<XlsxRow> datas)
         {
             mVariableNames = variableNames;
             mVariableTypes = variableTypes;
             mVariableSides = variableSides;
             mDatas = datas;
-            ParseSheetAttribute(sheetAttribute);
+            ParseSheetAttribute(managerName, keys);
             SplitCS();
             GeneratorRecord();
         }
@@ -248,7 +274,7 @@ namespace Nullspace
         {
             if (!string.IsNullOrEmpty(Keys))
             {
-                List<string> keys = new List<string>(Keys.Split('#'));
+                List<string> keys = new List<string>(Keys.Split(KeySplitChar));
                 string v = "new List<string>(){";
                 foreach (string key in keys)
                 {
@@ -260,6 +286,7 @@ namespace Nullspace
             }
             return "null";
         }
+
         private string GetDataManager()
         {
             GameDataManagerType type = GameDataManagerType.LIST;
@@ -271,36 +298,19 @@ namespace Nullspace
             {
                 case GameDataManagerType.LIST:
                     return "GameDataList";
-                case GameDataManagerType.ONE_MAP:
-                    return "GameDataOneMap";
-                case GameDataManagerType.TWO_MAP:
-                    return "GameDataTwoMap";
-                case GameDataManagerType.GROUP_MAP:
-                    return "GameDataGroupMap";
+                case GameDataManagerType.MAP:
+                    return "GameDataMap";
+                case GameDataManagerType.GROUP:
+                    return "GameDataGroup";
             }
             return "GameDataList";
         }
-        private void ParseSheetAttribute(Dictionary<string, string> data)
+
+        private void ParseSheetAttribute(string managerName, string keys)
         {
-            Keys = null;
+            Keys = keys;
             Delay = true;
-            Manager = null;
-            if (data.ContainsKey("keys"))
-            {
-                Keys = data["keys"];
-            }
-            if (data.ContainsKey("delay"))
-            {
-                bool b;
-                if (bool.TryParse(data["delay"], out b))
-                {
-                    Delay = b;
-                }
-            }
-            if (data.ContainsKey("manager"))
-            {
-                Manager = data["manager"];
-            }
+            Manager = managerName;
         }
 
         private string MakeClassDefine()
@@ -316,7 +326,7 @@ namespace Nullspace
                 return string.Format("public class {0} : {1}<{2}>", SheetName, baseName, SheetName);
             }
             DebugUtils.Assert(!string.IsNullOrEmpty(Keys), "Wrong Keys");
-            List<string> keys = new List<string>(Keys.Split('#'));
+            List<string> keys = new List<string>(Keys.Split(','));
             string dataTypeString = null;
             string readString = null;
             string writeString = null;
@@ -592,12 +602,6 @@ namespace Nullspace
                     writeString = "WriteList";
                     return;
             }
-            
-
-        }
-        public bool CheckData()
-        {
-            return true;
         }
     }
 }

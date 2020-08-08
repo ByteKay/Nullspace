@@ -74,7 +74,7 @@ namespace Nullspace
         }
         public static string GetDateTimeString()
         {
-            return FormatTime(GetTimeStampI());
+            return FormatTime(DateTime.UtcNow);
         }
     }
 }

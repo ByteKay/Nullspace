@@ -1,31 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Nullspace
 {
 
-    // 管理器：唯一索引
-    public class GameDataOneMap<M, T> : GameData<T> where T : GameDataOneMap<M, T>, new()
+    // 管理器：按key分组
+    public class GameDataGroup<M, T> : GameData<T> where T : GameDataGroup<M, T>, new()
     {
-        protected static Dictionary<M, T> mDataMap;
-        public static Dictionary<M, T> Data
+        protected static Dictionary<M, List<T>> mDataMapList;
+        public static Dictionary<M, List<T>> Data
         {
             get
             {
-                if (mDataMap == null)
+                if (mDataMapList == null)
                 {
                     Init();
-                    if (mDataMap == null)
+                    if (mDataMapList == null)
                     {
                         throw new Exception("wrong fileName: " + typeof(T).FullName);
                     }
                 }
-                return mDataMap;
+                return mDataMapList;
             }
         }
         protected static void SetData(List<T> allDatas)
         {
-            mDataMap = new Dictionary<M, T>();
+            mDataMapList = new Dictionary<M, List<T>>();
             M key1 = default(M);
             uint key2 = uint.MaxValue;
             List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
@@ -37,24 +38,26 @@ namespace Nullspace
                 {
                     t.IsInitialized();
                 }
-                if (!mDataMap.ContainsKey(key1))
+                if (!mDataMapList.ContainsKey(key1))
                 {
-                    mDataMap.Add(key1, t);
+                    mDataMapList.Add(key1, new List<T>());
                 }
-                else
-                {
-                    GameDataManager.Log(string.Format("duplicated key: {0} ", key1));
-                }
-                
+                mDataMapList[key1].Add(t);
             }
-            LogLoadedEnd("" + mDataMap.Count);
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in mDataMapList)
+            {
+                sb.AppendFormat("(Key:{0}, Count:{1}) ", item.Key, item.Value.Count);
+            }
+            LogLoadedEnd(sb.ToString());
         }
+
         protected static void Clear()
         {
-            if (mDataMap != null)
+            if (mDataMapList != null)
             {
-                mDataMap.Clear();
-                mDataMap = null;
+                mDataMapList.Clear();
+                mDataMapList = null;
                 GameDataManager.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
         }

@@ -59,12 +59,11 @@
     <Compile Include="Runtime\DataFormat\XML\SecurityParser.cs" />
     <Compile Include="Runtime\DataFormat\XML\SmallXmlParser.cs" />
     <Compile Include="Runtime\DataLoader\GameData.cs" />
-    <Compile Include="Runtime\DataLoader\GameDataGroupMap.cs" />
+    <Compile Include="Runtime\DataLoader\GameDataGroup.cs" />
     <Compile Include="Runtime\DataLoader\GameDataList.cs" />
     <Compile Include="Runtime\DataLoader\GameDataManager.cs" />
     <Compile Include="Runtime\DataLoader\GameDataManagerType.cs" />
-    <Compile Include="Runtime\DataLoader\GameDataOneMap.cs" />
-    <Compile Include="Runtime\DataLoader\GameDataTwoMap.cs" />
+    <Compile Include="Runtime\DataLoader\GameDataMap.cs" />
     <Compile Include="Runtime\DataTypeEnum.cs" />
     <Compile Include="Runtime\DateTimeUtils.cs" />
     <Compile Include="Runtime\DebugUtils.cs" />

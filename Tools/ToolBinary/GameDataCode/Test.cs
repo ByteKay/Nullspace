@@ -1,7 +1,7 @@
 /****************************************
 * The Class Is Generated Automatically By GameDataTool, 
 * Don't Modify It Manually.
-* DateTime: 0001-01-02 20:21:21.
+* DateTime: 2020-08-08.
 ****************************************/
 
 using System;
@@ -11,7 +11,7 @@ using Nullspace;
 using UnityEngine;
 namespace GameData
 {
-    public class MonsterProperty : GameDataTwoMap<uint, uint, MonsterProperty>
+    public class MonsterProperty : GameDataMap<uint, uint, MonsterProperty>
     {
         public static readonly string FileUrl = "Test#MonsterPropertys";
         public static readonly bool IsDelayInitialized = true;
