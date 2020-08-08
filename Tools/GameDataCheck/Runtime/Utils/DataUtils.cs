@@ -66,14 +66,14 @@ namespace Nullspace
             {
                 if (type.GetGenericTypeDefinition() == typeof(List<>))
                 {
-                    object ret = typeof(DataUtils).GetMethod("ToListString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                    object ret = ToListStringMethodInfo
                         .MakeGenericMethod(type.GetGenericArguments())
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
                 }
                 else if (type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
-                    object ret = typeof(DataUtils).GetMethod("ToMapString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                    object ret = ToMapStringMethodInfo
                         .MakeGenericMethod(type.GetGenericArguments())
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
@@ -110,7 +110,7 @@ namespace Nullspace
                     foreach (var item in list)
                     {
                         var v = ToObject(item, t);
-                        type.GetMethod("Add").Invoke(result, new object[] { v });
+                        ListAddMethodInfo.Invoke(result, new object[] { v });
                     }
                     return result;
                 }
@@ -123,7 +123,7 @@ namespace Nullspace
                     {
                         var key = ToObject(item.Key, types[0]);
                         var v = ToObject(item.Value, types[1]);
-                        type.GetMethod("Add").Invoke(result, new object[] { key, v });
+                        DictionaryAddMethodInfo.Invoke(result, new object[] { key, v });
                     }
                     return result;
                 }
@@ -134,23 +134,42 @@ namespace Nullspace
             {
                 return EnumUtils.StringToEnum(str, type);
             }
-            GenericParameterTypesOne[0] = type;
-            MethodInfo keyMethod = typeof(DataUtils).GetMethod("GetToObjectMethod", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).MakeGenericMethod(GenericParameterTypesOne);
-            DebugUtils.Assert(keyMethod != null, "GetToObjectMethod Not Found Type1: " + type.FullName);
-            MethodInfo method = (MethodInfo)keyMethod.Invoke(null, null);
-            DebugUtils.Assert(method != null, "GetToObjectMethod Not Found Type2: " + type.FullName);
+            MethodInfo method = GetToObjectMethodInfoFromCache(type);
             GenericParametersObjectTwo[0] = str;
             GenericParametersObjectTwo[1] = GetDefault(type);
             bool res = (bool)method.Invoke(null, GenericParametersObjectTwo);
             DebugUtils.Assert(res, string.Format("Data {0} Not Right Type {1}", str, type.FullName));
             return GenericParametersObjectTwo[1];
         }
+
+        private static MethodInfo GetToObjectMethodInfoFromCache(Type type)
+        {
+            if (GenericMethodInfos.ContainsKey(type))
+            {
+                return GenericMethodInfos[type];
+            }
+            GenericParameterTypesOne[0] = type;
+            MethodInfo keyMethod = GetToObjectMethodInfo.MakeGenericMethod(GenericParameterTypesOne);
+            DebugUtils.Assert(keyMethod != null, "GetToObjectMethod Not Found Type1: " + type.FullName);
+            MethodInfo method = (MethodInfo)keyMethod.Invoke(null, null);
+            DebugUtils.Assert(method != null, "GetToObjectMethod Not Found Type2: " + type.FullName);
+            GenericMethodInfos.Add(type, method);
+            return method;
+        }
     }
 
     public partial class DataUtils
     {
-        private const int CacheLen = 1024 * 1024;
+        private const int CacheLen = 10; // 1024 * 1024;
         private static byte[] CacheBytes = new byte[CacheLen];
+
+        private static BindingFlags StaticNonPublieFlatten = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+        private static MethodInfo DictionaryAddMethodInfo = typeof(Dictionary<,>).GetMethod("Add");
+        private static MethodInfo ListAddMethodInfo = typeof(List<>).GetMethod("Add");
+        private static MethodInfo GetToObjectMethodInfo = typeof(DataUtils).GetMethod("GetToObjectMethod", StaticNonPublieFlatten);
+        private static MethodInfo ToListStringMethodInfo = typeof(DataUtils).GetMethod("ToListString", StaticNonPublieFlatten);
+        private static MethodInfo ToMapStringMethodInfo = typeof(DataUtils).GetMethod("ToMapString", StaticNonPublieFlatten);
+        private static Dictionary<Type, MethodInfo> GenericMethodInfos = new Dictionary<Type, MethodInfo>();
 
         private const char KEY_VALUE_SPRITER = ':';
         private const char MAP_SPRITER = ',';
@@ -163,6 +182,7 @@ namespace Nullspace
         private static object[] GenericParametersObjectOne = new object[1];
         private static object[] GenericParametersObjectTwo = new object[2];
         private static Type[] GenericParameterTypesOne = new Type[1];
+        private static StringBuilder BuilderCache = new StringBuilder();
 
         static DataUtils()
         {
@@ -171,7 +191,7 @@ namespace Nullspace
             ToObjectMethodMap.Clear();
             ToStringMethodMap.Clear();
             Type type = typeof(DataUtils);
-            MethodInfo[] infos = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+            MethodInfo[] infos = type.GetMethods(StaticNonPublieFlatten | BindingFlags.Public);
             foreach (var info in infos)
             {
                 object[] attributes = info.GetCustomAttributes(typeof(DataReadWriteAttribute), false);
@@ -244,32 +264,32 @@ namespace Nullspace
             }
             else
             {
-                StringBuilder sb = new StringBuilder();
+                BuilderCache.Length = 0;
                 foreach (var item in list)
                 {
                     string key = ToString(item);
-                    sb.AppendFormat("{0}{1}", key, LIST_SPRITER);
+                    BuilderCache.AppendFormat("{0}{1}", key, LIST_SPRITER);
                 }
-                sb.Remove(sb.Length - 1, 1);
-                return sb.ToString();
+                BuilderCache.Remove(BuilderCache.Length - 1, 1);
+                return BuilderCache.ToString();
             }
         }
 
-        private static string ToMapString<T, U>(IEnumerable<KeyValuePair<T, U>> map)
+        private static string ToMapString<T, U>(Dictionary<T, U>  map) // IEnumerable<KeyValuePair<T, U>>
         {
-            if (map == null || map.Count() == 0)
+            if (map == null || map.Count == 0)
             {
                 return null;
             }
-            StringBuilder sb = new StringBuilder();
+            BuilderCache.Length = 0;
             foreach (var item in map)
             {
-                string key = ToString<T>(item.Key);
-                string value = ToString<U>(item.Value);
-                sb.AppendFormat("{0}{1}{2}{3}", key, KEY_VALUE_SPRITER, value, MAP_SPRITER);
+                string key = ToString(item.Key);
+                string value = ToString(item.Value);
+                BuilderCache.AppendFormat("{0}{1}{2}{3}", key, KEY_VALUE_SPRITER, value, MAP_SPRITER);
             }
-            sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
+            BuilderCache.Remove(BuilderCache.Length - 1, 1);
+            return BuilderCache.ToString();
         }
 
         private static Dictionary<string, string> ToMapObject(string str)

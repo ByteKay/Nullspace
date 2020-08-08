@@ -90,6 +90,7 @@ namespace Nullspace
             builder.AppendLine("* The Class Is Generated Automatically By GameDataTool, ");
             builder.AppendLine("* Don't Modify It Manually.");
             builder.AppendFormat("* DateTime: {0}.", DateTimeUtils.GetDateTimeString()).AppendLine();
+            builder.AppendLine("Later: Export Method InitializeFromXml(SecurityElement element), reduce reflection count");
             builder.AppendLine("****************************************/");
             builder.AppendLine();
             builder.AppendLine("using System;");
