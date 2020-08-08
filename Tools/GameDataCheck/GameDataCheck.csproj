@@ -58,6 +58,7 @@
     <Compile Include="Runtime\DataFormat\XML\SecurityParser.cs" />
     <Compile Include="Runtime\DataFormat\XML\SmallXmlParser.cs" />
     <Compile Include="Runtime\DataLoader\GameData.cs" />
+    <Compile Include="Runtime\DataLoader\GameDataCollection.cs" />
     <Compile Include="Runtime\DataLoader\GameDataGroup.cs" />
     <Compile Include="Runtime\DataLoader\GameDataList.cs" />
     <Compile Include="Runtime\DataLoader\GameDataManager.cs" />

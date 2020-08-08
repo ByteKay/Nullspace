@@ -1,11 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Security;
 using GameData;
 namespace Nullspace
 {
+    public partial class GameDataManager
+    {
+        private static object[] GenericParameterArrayOne = new object[1];
+        private const string GameDataNamespaceName = "GameData";
+        private const string FileURL = "FileUrl";
+        private const string XmlListSetMethodName = "SetData";
+        private const string XmlSetMethodName = "SetOriginData";
+        private const string XmlFileSuffix = "_client.xml";
+        private const string GameDataClearMethodName = "Clear";
+        private const string GameDataInitMethodName = "InitByFileUrl";
+        
+        private const BindingFlags StaticNonPublicFlatten = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+
+        private static char FileUrlSplit = '#';
+        private static string FileDir = ".";
+        private static bool IsAssetBundle = false;
+        public static bool ForceImmediate = false;
+    }
+
     // public
     public partial class GameDataManager
     {
@@ -16,8 +34,8 @@ namespace Nullspace
         /// <param name="fileUrl">分两块数据"fileName#className"</param>
         public static void InitByFile<T>(string fileUrl) where T : GameData<T>, new()
         {
-            string[] strs = fileUrl.Split('#');
-            DebugUtils.Assert(strs.Length == 2, "wrong url: " + fileUrl);
+            string[] strs = fileUrl.Split(FileUrlSplit);
+            DebugUtils.Assert(strs.Length == 2, "Wrong URL Format: " + fileUrl);
             InitByFile<T>(strs[0].Trim(), strs[1].Trim());
         }
         
@@ -33,7 +51,8 @@ namespace Nullspace
             }
             if (!FileLoaded.ContainsKey(fileName))
             {
-                throw new Exception("wrong xml element: " + fileName);
+                DebugUtils.Assert(false, "Wrong XML Element: " + fileName);
+                return;
             }
             SecurityElement p = SerchChildByName(FileLoaded[fileName], tagName, false);
             if (p != null)
@@ -107,7 +126,7 @@ namespace Nullspace
 
         public static void InitData(Type type)
         {
-            MethodInfo info = type.GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            MethodInfo info = type.GetMethod(GameDataInitMethodName, StaticNonPublicFlatten);
             info.Invoke(null, null);
         }
 
@@ -148,11 +167,7 @@ namespace Nullspace
     // private
     public partial class GameDataManager
     {
-        private static object[] GenericParameterArrayOne = new object[1];
-        private const string GameDataNamespaceName = "GameData";
-        private static bool IsAssetBundle = false;
-        private static string FileDir = ".";
-        public static bool ForceImmediate = false;
+
 
         private static Dictionary<string, List<Type>> mGameDataTypes = new Dictionary<string, List<Type>>();
         private static Dictionary<string, SecurityElement> FileLoaded = new Dictionary<string, SecurityElement>();
@@ -164,7 +179,7 @@ namespace Nullspace
 
         private static void ClearData(Type t)
         {
-            t.GetMethod("Clear", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Invoke(null, null);
+            t.GetMethod(GameDataClearMethodName, StaticNonPublicFlatten).Invoke(null, null);
         }
 
         private static void LoadGameDataTypes()
@@ -184,8 +199,8 @@ namespace Nullspace
                     {
                         if (type == gameDataType || type.IsGenericType && type.GetGenericTypeDefinition() == gameDataGenericType)
                         {
-                            string fileUrl = item.GetField("FileUrl").GetValue(null) as string;
-                            string[] strs = fileUrl.Split('#');
+                            string fileUrl = item.GetField(FileURL).GetValue(null) as string;
+                            string[] strs = fileUrl.Split(FileUrlSplit);
                             string fileName = strs[0].Trim();
                             if (!mGameDataTypes.ContainsKey(fileName))
                             {
@@ -216,13 +231,14 @@ namespace Nullspace
         }
         private static SecurityElement LoadXmlFile(string filePath)
         {
-            filePath += "_client.xml";
+            filePath += XmlFileSuffix;
             if (System.IO.File.Exists(filePath))
             {
                 return LoadXmlContent(System.IO.File.ReadAllText(filePath));
             }
             return null;
         }
+
         private static SecurityElement LoadXmlAsset(string filePath)
         {
             UnityEngine.AssetBundle ab = UnityEngine.AssetBundle.LoadFromFile(filePath);
@@ -231,12 +247,14 @@ namespace Nullspace
             UnityEngine.AssetBundle.UnloadAllAssetBundles(false);
             return LoadXmlContent(xmlContent);
         }
+
         private static SecurityElement LoadXmlContent(string content)
         {
             SecurityParser securityParser = new SecurityParser();
             securityParser.LoadXml(content);
             return securityParser.ToXml();
         }
+
         private static SecurityElement SerchChildByName(SecurityElement root, string serchNames, bool recursive)
         {
             if (root.Tag == serchNames)
@@ -267,7 +285,7 @@ namespace Nullspace
         {
             List<T> allDataList = new List<T>();
             Type type = typeof(T);
-            MethodInfo method = type.GetMethod("SetOriginData", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo method = type.GetMethod(XmlSetMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
             foreach (SecurityElement chlid in p.Children)
             {
                 T t = new T();
@@ -277,7 +295,7 @@ namespace Nullspace
             }
             p.Children.Clear(); // 断开引用
             GenericParameterArrayOne[0] = allDataList;
-            type.GetMethod("SetData", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Invoke(null, GenericParameterArrayOne);
+            type.GetMethod(XmlListSetMethodName, StaticNonPublicFlatten).Invoke(null, GenericParameterArrayOne);
         }
 
         private static T Init<T>(Properties p) where T : GameData<T>, new()

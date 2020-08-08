@@ -66,6 +66,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Editor\DataFileTypeEnum.cs" />
+    <Compile Include="Editor\DataTypeEnum.cs" />
     <Compile Include="Runtime\DataFormat\DataFormatConvertUtils.cs" />
     <Compile Include="Runtime\DataFormat\Properties\Properties.cs" />
     <Compile Include="Runtime\DataFormat\Properties\PropertiesXML.cs" />
@@ -75,16 +76,16 @@
     <Compile Include="Runtime\DataFormat\XML\SecurityParser.cs" />
     <Compile Include="Runtime\DataFormat\XML\SmallXmlParser.cs" />
     <Compile Include="Runtime\DataLoader\GameData.cs" />
+    <Compile Include="Runtime\DataLoader\GameDataCollection.cs" />
     <Compile Include="Runtime\DataLoader\GameDataGroup.cs" />
     <Compile Include="Runtime\DataLoader\GameDataList.cs" />
     <Compile Include="Runtime\DataLoader\GameDataManager.cs" />
     <Compile Include="Runtime\DataLoader\GameDataManagerType.cs" />
     <Compile Include="Runtime\DataLoader\GameDataMap.cs" />
-    <Compile Include="Editor\DataTypeEnum.cs" />
+    <Compile Include="Runtime\Utils\DataUtils.cs" />
     <Compile Include="Runtime\Utils\DateTimeUtils.cs" />
     <Compile Include="Runtime\Utils\DebugUtils.cs" />
     <Compile Include="Runtime\Utils\EnumUtils.cs" />
-    <Compile Include="Runtime\Utils\DataUtils.cs" />
     <Compile Include="Runtime\Utils\MD5HashUtils.cs" />
     <Compile Include="Runtime\Utils\StringUtils.cs" />
   </ItemGroup>

@@ -1,7 +1,5 @@
 ﻿
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Security;
 
@@ -9,7 +7,15 @@ namespace Nullspace
 {
     public class GameData
     {
+        protected const string KeyNameListName = "KeyNameList";
+        protected const string FileUrlName = "FileUrl";
 
+        protected bool mIsInitialized = false;
+        protected SecurityElement mOriginData = null;
+        protected void SetOriginData(SecurityElement originData)
+        {
+            mOriginData = originData;
+        }
     }
 
     /// <summary>
@@ -18,7 +24,32 @@ namespace Nullspace
     /// <typeparam name="T"></typeparam>
     public partial class GameData<T>
     {
-
+        public void Initialize()
+        {
+            if (!mIsInitialized)
+            {
+                if (mOriginData != null && mOriginData.Attributes != null)
+                {
+                    PropertyInfo[] props = typeof(T).GetProperties();
+                    List<string> keyNameList = typeof(T).GetField(KeyNameListName).GetValue(null) as List<string>;
+                    foreach (PropertyInfo prop in props)
+                    {
+                        if (keyNameList != null && keyNameList.Contains(prop.Name))
+                        {
+                            continue;
+                        }
+                        if (mOriginData.Attributes.ContainsKey(prop.Name))
+                        {
+                            string value = (string)mOriginData.Attributes[prop.Name];
+                            var v = DataUtils.ToObject(value, prop.PropertyType);
+                            prop.SetValue(this, v, null);
+                        }
+                    }
+                }
+                mOriginData = null; // 释放
+                mIsInitialized = true;
+            }
+        }
     }
 
     public partial class GameData<T> : GameData where T : GameData<T>, new()
@@ -50,69 +81,27 @@ namespace Nullspace
                         key2 = (N)obj;
                     }
                 }
-                DebugUtils.Log(string.Format("{0} {1}", key1, key2));
                 return keyNameList.Count;
             }
             return 0;
         }
-        protected static void Init()
+        protected static void InitByFileUrl()
         {
-            string fileUrl = typeof(T).GetField("FileUrl").GetValue(null) as string;
+            string fileUrl = typeof(T).GetField(FileUrlName).GetValue(null) as string;
             LogLoadedBegin(fileUrl);
             GameDataManager.InitByFile<T>(fileUrl);
         }
-
         protected static bool IsImmediateLoad()
         {
             return GameDataManager.ForceImmediate || !(bool)typeof(T).GetField("IsDelayInitialized").GetValue(null);
         }
-
         protected static void LogLoadedBegin(string fileUrl)
         {
             DebugUtils.Log(string.Format("***** GameDataTypeName: {0} FileUrl: {1} Begin ***** ", typeof(T).FullName, fileUrl));
         }
-
         protected static void LogLoadedEnd(string dataInfo)
         {
             DebugUtils.Log(string.Format("***** GameDataTypeName: {0}, IsImmediateLoad: {1}, Info: {2} End ***** ", typeof(T).FullName, IsImmediateLoad(), dataInfo));
-        }
-
-        public bool IsInitialized()
-        {
-            if (!mIsInitialized)
-            {
-                Initialize(this);
-            }
-            return mIsInitialized;
-        }
-        protected SecurityElement mOriginData = null;
-        protected bool mIsInitialized = false;
-        protected void SetOriginData(SecurityElement originData)
-        {
-            mOriginData = originData;
-        }
-        private void Initialize(GameData<T> instance)
-        {
-            if (mOriginData != null && mOriginData.Attributes != null)
-            {
-                PropertyInfo[] props = typeof(T).GetProperties();
-                List<string> keyNameList = typeof(T).GetField("KeyNameList").GetValue(null) as List<string>;
-                foreach (PropertyInfo prop in props)
-                {
-                    if (keyNameList != null && keyNameList.Contains(prop.Name))
-                    {
-                        continue;
-                    }
-                    if (mOriginData.Attributes.ContainsKey(prop.Name))
-                    {
-                        string value = (string)mOriginData.Attributes[prop.Name];
-                        var v = DataUtils.ToObject(value, prop.PropertyType);
-                        prop.SetValue(instance, v, null);
-                    }
-                }
-            }
-            mOriginData = null; // 释放
-            mIsInitialized = true;
         }
     }
 }

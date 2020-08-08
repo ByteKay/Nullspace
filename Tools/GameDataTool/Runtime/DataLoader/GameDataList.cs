@@ -1,4 +1,5 @@
 ﻿using System;
+
 using System.Collections.Generic;
 
 namespace Nullspace
@@ -6,14 +7,14 @@ namespace Nullspace
     // 管理器：数组列表
     public class GameDataList<T> : GameData<T> where T : GameDataList<T>, new()
     {
-        protected static List<T> mDataList;
-        public static List<T> Data
+        protected static GameDataCollection<T> mDataList;
+        public static GameDataCollection<T> Data
         {
             get
             {
                 if (mDataList == null)
                 {
-                    Init();
+                    InitByFileUrl();
                     if (mDataList == null)
                     {
                         throw new Exception("wrong fileName: " + typeof(T).FullName);
@@ -23,16 +24,25 @@ namespace Nullspace
             }
         }
 
+        protected static int Count
+        {
+            get
+            {
+                return Data != null ? Data.Count : 0;
+            }
+            
+        }
+
         protected static void SetData(List<T> allDatas)
         {
             if (IsImmediateLoad())
             {
                 foreach (T t in allDatas)
                 {
-                    t.IsInitialized();
+                    t.Initialize();
                 }
             }
-            mDataList = new List<T>();
+            mDataList = new GameDataCollection<T>();
             mDataList.AddRange(allDatas);
             LogLoadedEnd("" + mDataList.Count);
         }
@@ -41,7 +51,7 @@ namespace Nullspace
         {
             if (mDataList != null)
             {
-                mDataList.Clear();
+                mDataList.Reset();
                 mDataList = null;
                 DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
             }
