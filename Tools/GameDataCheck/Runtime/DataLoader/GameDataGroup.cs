@@ -16,7 +16,7 @@ namespace Nullspace
                     InitByFileUrl();
                     if (mDataMapList == null)
                     {
-                        DebugUtils.Log(string.Format("Wrong FileName: {0}", typeof(T).FullName));
+                        DebugUtils.Log(InfoType.Error, string.Format("Wrong FileName: {0}", typeof(T).FullName));
                     }
                 }
                 return mDataMapList;
@@ -50,7 +50,7 @@ namespace Nullspace
             {
                 mDataMapList.Clear();
                 mDataMapList = null;
-                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(InfoType.Info, string.Format("Clear {0}", typeof(T).FullName));
             }
         }
         public static GameDataCollection<T> Get(M m)
@@ -63,10 +63,10 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Log(string.Format("Not Found Key1:{1}", m));
+                    DebugUtils.Log(InfoType.Error, string.Format("Not Found Key1:{1}", m));
                 }
             }
-            DebugUtils.Log(string.Format("Data Null : {0}", typeof(T).FullName));
+            DebugUtils.Log(InfoType.Error, string.Format("Data Null : {0}", typeof(T).FullName));
             return null;
         }
 

@@ -17,7 +17,7 @@ namespace Nullspace
                     InitByFileUrl();
                     if (mDataMap == null)
                     {
-                        DebugUtils.Log("Wrong FileName ClassTypeName: " + typeof(T).FullName);
+                        DebugUtils.Log(InfoType.Error, "Wrong FileName ClassTypeName: " + typeof(T).FullName);
                     }
                 }
                 return mDataMap;
@@ -43,7 +43,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Log(string.Format("Duplicated Key: {0} ", key1));
+                    DebugUtils.Log(InfoType.Error, string.Format("Duplicated Key: {0} ", key1));
                 }
                 
             }
@@ -55,7 +55,7 @@ namespace Nullspace
             {
                 mDataMap.Clear();
                 mDataMap = null;
-                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(InfoType.Info, string.Format("Clear {0}", typeof(T).FullName));
             }
         }
 
@@ -71,10 +71,10 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Log(string.Format("Not Found Key1:{1}", m));
+                    DebugUtils.Log(InfoType.Error, string.Format("Not Found Key1:{1}", m));
                 }
             }
-            DebugUtils.Log(string.Format("Data Null : {0}", typeof(T).FullName));
+            DebugUtils.Log(InfoType.Error, string.Format("Data Null : {0}", typeof(T).FullName));
             return null;
         }
     }
@@ -92,7 +92,7 @@ namespace Nullspace
                     InitByFileUrl();
                     if (mDataMapMap == null)
                     {
-                        DebugUtils.Log("Wrong File ClassTypeName: " + typeof(T).FullName);
+                        DebugUtils.Log(InfoType.Info, "Wrong File ClassTypeName: " + typeof(T).FullName);
                     }
                 }
                 return mDataMapMap;
@@ -122,7 +122,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    DebugUtils.Log(string.Format("Duplicated Key: {0} {1}", key1, key2));
+                    DebugUtils.Log(InfoType.Error, string.Format("Duplicated Key: {0} {1}", key1, key2));
                 }
             }
             LogLoadedEnd("" + mDataMapMap.Count);
@@ -133,7 +133,7 @@ namespace Nullspace
             {
                 mDataMapMap.Clear();
                 mDataMapMap = null;
-                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(InfoType.Info, string.Format("Clear {0}", typeof(T).FullName));
             }
         }
         
@@ -151,15 +151,15 @@ namespace Nullspace
                     }
                     else
                     {
-                        DebugUtils.Log(string.Format("Not Found Key2:{0} In Key1:{1}", n, m));
+                        DebugUtils.Log(InfoType.Error, string.Format("Not Found Key2:{0} In Key1:{1}", n, m));
                     }
                 }
                 else
                 {
-                    DebugUtils.Log(string.Format("Not Found Key1:{1}", m));
+                    DebugUtils.Log(InfoType.Info, string.Format("Not Found Key1:{1}", m));
                 }
             }
-            DebugUtils.Log(string.Format("Data Null : {0}", typeof(T).FullName));
+            DebugUtils.Log(InfoType.Error, string.Format("Data Null : {0}", typeof(T).FullName));
             return null;
         }
 

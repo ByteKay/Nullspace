@@ -53,7 +53,7 @@ namespace Nullspace
             {
                 mDataList.Reset();
                 mDataList = null;
-                DebugUtils.Log(string.Format("Clear {0}", typeof(T).FullName));
+                DebugUtils.Log(InfoType.Info, string.Format("Clear {0}", typeof(T).FullName));
             }
         }
     }

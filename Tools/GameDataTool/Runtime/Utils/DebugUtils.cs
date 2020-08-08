@@ -3,11 +3,18 @@ using System.Diagnostics;
 
 namespace Nullspace
 {
+    public enum InfoType
+    {
+        Info,
+        Warning,
+        Error
+    }
+
     public class DebugUtils
     {
-        private static Action<string> LogAction = null;
+        private static Action<InfoType, string> LogAction = null;
 
-        public static void SetLogAction(Action<string> logAction)
+        public static void SetLogAction(Action<InfoType, string> logAction)
         {
             LogAction = logAction;
         }
@@ -16,16 +23,16 @@ namespace Nullspace
         {
             if (!isTrue)
             {
-                Log(message);
+                Log(InfoType.Error, message);
             }
             Debug.Assert(isTrue, message);
         }
 
-        public static void Log(string info)
+        public static void Log(InfoType infoType, string info)
         {
             if (LogAction != null)
             {
-                LogAction(info);
+                LogAction(infoType, info);
             }
         }
     }

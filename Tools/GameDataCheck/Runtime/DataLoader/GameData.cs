@@ -97,11 +97,11 @@ namespace Nullspace
         }
         protected static void LogLoadedBegin(string fileUrl)
         {
-            DebugUtils.Log(string.Format("***** GameDataTypeName: {0} FileUrl: {1} Begin ***** ", typeof(T).FullName, fileUrl));
+            DebugUtils.Log(InfoType.Info, string.Format("***** GameDataTypeName: {0} FileUrl: {1} Begin ***** ", typeof(T).FullName, fileUrl));
         }
         protected static void LogLoadedEnd(string dataInfo)
         {
-            DebugUtils.Log(string.Format("***** GameDataTypeName: {0}, IsImmediateLoad: {1}, Info: {2} End ***** ", typeof(T).FullName, IsImmediateLoad(), dataInfo));
+            DebugUtils.Log(InfoType.Info, string.Format("***** GameDataTypeName: {0}, IsImmediateLoad: {1}, Info: {2} End ***** ", typeof(T).FullName, IsImmediateLoad(), dataInfo));
         }
     }
 }
