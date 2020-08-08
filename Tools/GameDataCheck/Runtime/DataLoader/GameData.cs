@@ -38,7 +38,7 @@ namespace Nullspace
                     DebugUtils.Assert(instance.mOriginData.Attributes.ContainsKey(key), "Not Contain Key: " + key);
                     string nodeV = instance.mOriginData.Attributes[key].ToString();
                     PropertyInfo info = typeof(U).GetProperty(key);
-                    object obj = GameDataUtils.ToObject(nodeV, info.PropertyType);
+                    object obj = DataUtils.ToObject(nodeV, info.PropertyType);
                     DebugUtils.Assert(obj != null, "not right key: " + key);
                     info.SetValue(instance, obj, null);
                     if (i == 0)
@@ -106,7 +106,7 @@ namespace Nullspace
                     if (mOriginData.Attributes.ContainsKey(prop.Name))
                     {
                         string value = (string)mOriginData.Attributes[prop.Name];
-                        var v = GameDataUtils.ToObject(value, prop.PropertyType);
+                        var v = DataUtils.ToObject(value, prop.PropertyType);
                         prop.SetValue(instance, v, null);
                     }
                 }

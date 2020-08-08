@@ -289,7 +289,7 @@ namespace Nullspace
                 string value = p.GetString(prop.Name, null);
                 if (value != null)
                 {
-                    var v = GameDataUtils.ToObject(value, prop.PropertyType);
+                    var v = DataUtils.ToObject(value, prop.PropertyType);
                     prop.SetValue(t, v, null);
                 }
             }
@@ -305,7 +305,7 @@ namespace Nullspace
                 string value = p.GetString(prop.Name, null);
                 if (value != null)
                 {
-                    var v = GameDataUtils.ToObject(value, prop.PropertyType);
+                    var v = DataUtils.ToObject(value, prop.PropertyType);
                     prop.SetValue(instance, value, null);
                 }
             }
