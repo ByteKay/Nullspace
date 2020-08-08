@@ -78,7 +78,7 @@ namespace Nullspace
                 records.Add(sheet.SheetName, sheet.RecordSheet);
             }
             RecordInfo.FileHash = MD5HashUtils.BuildFileMd5(RecordInfo.FilePath);
-            RecordInfo.SheetInfo = GameDataUtils.ToString(records);
+            RecordInfo.SheetInfo = DataUtils.ToString(records);
             RecordInfo.SheetHash = MD5HashUtils.Get(RecordInfo.SheetInfo);
         }
 

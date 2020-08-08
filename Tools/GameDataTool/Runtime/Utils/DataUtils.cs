@@ -10,17 +10,17 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class GameDataReadWriteAttribute : Attribute
+    public class DataReadWriteAttribute : Attribute
     {
-        public GameDataReadWriteType ReadWriteType { get; set; }
+        public DataReadWriteType ReadWriteType { get; set; }
         public Type Type;
-        public GameDataReadWriteAttribute(GameDataReadWriteType readWriteType, Type type)
+        public DataReadWriteAttribute(DataReadWriteType readWriteType, Type type)
         {
             ReadWriteType = readWriteType;
             Type = type;
         }
     }
-    public enum GameDataReadWriteType
+    public enum DataReadWriteType
     {
         Read = 0,
         Write,
@@ -28,7 +28,7 @@ namespace Nullspace
         ToObject,
     }
 
-    public partial class GameDataUtils
+    public partial class DataUtils
     {
         /// <summary>
         /// 不支持 List 嵌套 其他 集合 类型
@@ -66,14 +66,14 @@ namespace Nullspace
             {
                 if (type.GetGenericTypeDefinition() == typeof(List<>))
                 {
-                    object ret = typeof(GameDataUtils).GetMethod("ToListString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                    object ret = typeof(DataUtils).GetMethod("ToListString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                         .MakeGenericMethod(type.GetGenericArguments())
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
                 }
                 else if (type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
-                    object ret = typeof(GameDataUtils).GetMethod("ToMapString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                    object ret = typeof(DataUtils).GetMethod("ToMapString", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                         .MakeGenericMethod(type.GetGenericArguments())
                         .Invoke(null, new object[] { target });
                     return ret != null ? ret.ToString() : null;
@@ -135,7 +135,7 @@ namespace Nullspace
                 return EnumUtils.StringToEnum(str, type);
             }
             GenericParameterTypesOne[0] = type;
-            MethodInfo keyMethod = typeof(GameDataUtils).GetMethod("GetToObjectMethod", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).MakeGenericMethod(GenericParameterTypesOne);
+            MethodInfo keyMethod = typeof(DataUtils).GetMethod("GetToObjectMethod", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).MakeGenericMethod(GenericParameterTypesOne);
             DebugUtils.Assert(keyMethod != null, "GetToObjectMethod Not Found Type1: " + type.FullName);
             MethodInfo method = (MethodInfo)keyMethod.Invoke(null, null);
             DebugUtils.Assert(method != null, "GetToObjectMethod Not Found Type2: " + type.FullName);
@@ -147,7 +147,7 @@ namespace Nullspace
         }
     }
 
-    public partial class GameDataUtils
+    public partial class DataUtils
     {
         private const int CacheLen = 1024 * 1024;
         private static byte[] CacheBytes = new byte[CacheLen];
@@ -164,32 +164,32 @@ namespace Nullspace
         private static object[] GenericParametersObjectTwo = new object[2];
         private static Type[] GenericParameterTypesOne = new Type[1];
 
-        static GameDataUtils()
+        static DataUtils()
         {
             ReadMethodMap.Clear();
             WriteMethodMap.Clear();
             ToObjectMethodMap.Clear();
             ToStringMethodMap.Clear();
-            Type type = typeof(GameDataUtils);
+            Type type = typeof(DataUtils);
             MethodInfo[] infos = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy);
             foreach (var info in infos)
             {
-                object[] attributes = info.GetCustomAttributes(typeof(GameDataReadWriteAttribute), false);
+                object[] attributes = info.GetCustomAttributes(typeof(DataReadWriteAttribute), false);
                 if (attributes.Length > 0)
                 {
-                    GameDataReadWriteAttribute readWriteType = (GameDataReadWriteAttribute)attributes[0];
+                    DataReadWriteAttribute readWriteType = (DataReadWriteAttribute)attributes[0];
                     switch (readWriteType.ReadWriteType)
                     {
-                        case GameDataReadWriteType.Read:
+                        case DataReadWriteType.Read:
                             ReadMethodMap.Add(readWriteType.Type, info);
                             break;
-                        case GameDataReadWriteType.Write:
+                        case DataReadWriteType.Write:
                             WriteMethodMap.Add(readWriteType.Type, info);
                             break;
-                        case GameDataReadWriteType.ToString:
+                        case DataReadWriteType.ToString:
                             ToStringMethodMap.Add(readWriteType.Type, info);
                             break;
-                        case GameDataReadWriteType.ToObject:
+                        case DataReadWriteType.ToObject:
                             ToObjectMethodMap.Add(readWriteType.Type, info);
                             break;
                     }
@@ -304,75 +304,75 @@ namespace Nullspace
             return values;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(byte))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(byte))]
         private static bool ToObject(string str, out byte v)
         {
             return byte.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(bool))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(bool))]
         private static bool ToObject(string str, out bool v)
         {
             return bool.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(float))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(float))]
         private static bool ToObject(string str, out float v)
         {
             return float.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(short))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(short))]
         private static bool ToObject(string str, out short v)
         {
             return short.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(int))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(int))]
         private static bool ToObject(string str, out int v)
         {
             return int.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(long))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(long))]
         private static bool ToObject(string str, out long v)
         {
             return long.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(ushort))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(ushort))]
         private static bool ToObject(string str, out ushort v)
         {
             return ushort.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(uint))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(uint))]
         private static bool ToObject(string str, out uint v)
         {
             return uint.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(ulong))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(ulong))]
         private static bool ToObject(string str, out ulong v)
         {
             return ulong.TryParse(str, out v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(string))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(string))]
         private static bool ToObject(string str, out string v)
         {
             v = str;
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(DateTime))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(DateTime))]
         private static bool ToObject(string str, out DateTime v)
         {
             v = DateTimeUtils.GetTime(str);
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Matrix4x4))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Matrix4x4))]
         private static bool ToObject(string str, out Matrix4x4 v)
         {
             v = Matrix4x4.zero;
@@ -405,7 +405,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Vector2))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector2))]
         private static bool ToObject(string str, out Vector2 v)
         {
             v = Vector2.zero;
@@ -419,7 +419,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Vector3))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector3))]
         private static bool ToObject(string str, out Vector3 v)
         {
             v = Vector3.zero;
@@ -434,7 +434,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Vector3Int))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector3Int))]
         private static bool ToObject(string str, out Vector3Int v)
         {
             v = Vector3Int.zero;
@@ -451,7 +451,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Vector4))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector4))]
         private static bool ToObject(string str, out Vector4 v)
         {
             v = Vector4.zero;
@@ -467,7 +467,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Quaternion))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Quaternion))]
         private static bool ToObject(string str, out Quaternion v)
         {
             v = Quaternion.identity;
@@ -483,7 +483,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToObject, typeof(Color))]
+        [DataReadWrite(DataReadWriteType.ToObject, typeof(Color))]
         private static bool ToObject(string str, out Color v)
         {
             v = Color.black;
@@ -507,73 +507,73 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(byte))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(byte))]
         private static string ToString(byte v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(bool))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(bool))]
         private static string ToString(bool v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(float))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(float))]
         private static string ToString(float v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(short))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(short))]
         private static string ToString(short v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(int))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(int))]
         private static string ToString(int v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(long))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(long))]
         private static string ToString(long v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(ushort))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(ushort))]
         private static string ToString(ushort v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(uint))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(uint))]
         private static string ToString(uint v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(ulong))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(ulong))]
         private static string ToString(ulong v)
         {
             return string.Format("{0}", v);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(string))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(string))]
         private static string ToString(string v)
         {
             return v;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(DateTime))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(DateTime))]
         private static string ToString(DateTime dt)
         {
             return DateTimeUtils.FormatTimeHMS(dt);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Matrix4x4))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Matrix4x4))]
         private static string ToString(Matrix4x4 v)
         {
             return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}",
@@ -596,37 +596,37 @@ namespace Nullspace
                 );
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Vector2))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Vector2))]
         private static string ToString(Vector2 v)
         {
             return string.Format("{0},{1}", v.x, v.y);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Vector3))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Vector3))]
         private static string ToString(Vector3 v)
         {
             return string.Format("{0},{1},{2}", v.x, v.y, v.z);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Vector3Int))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Vector3Int))]
         private static string ToString(Vector3Int v)
         {
             return string.Format("{0},{1},{2}", v.x, v.y, v.z);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Vector4))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Vector4))]
         private static string ToString(Vector4 v)
         {
             return string.Format("{0},{1},{2},{3}", v.x, v.y, v.z, v.w);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Quaternion))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Quaternion))]
         private static string ToString(Quaternion v)
         {
             return string.Format("{0},{1},{2},{3}", v.x, v.y, v.z, v.w);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.ToString, typeof(Color))]
+        [DataReadWrite(DataReadWriteType.ToString, typeof(Color))]
         private static string ToString(Color v)
         {
             return string.Format("{0},{1},{2},{3}", v.r, v.g, v.b, v.a);
@@ -634,7 +634,7 @@ namespace Nullspace
 
     }
 
-    public partial class GameDataUtils
+    public partial class DataUtils
     {
         protected static bool IsStreamType<T>()
         {
@@ -753,20 +753,20 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(INullStream))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(INullStream))]
         public static bool ReadStream(NullMemoryStream stream, ref INullStream v)
         {
             return v.LoadFromStream(stream);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(INullStream))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(INullStream))]
         public static int WriteStream(NullMemoryStream stream, INullStream v)
         {
             return v.SaveToStream(stream);
         }
 
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(byte[]))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(byte[]))]
         private static byte[] ReadBytes(NullMemoryStream stream, int count)
         {
             if (stream.CanRead(count))
@@ -782,7 +782,7 @@ namespace Nullspace
             return null;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(byte))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(byte))]
         public static bool ReadByte(NullMemoryStream stream, out byte v)
         {
             v = 0;
@@ -795,7 +795,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(bool))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(bool))]
         public static bool ReadBool(NullMemoryStream stream, out bool v)
         {
             v = false;
@@ -808,7 +808,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(float))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(float))]
         public static bool ReadFloat(NullMemoryStream stream, out float v)
         {
             v = 0;
@@ -821,7 +821,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(short))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(short))]
         public static bool ReadShort(NullMemoryStream stream, out short v)
         {
             v = 0;
@@ -834,7 +834,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(int))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(int))]
         public static bool ReadInt(NullMemoryStream stream, out int v)
         {
             v = 0;
@@ -847,7 +847,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(long))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(long))]
         public static bool ReadLong(NullMemoryStream stream, out long v)
         {
             v = 0;
@@ -860,7 +860,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(ushort))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(ushort))]
         public static bool ReadUShort(NullMemoryStream stream, out ushort v)
         {
             v = 0;
@@ -873,7 +873,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(uint))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(uint))]
         public static bool ReadUInt(NullMemoryStream stream, out uint v)
         {
             v = 0;
@@ -886,7 +886,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(ulong))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(ulong))]
         public static bool ReadULong(NullMemoryStream stream, out ulong v)
         {
             v = 0;
@@ -899,7 +899,7 @@ namespace Nullspace
             return true;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(string))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(string))]
         public static bool ReadString(NullMemoryStream stream, out string v)
         {
             v = null;
@@ -916,7 +916,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Vector2))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Vector2))]
         public static bool ReadVector2(NullMemoryStream stream, out Vector2 v)
         {
             v = Vector2.zero;
@@ -929,7 +929,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Vector3))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Vector3))]
         public static bool ReadVector3(NullMemoryStream stream, out Vector3 v)
         {
             v = Vector3.zero;
@@ -942,7 +942,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Vector4))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Vector4))]
         public static bool ReadVector4(NullMemoryStream stream, out Vector4 v)
         {
             v = Vector4.zero;
@@ -955,7 +955,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Quaternion))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Quaternion))]
         public static bool ReadQuaternion(NullMemoryStream stream, out Quaternion v)
         {
             v = Quaternion.identity;
@@ -968,7 +968,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Color))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Color))]
         public static bool ReadColor(NullMemoryStream stream, out Color v)
         {
             v = Color.black;
@@ -981,7 +981,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Matrix4x4))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Matrix4x4))]
         public static bool ReadMatrix4x4(NullMemoryStream stream, out Matrix4x4 m)
         {
             m = Matrix4x4.zero;
@@ -1001,7 +1001,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Read, typeof(Vector3Int))]
+        [DataReadWrite(DataReadWriteType.Read, typeof(Vector3Int))]
         public static bool ReadVector3Int(NullMemoryStream stream, ref Vector3Int v)
         {
             v = Vector3Int.zero;
@@ -1016,7 +1016,7 @@ namespace Nullspace
             return false;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(string))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(string))]
         public static int WriteString(NullMemoryStream stream, string str)
         {
             if (str == null)
@@ -1030,77 +1030,77 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(byte[]))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(byte[]))]
         public static int WriteBytes(NullMemoryStream stream, byte[] bytes, int count)
         {
             stream.Write(bytes, 0, count);
             return bytes.Length;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(byte))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(byte))]
         public static int WriteByte(NullMemoryStream stream, byte value)
         {
             WriteByte(stream, value);
             return sizeof(byte);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(bool))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(bool))]
         public static int WriteBool(NullMemoryStream stream, bool value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(float))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(float))]
         public static int WriteFloat(NullMemoryStream stream, float value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(short))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(short))]
         public static int WriteShort(NullMemoryStream stream, short value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(int))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(int))]
         public static int WriteInt(NullMemoryStream stream, int value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(long))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(long))]
         public static int WriteLong(NullMemoryStream stream, long value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(ushort))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(ushort))]
         public static int WriteUShort(NullMemoryStream stream, ushort value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(uint))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(uint))]
         public static int WriteUInt(NullMemoryStream stream, uint value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(ulong))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(ulong))]
         public static int WriteULong(NullMemoryStream stream, ulong value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return WriteBytes(stream, bytes, bytes.Length);
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Vector2))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Vector2))]
         public static int WriteVector2(NullMemoryStream stream, Vector2 value)
         {
             int size = WriteFloat(stream, value.x);
@@ -1108,7 +1108,7 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Vector3))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Vector3))]
         public static int WriteVector3(NullMemoryStream stream, Vector3 value)
         {
             int size = WriteFloat(stream, value.x);
@@ -1117,7 +1117,7 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Vector4))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Vector4))]
         public static int WriteVector4(NullMemoryStream stream, Vector4 value)
         {
             int size = WriteFloat(stream, value.x);
@@ -1127,7 +1127,7 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Quaternion))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Quaternion))]
         public static int WriteQuaternion(NullMemoryStream stream, Quaternion value)
         {
             int size = WriteFloat(stream, value.x);
@@ -1137,7 +1137,7 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Color))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Color))]
         public static int WriteColor(NullMemoryStream stream, Color value)
         {
             int size = WriteFloat(stream, value.r);
@@ -1147,7 +1147,7 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Matrix4x4))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Matrix4x4))]
         public static int WriteMatrix4x4(NullMemoryStream stream, Matrix4x4 value)
         {
             int size = WriteVector4(stream, value.GetColumn(0));
@@ -1157,7 +1157,7 @@ namespace Nullspace
             return size;
         }
 
-        [GameDataReadWrite(GameDataReadWriteType.Write, typeof(Vector3Int))]
+        [DataReadWrite(DataReadWriteType.Write, typeof(Vector3Int))]
         public static int WriteVector3Int(NullMemoryStream stream, Vector3Int value)
         {
             int size = WriteInt(stream, value.x);

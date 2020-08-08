@@ -194,9 +194,9 @@ namespace Nullspace
 
         private void GeneratorRecord()
         {
-            string varNames = GameDataUtils.ToString(mVariableNames);
-            string varTypes = GameDataUtils.ToString(mVariableTypes);
-            string varSides = GameDataUtils.ToString(mVariableSides);
+            string varNames = DataUtils.ToString(mVariableNames);
+            string varTypes = DataUtils.ToString(mVariableTypes);
+            string varSides = DataUtils.ToString(mVariableSides);
             Dictionary<string, string> record = new Dictionary<string, string>();
             record.Add("varNames", varNames);
             record.Add("varTypes", varTypes);
@@ -204,7 +204,7 @@ namespace Nullspace
             record.Add("Manager", Manager);
             record.Add("Delay", Delay.ToString());
             record.Add("Keys", Keys);
-            RecordSheet = GameDataUtils.ToString(record);
+            RecordSheet = DataUtils.ToString(record);
         }
 
         private void SplitCS()

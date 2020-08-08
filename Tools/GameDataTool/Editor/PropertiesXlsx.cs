@@ -21,7 +21,7 @@ namespace Nullspace
                 object o = info.GetValue(target, null);
                 if (o != null)
                 {
-                    string v = GameDataUtils.ToString(o);
+                    string v = DataUtils.ToString(o);
                     prop.SetString(info.Name, v);
                 }
             }
