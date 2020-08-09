@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\Sequence\obj\Debug\Sequence.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\Sequence.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\Sequence.pdb
+G:\UnityWorkspace\Nullspace\Tools\Sequence\obj\Debug\Sequence.dll
+G:\UnityWorkspace\Nullspace\Tools\Sequence\obj\Debug\Sequence.pdb

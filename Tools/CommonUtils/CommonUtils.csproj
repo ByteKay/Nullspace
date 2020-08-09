@@ -61,6 +61,7 @@
     <Compile Include="Common\ObjectPool\ObjectPool.cs" />
     <Compile Include="Common\ObjectPool\ObjectPools.cs" />
     <Compile Include="Common\Singleton.cs" />
+    <Compile Include="Common\ThreeState.cs" />
     <Compile Include="Common\Timer\FrameTimerTaskHeap.cs" />
     <Compile Include="Common\Timer\TimerTask.cs" />
     <Compile Include="Common\Timer\TimerTaskQueue.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Utils\DateTimeUtils.cs" />
     <Compile Include="Utils\DebugUtils.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
+    <Compile Include="Utils\MathUtils.cs" />
     <Compile Include="Utils\MD5HashUtils.cs" />
     <Compile Include="Utils\ProfilerUtils.cs" />
     <Compile Include="Utils\StringUtils.cs" />

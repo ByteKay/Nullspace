@@ -42,6 +42,11 @@ namespace Nullspace
         private int mLevel;
         private bool mIsTimerOn;
 
+        public ResourceConfig()
+        {
+            mNames = new List<string>();
+        }
+
         public int ID { get { return mID; } set { mID = value; } }
         public string Directory { get { return mDirectory; } set { mDirectory = value; } }
         public List<string> Names { get { return mNames; } set { mNames = value; } }
