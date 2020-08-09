@@ -12,7 +12,8 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             Config = Properties.Create("config.txt");
-            GameDataManager.SetDir(Config.GetString("xml_dir", "."), false, true);
+            bool forceImmediate = Config.GetBool("ForceImmediate", false);
+            GameDataManager.SetDir(Config.GetString("xml_dir", "."), false, forceImmediate);
             DebugUtils.SetLogAction(LogAction);
 
             LogAction(InfoType.Error, "Check Start ...");
