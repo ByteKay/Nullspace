@@ -53,6 +53,7 @@
     <Compile Include="Common\EventDispatcher\EnumEventType.cs" />
     <Compile Include="Common\EventDispatcher\EventDispatcher.cs" />
     <Compile Include="Common\EventDispatcher\EventException.cs" />
+    <Compile Include="Common\EventDispatcher\IEventManager.cs" />
     <Compile Include="Common\EventDispatcher\IntEventDefines.cs" />
     <Compile Include="Common\EventDispatcher\IntEventDispatcher.cs" />
     <Compile Include="Common\EventDispatcher\StringEventDefines.cs" />
