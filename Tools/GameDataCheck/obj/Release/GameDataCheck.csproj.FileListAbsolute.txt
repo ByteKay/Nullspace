@@ -3,8 +3,10 @@ F:\Unity\Nullspace\Tools\GameDataCheck\bin\GameDataCheck.pdb
 F:\Unity\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheck.exe
 F:\Unity\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheck.pdb
 F:\Unity\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheck.csprojResolveAssemblyReference.cache
-G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheck.exe
-G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheck.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\bin\GameDataCheck.exe
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\bin\GameDataCheck.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheck.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataCheckDebug.exe
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataCheckDebug.pdb
+G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheckDebug.exe
+G:\UnityWorkspace\Nullspace\Tools\GameDataCheck\obj\Release\GameDataCheckDebug.pdb

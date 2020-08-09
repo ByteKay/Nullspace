@@ -21,7 +21,6 @@ namespace Nullspace
             if (MainEntry.Config.GetBool("export_cs", false))
             {
                 string csDir = MainEntry.Config.GetString("cs_dir", null);
-                string dllMode = MainEntry.Config.GetString("define_dll", " -debug ");
                 string refDll = Path.GetFullPath(".");
                 csDir = Path.GetFullPath(csDir);
                 List<string> cmdList = new List<string>()

@@ -8,3 +8,5 @@ F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.exe
 F:\Unity\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
 F:\Unity\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.csprojResolveAssemblyReference.cache
 G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Debug\GameDataTool.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataTool.exe
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataTool.pdb

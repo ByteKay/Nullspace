@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,6 +34,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\CommonUtils.dll</HintPath>
+    </Reference>
     <Reference Include="EPPlus, Version=4.1.0.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\EPPlus.dll</HintPath>
@@ -70,8 +74,6 @@
     <Compile Include="Runtime\DataFormat\DataFormatConvertUtils.cs" />
     <Compile Include="Runtime\DataFormat\Properties\Properties.cs" />
     <Compile Include="Runtime\DataFormat\Properties\PropertiesXML.cs" />
-    <Compile Include="Runtime\DataFormat\Stream\INullStream.cs" />
-    <Compile Include="Runtime\DataFormat\Stream\NullMemoryStream.cs" />
     <Compile Include="Runtime\DataFormat\XML\MiniParser.cs" />
     <Compile Include="Runtime\DataFormat\XML\SecurityParser.cs" />
     <Compile Include="Runtime\DataFormat\XML\SmallXmlParser.cs" />
@@ -82,13 +84,6 @@
     <Compile Include="Runtime\DataLoader\GameDataManager.cs" />
     <Compile Include="Runtime\DataLoader\GameDataManagerType.cs" />
     <Compile Include="Runtime\DataLoader\GameDataMap.cs" />
-    <Compile Include="Runtime\Utils\DataUtils.cs" />
-    <Compile Include="Runtime\Utils\DateTimeUtils.cs" />
-    <Compile Include="Runtime\Utils\DebugUtils.cs" />
-    <Compile Include="Runtime\Utils\EnumUtils.cs" />
-    <Compile Include="Runtime\Utils\MD5HashUtils.cs" />
-    <Compile Include="Runtime\Utils\ProfilerUtils.cs" />
-    <Compile Include="Runtime\Utils\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

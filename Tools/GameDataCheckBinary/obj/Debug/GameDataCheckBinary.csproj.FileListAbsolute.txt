@@ -3,3 +3,5 @@ G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\bin\GameDataCheck.exe
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\bin\GameDataCheck.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\obj\Debug\GameDataCheck.exe
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\obj\Debug\GameDataCheck.pdb
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataCheck.exe
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataCheck.pdb
