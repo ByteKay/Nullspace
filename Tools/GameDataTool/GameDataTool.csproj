@@ -87,6 +87,7 @@
     <Compile Include="Runtime\Utils\DebugUtils.cs" />
     <Compile Include="Runtime\Utils\EnumUtils.cs" />
     <Compile Include="Runtime\Utils\MD5HashUtils.cs" />
+    <Compile Include="Runtime\Utils\ProfilerUtils.cs" />
     <Compile Include="Runtime\Utils\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -16,7 +16,9 @@ namespace Nullspace
             DebugUtils.SetLogAction(LogAction);
 
             LogAction(InfoType.Error, "Check Start ...");
+            int id = ProfilerUtils.StartProfiler();
             GameDataManager.InitAllData();
+            ProfilerUtils.StopProfiler(id, "GameDataManager.InitAllData", true);
             GameDataManager.ClearAllData();
             LogAction(InfoType.Error, "Check End ...");
             Console.ReadLine();
