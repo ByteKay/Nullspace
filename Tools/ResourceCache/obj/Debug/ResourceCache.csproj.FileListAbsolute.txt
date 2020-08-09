@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\ResourceCache\obj\Debug\ResourceCache.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\ResourceCache.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\ResourceCache.pdb
+G:\UnityWorkspace\Nullspace\Tools\ResourceCache\obj\Debug\ResourceCache.dll
+G:\UnityWorkspace\Nullspace\Tools\ResourceCache\obj\Debug\ResourceCache.pdb

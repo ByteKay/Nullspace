@@ -41,6 +41,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CallbackWrapper\AbstractCallback.cs" />
+    <Compile Include="Common\CallbackWrapper\Callback.cs" />
+    <Compile Include="Common\CallbackWrapper\CallbackT.cs" />
+    <Compile Include="Common\CallbackWrapper\CallbackTU.cs" />
+    <Compile Include="Common\CallbackWrapper\CallbackTUV.cs" />
+    <Compile Include="Common\CallbackWrapper\CallbackTUVW.cs" />
+    <Compile Include="Common\DataStruct\DoubleCircleLinkedList.cs" />
+    <Compile Include="Common\DataStruct\PriorityQueue.cs" />
+    <Compile Include="Common\EventDispatcher\EnumEventDispatcher.cs" />
+    <Compile Include="Common\EventDispatcher\EnumEventType.cs" />
+    <Compile Include="Common\EventDispatcher\EventDispatcher.cs" />
+    <Compile Include="Common\EventDispatcher\EventException.cs" />
+    <Compile Include="Common\EventDispatcher\IntEventDefines.cs" />
+    <Compile Include="Common\EventDispatcher\IntEventDispatcher.cs" />
+    <Compile Include="Common\EventDispatcher\StringEventDefines.cs" />
+    <Compile Include="Common\EventDispatcher\StringEventDispatcher.cs" />
+    <Compile Include="Common\ObjectPool\ObjectKey.cs" />
+    <Compile Include="Common\ObjectPool\ObjectPool.cs" />
+    <Compile Include="Common\ObjectPool\ObjectPools.cs" />
+    <Compile Include="Common\Singleton.cs" />
+    <Compile Include="Common\Timer\FrameTimerTaskHeap.cs" />
+    <Compile Include="Common\Timer\TimerTask.cs" />
+    <Compile Include="Common\Timer\TimerTaskQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stream\INullStream.cs" />
     <Compile Include="Stream\NullMemoryStream.cs" />
@@ -52,6 +75,7 @@
     <Compile Include="Utils\ProfilerUtils.cs" />
     <Compile Include="Utils\StringUtils.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
