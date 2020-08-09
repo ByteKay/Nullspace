@@ -1,11 +1,10 @@
 ﻿using System;
-
 namespace Nullspace
 {
     public static class DateTimeUtils
     {
         private static DateTime ZERO = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-
+        
         public static string FormatTimeHMS(DateTime datetime)
         {
             return datetime.ToString("yyyy-MM-dd HH:mm:ss");

@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\ClientNetwork.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\ClientNetwork.pdb
+G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.dll
+G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.pdb

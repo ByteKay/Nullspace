@@ -6,8 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataTool", "GameDataTool\GameDataTool.csproj", "{E46C291A-1B25-4127-946A-4E0425E0B320}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataCheck", "GameDataCheck\GameDataCheck.csproj", "{7BA96655-468A-45F5-AE46-7F62E706BBF3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D8C44D02-ECAF-462B-8196-23B062D8C9B8} = {D8C44D02-ECAF-462B-8196-23B062D8C9B8}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataCheckBinary", "GameDataCheckBinary\GameDataCheckBinary.csproj", "{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E46C291A-1B25-4127-946A-4E0425E0B320} = {E46C291A-1B25-4127-946A-4E0425E0B320}
+		{7BA96655-468A-45F5-AE46-7F62E706BBF3} = {7BA96655-468A-45F5-AE46-7F62E706BBF3}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "CommonUtils\CommonUtils.csproj", "{D8C44D02-ECAF-462B-8196-23B062D8C9B8}"
 EndProject
@@ -21,6 +28,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequence", "Sequence\Sequen
 	ProjectSection(ProjectDependencies) = postProject
 		{D8C44D02-ECAF-462B-8196-23B062D8C9B8} = {D8C44D02-ECAF-462B-8196-23B062D8C9B8}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateController", "StateController\StateController.csproj", "{E8BB5016-06DF-40C3-ABA7-F38838A33054}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D8C44D02-ECAF-462B-8196-23B062D8C9B8} = {D8C44D02-ECAF-462B-8196-23B062D8C9B8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNetwork", "ClientNetwork\ClientNetwork.csproj", "{37FEB0B6-7639-4FF7-B5AB-6F8669E4ACAF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D8C44D02-ECAF-462B-8196-23B062D8C9B8} = {D8C44D02-ECAF-462B-8196-23B062D8C9B8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcclusionCulling", "OcclusionCulling\OcclusionCulling.csproj", "{B80DF798-C39E-49CF-9CF0-02476295DB6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csproj", "{63C9402A-3367-4D61-8256-EFC65245FA14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D8C44D02-ECAF-462B-8196-23B062D8C9B8} = {D8C44D02-ECAF-462B-8196-23B062D8C9B8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeController", "TimeController\TimeController.csproj", "{9876EA7D-F99E-43CB-BAD0-E1668613722B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +78,26 @@ Global
 		{A5F3C577-B18D-4D99-99F2-4981E82C0381}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5F3C577-B18D-4D99-99F2-4981E82C0381}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5F3C577-B18D-4D99-99F2-4981E82C0381}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8BB5016-06DF-40C3-ABA7-F38838A33054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8BB5016-06DF-40C3-ABA7-F38838A33054}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8BB5016-06DF-40C3-ABA7-F38838A33054}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8BB5016-06DF-40C3-ABA7-F38838A33054}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37FEB0B6-7639-4FF7-B5AB-6F8669E4ACAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37FEB0B6-7639-4FF7-B5AB-6F8669E4ACAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37FEB0B6-7639-4FF7-B5AB-6F8669E4ACAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37FEB0B6-7639-4FF7-B5AB-6F8669E4ACAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B80DF798-C39E-49CF-9CF0-02476295DB6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B80DF798-C39E-49CF-9CF0-02476295DB6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B80DF798-C39E-49CF-9CF0-02476295DB6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B80DF798-C39E-49CF-9CF0-02476295DB6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63C9402A-3367-4D61-8256-EFC65245FA14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63C9402A-3367-4D61-8256-EFC65245FA14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63C9402A-3367-4D61-8256-EFC65245FA14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63C9402A-3367-4D61-8256-EFC65245FA14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\StateController\obj\Debug\StateController.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\StateController.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\StateController.pdb
+G:\UnityWorkspace\Nullspace\Tools\StateController\obj\Debug\StateController.dll
+G:\UnityWorkspace\Nullspace\Tools\StateController\obj\Debug\StateController.pdb

@@ -1,0 +1,102 @@
+﻿
+using System;
+using System.IO;
+
+namespace Nullspace
+{
+    public class Logger
+    {
+        private LogFileWriter mFileWriter;
+        private LoggerConfig Config;
+        private Action<string> mLog;
+        private bool isInitialize = false;
+
+        public void Stop()
+        {
+            if (mFileWriter != null)
+            {
+                mFileWriter.Stop();
+            }
+        }
+
+        public void Initialize(LoggerConfig config)
+        {
+            if (!isInitialize)
+            {
+                Config = config;
+                if (!Directory.Exists(Config.Directory))
+                {
+                    Directory.CreateDirectory(Config.Directory);
+                }
+                mFileWriter = new LogFileWriter(Config);
+                mLog = mFileWriter.Log;
+                isInitialize = true;
+            }
+        }
+
+        public void AddLogOut(Action<string> logOut)
+        {
+            mLog += logOut;
+        }
+
+        public void LogDebug(string message)
+        {
+            if ((Config.mLogLevel & LogLevel.DEBUG) == LogLevel.DEBUG)
+            {
+                string msg = GeneratorMessage(LogLevel.DEBUG, message);
+                mLog(msg);
+            }
+        }
+
+        public void LogInfo(string message)
+        {
+            if ((Config.mLogLevel & LogLevel.INFO) == LogLevel.INFO)
+            {
+                string msg = GeneratorMessage(LogLevel.INFO, message);
+                mLog(msg);
+            }
+        }
+
+        public void LogWarning(string message)
+        {
+            if ((Config.mLogLevel & LogLevel.WARNING) == LogLevel.WARNING)
+            {
+                string msg = GeneratorMessage(LogLevel.WARNING, message);
+                mLog(msg);
+            }
+        }
+
+        public void LogError(string message)
+        {
+            if ((Config.mLogLevel & LogLevel.ERROR) == LogLevel.ERROR)
+            {
+                string msg = GeneratorMessage(LogLevel.ERROR, message);
+                mLog(msg);
+            }
+        }
+
+        public void LogExcept(string message)
+        {
+            if ((Config.mLogLevel & LogLevel.EXCEPT) == LogLevel.EXCEPT)
+            {
+                string msg = GeneratorMessage(LogLevel.EXCEPT, message);
+                mLog(msg);
+            }
+        }
+
+        public void LogCritical(string message)
+        {
+            if ((Config.mLogLevel & LogLevel.CRITICAL) == LogLevel.CRITICAL)
+            {
+                string msg = GeneratorMessage(LogLevel.CRITICAL, message);
+                mLog(msg);
+            }
+        }
+
+        private string GeneratorMessage(LogLevel loglevel, string message)
+        {
+            return string.Format("{0} {1} {2}", DateTimeUtils.FormatTimeHMS(DateTime.Now), loglevel, message);
+        }
+    }
+
+}

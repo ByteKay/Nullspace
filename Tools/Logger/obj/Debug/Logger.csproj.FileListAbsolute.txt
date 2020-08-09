@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\Logger\obj\Debug\Logger.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\Logger.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\Logger.pdb
+G:\UnityWorkspace\Nullspace\Tools\Logger\obj\Debug\Logger.dll
+G:\UnityWorkspace\Nullspace\Tools\Logger\obj\Debug\Logger.pdb
