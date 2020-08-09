@@ -7,6 +7,7 @@ namespace Nullspace
 {
     public class ResourceCachePools
     {
+        public static bool IsPrintOn = false;
         private static List<int> CACHE = new List<int>();
         private Dictionary<int, ResourceCachePool> mPools;
         private Dictionary<int, ResourceCacheEntity> mAcquiredItems;
@@ -43,10 +44,11 @@ namespace Nullspace
                     }
                 }
             }
-#if UNITY_EDITOR
-            PrintTimerId = -1;
-            PrintTimer(true);
-#endif
+            if (IsPrintOn)
+            {
+                PrintTimerId = -1;
+                PrintTimer(true);
+            }
         }
 
         public virtual void Clear(ResourceCacheMask mask)
@@ -213,7 +215,6 @@ namespace Nullspace
             }
         }
 
-#if UNITY_EDITOR
         private int PrintTimerId;
 
         private void PrintInfo()
@@ -225,7 +226,7 @@ namespace Nullspace
                 cnt = cnt + 1;
                 printStr = printStr + " " + entity.ManagerId;
             }
-            DebugUtils.Info("ResourceCachePools:PrintInfo", string.Format("Entity Used Total: {0} {1}", cnt, printStr));
+            DebugUtils.Log(InfoType.Info, string.Format("ResourceCachePools:PrintInfo Entity Used Total: {0} {1}", cnt, printStr));
             cnt = 0;
             printStr = "";
             int totalCnt = 0;
@@ -235,7 +236,7 @@ namespace Nullspace
                 printStr = printStr + " id: " + pool.GetManagerId() + ", count: " + pool.Count;
                 totalCnt = totalCnt + pool.Count;
             }
-            DebugUtils.Info("ResourceCachePools:PrintInfo", string.Format("Manager Cached Total:  {0}, {1}", totalCnt, printStr));
+            DebugUtils.Log(InfoType.Info, string.Format("ResourceCachePools:PrintInfo Manager Cached Total:  {0}, {1}", totalCnt, printStr));
         }
 
         private void PrintTimer(bool timerOn)
@@ -257,6 +258,5 @@ namespace Nullspace
                 }
             }
         }
-#endif
     }
 }
