@@ -27,15 +27,15 @@ namespace Nullspace
         public static void Update()
         {
             NetworkPacket packet = null;
-            lock (mLock)
+            while (mCommandPacket.Count > 0) // 此处可以不加锁
             {
-                while (mCommandPacket.Count > 0)
+                lock (mLock)
                 {
                     packet = mCommandPacket.Dequeue();
-                    if (packet != null)
-                    {
-                        IntEventDispatcher.TriggerEvent(packet.CommandId, packet);
-                    }
+                }
+                if (packet != null)
+                {
+                    IntEventDispatcher.TriggerEvent(packet.CommandID, packet);
                 }
             }
         }
@@ -48,21 +48,21 @@ namespace Nullspace
                 mCommandPacket.Clear();
             }
         }
+
         private static void RegisterCommandEvent()
         {
-            IntEventDispatcher.AddEventListener<NetworkPacket>(NetworkCommandType.HeartCodec, HandleHeartEvent);
+            IntEventDispatcher.AddEventListener<NetworkPacket>(NetworkCommandDefine.HeartCodec, HandleHeartEvent);
         }
 
         private static void UnregisterCommandEvent()
         {
-            IntEventDispatcher.RemoveEventListener<NetworkPacket>(NetworkCommandType.HeartCodec, HandleHeartEvent);
+            IntEventDispatcher.RemoveEventListener<NetworkPacket>(NetworkCommandDefine.HeartCodec, HandleHeartEvent);
         }
 
         private static void HandleHeartEvent(NetworkPacket packet)
         {
-            DebugUtils.Log(InfoType.Info, "CommandType: " + packet.mHead.mType);
+            DebugUtils.Log(InfoType.Info, "CommandId: " + packet.CommandID);
         }
-        
     }
 
 

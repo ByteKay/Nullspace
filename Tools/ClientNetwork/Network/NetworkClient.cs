@@ -9,8 +9,22 @@ namespace Nullspace
 {
     public partial class NetworkClient
     {
-        protected static byte[] mBufferHead = new byte[NetworkHead.Size()];
+        protected static byte[] mBufferHead;
+        protected static EventWaitHandle mReceiveWait;
+        protected static EventWaitHandle mSendWait;
+        protected static object mSendLock;
+
+        static NetworkClient()
+        {
+            mBufferHead = new byte[NetworkPacket.HeadSize];
+            mReceiveWait = new AutoResetEvent(false);
+            mSendWait = new AutoResetEvent(false);
+            mSendLock = new object();
+        }
+
         protected byte[] mContents;
+        protected NetworkPacket mPacket;
+
         protected Thread mReceiveThread;
         protected void Receive()
         {
@@ -25,7 +39,8 @@ namespace Nullspace
             bool flag = Receive(ref mBufferHead, mBufferHead.Length);
             if (flag)
             {
-                mHead.InitializeBy(mBufferHead);
+                mPacket = ObjectPools.Instance.Acquire<NetworkPacket>();
+                mPacket.ToHead(mBufferHead);
             }
             return flag;
         }
@@ -34,10 +49,10 @@ namespace Nullspace
         {
             bool flag = true;
             mContents = null; // reset
-            if (mHead.mLength > 0)
+            if (mPacket.Length > 0)
             {
-                mContents = new byte[mHead.mLength];
-                flag = Receive(ref mContents, mHead.mLength);
+                mContents = new byte[mPacket.Length];
+                flag = Receive(ref mContents, mPacket.Length);
             }
             return flag;
         }
@@ -63,7 +78,8 @@ namespace Nullspace
 
         protected void ProcessPacket()
         {
-            NetworkPacket packet = new NetworkPacket(mHead.Clone(), mContents, this);
+            NetworkPacket packet = ObjectPools.Instance.Acquire<NetworkPacket>();
+            packet.BodyContent = mContents;
             NetworkEventHandler.AddPacket(packet);
         }
 
@@ -166,39 +182,33 @@ namespace Nullspace
 
     public partial class NetworkClient
     {
-        private static EventWaitHandle mReceiveWait = new AutoResetEvent(false);
-        private static EventWaitHandle mSendWait = new AutoResetEvent(false);
-        private static object mSendLock = new object();
-        protected static NetworkHead mHead = new NetworkHead();
-
-        protected Properties mConfig;
         protected string mIP;
         protected int mPort;
-        protected int mReconnectCount = 0;
         protected int mReconnectMaxCount = 5;
         protected int mReconnectTimerInterval = 2000;
+        protected int mHeartInterval = 3000;
 
+        protected int mReconnectCount = 0;
+        protected int mHeartTimerId = -1;
         private IPAddress mAddress;
         private Socket mClientSocket;
 
-        public void Initialize(Properties prop)
+        public NetworkClient(Properties prop)
         {
-            mConfig = prop;
-            InitData();
+            InitData(prop);
             InitState();
             // 开始
             StateCtl.Set(StateParamName, StateParameterValue.None2Initialized);
         }
 
-        protected void InitData()
+        protected void InitData(Properties prop)
         {
-            mIP = mConfig.GetString("IP", null);
-            mPort = mConfig.GetInt("port");
-            mReconnectCount = mConfig.GetInt("reconnect_count");
-            mReconnectMaxCount = mConfig.GetInt("reconnect_max_count");
-            mReconnectMaxCount = mConfig.GetInt("reconnect_timer_interval");
+            mIP = prop.GetString("ip", null);
+            mPort = prop.GetInt("port");
+            mReconnectMaxCount = prop.GetInt("reconnect_max_count");
+            mReconnectMaxCount = prop.GetInt("reconnect_timer_interval");
+            mHeartInterval = prop.GetInt("heart_interval");
             mAddress = IPAddress.Parse(mIP);
-
             mNeedSendMessages = new Queue<byte[]>();
             mSendPack = new List<byte>();
         }
@@ -210,14 +220,12 @@ namespace Nullspace
             mClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             mClientSocket.NoDelay = true;
         }
-
     }
 
     public partial class NetworkClient
     {
         protected StateController<NetworkConnectState> StateCtl;
         protected const string StateParamName = "State";
-
 
         protected bool mIsStop = true;
         protected int mReconnectTimerId = -1;
@@ -226,19 +234,20 @@ namespace Nullspace
 
         protected static class StateParameterValue
         {
-            public const int None2Initialized = -1;
-            public const int Initialized2Connectting = 0;
+            public const int None = -1;
+            public const int None2Initialized = 0;
+            public const int Initialized2Connectting = 1;
 
-            public const int Connectting2Connectted = 1;
-            public const int Connectting2Disconnected = 2;
-            public const int Connectting2Reconnectting = 3;
+            public const int Connectting2Connectted = 2;
+            public const int Connectting2Disconnected = 3;
+            public const int Connectting2Reconnectting = 4;
 
             public const int Connectted2Reconnectting = 5;
             public const int Connectted2Disconnected = 6;
 
-            public const int Reconnectting2ConnectFailed = 4;
-            public const int Reconnectting2Connectted = 7;
-            public const int Reconnectting2Disconnected = 8;
+            public const int Reconnectting2ConnectFailed = 7;
+            public const int Reconnectting2Connectted = 8;
+            public const int Reconnectting2Disconnected = 9;
         }
 
         public NetworkConnectState State { get { return StateCtl.Current.StateType; } }
@@ -352,6 +361,7 @@ namespace Nullspace
         {
             mSendWait.Set();
             mReceiveWait.Set();
+            InitHeart();
             DebugUtils.Log(InfoType.Info, "EnterConnectted");
         }
 
@@ -397,7 +407,7 @@ namespace Nullspace
         protected void InitState()
         {
             StateCtl = new StateController<NetworkConnectState>();
-            StateCtl.AddParameter(StateParamName, StateParameterDataType.INT, StateParameterValue.None2Initialized);
+            StateCtl.AddParameter(StateParamName, StateParameterDataType.INT, StateParameterValue.None);
 
             StateCtl.AddState(NetworkConnectState.None).AsCurrent().AddTransfer(NetworkConnectState.Initialized).With(StateParamName, ConditionOperationType.EQUAL, StateParameterValue.None2Initialized);
             StateCtl.AddState(NetworkConnectState.Initialized).AddTransfer(NetworkConnectState.Connectting).With(StateParamName, ConditionOperationType.EQUAL, StateParameterValue.Initialized2Connectting);
@@ -418,10 +428,9 @@ namespace Nullspace
             StateCtl.AddState(NetworkConnectState.Connectting).Enter(EnterConnectting);
             StateCtl.AddState(NetworkConnectState.Reconnectting).Enter(EnterReconnectting).Exit(LeaveReconnectting);
             StateCtl.AddState(NetworkConnectState.ConnectFailed).Enter(EnterConnectFailed);
-            StateCtl.AddState(NetworkConnectState.Connectted).Enter(EnterConnectted);
+            StateCtl.AddState(NetworkConnectState.Connectted).Enter(EnterConnectted).Exit(ExitConnectted);
             StateCtl.AddState(NetworkConnectState.Disconnected).Enter(EnterDisconnected);
         }
-
 
         protected void InitThread()
         {
@@ -431,6 +440,26 @@ namespace Nullspace
             mReceiveThread.Start();
             mSendThread = new Thread(SendMessage);
             mSendThread.Start();
+        }
+
+        protected void ExitConnectted()
+        {
+            ClearHeart();
+        }
+
+        protected void InitHeart()
+        {
+            mHeartTimerId = TimerTaskQueue.Instance.AddTimer(mHeartInterval, mHeartInterval, HeartTimerCallback);
+        }
+
+        protected void HeartTimerCallback()
+        {
+            Send(NetworkPacket.HeartPacketBytes);
+        }
+
+        protected void ClearHeart()
+        {
+            TimerTaskQueue.Instance.DelTimer(mHeartTimerId);
         }
     }
 

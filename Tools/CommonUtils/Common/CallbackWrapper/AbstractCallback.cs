@@ -17,6 +17,10 @@ namespace Nullspace
         {
 
         }
+        public override void Destroy()
+        {
+
+        }
 
         public abstract void Run();
     }

@@ -1,56 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Nullspace
 {
-    public abstract class NetworkMessage
+    public class NetworkMessage : ObjectKey
     {
-        protected byte[] mCacheBytes;
-        private int mReadIndex = 0;
-        protected List<byte> mSendBytes;
-
+        public static byte[] CacheBytes = new byte[1024];
+        protected MemoryStream mByteStream;
         public NetworkMessage()
         {
-            mCacheBytes = null;
-            mSendBytes = new List<byte>();
+            mByteStream = new MemoryStream();
+            Reset();
         }
 
-        public abstract void ReadPacket();
-        public abstract void WritePacket();
-
-        public virtual void InitializeBy(byte[] bytes)
+        public override void Initialize()
         {
-            mReadIndex = 0;
-            mSendBytes.Clear();
-            mCacheBytes = bytes;
-            ReadPacket();
+            Reset();
+        }
+
+        public override void Clear()
+        {
+            Reset();
+        }
+
+        public override void Destroy()
+        {
+            mByteStream.Close();
+        }
+
+        public void Reset()
+        {
+            mByteStream.SetLength(0);
+            mByteStream.Seek(0, SeekOrigin.Begin);
         }
 
         public void WriteLength()
         {
-            byte[] size = BitConverter.GetBytes(mSendBytes.Count);
-            mSendBytes.InsertRange(0, size);
+            byte[] size = BitConverter.GetBytes(mByteStream.Length);
+            mByteStream.Seek(0, SeekOrigin.Begin);
+            mByteStream.Write(size, 0, size.Length);
         }
 
         public short ReadInt16()
         {
             if (CanRead(sizeof(short)))
             {
-                short value = BitConverter.ToInt16(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(short);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(short));
+                return BitConverter.ToInt16(CacheBytes, 0);
             }
             return short.MaxValue;
         }
 
-        public ushort ReadUInt16()
+        public ushort ReadUInt16(byte[] buffers, int offset, ref int position)
         {
             if (CanRead(sizeof(ushort)))
             {
-                ushort value = BitConverter.ToUInt16(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(ushort);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(short));
+                return BitConverter.ToUInt16(CacheBytes, 0);
             }
             return ushort.MaxValue;
         }
@@ -58,22 +66,21 @@ namespace Nullspace
         public void WriteUInt16(ushort value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            mSendBytes.AddRange(bytes);
+            mByteStream.Write(bytes, 0, bytes.Length);
         }
 
         public void WriteInt16(short value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            mSendBytes.AddRange(bytes);
+            mByteStream.Write(bytes, 0, bytes.Length);
         }
 
         public int ReadInt32()
         {
             if (CanRead(sizeof(int)))
             {
-                int value = BitConverter.ToInt32(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(int);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(int));
+                return BitConverter.ToInt32(CacheBytes, 0);
             }
             return int.MaxValue;
         }
@@ -81,16 +88,15 @@ namespace Nullspace
         public void WriteInt32(int value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            mSendBytes.AddRange(bytes);
+            mByteStream.Write(bytes, 0, bytes.Length);
         }
 
         public long ReadInt64()
         {
             if (CanRead(sizeof(long)))
             {
-                long value = BitConverter.ToInt64(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(long);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(long));
+                return BitConverter.ToInt64(CacheBytes, 0);
             }
             return long.MaxValue;
         }
@@ -98,22 +104,21 @@ namespace Nullspace
         public void WriteInt64(long value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            mSendBytes.AddRange(bytes);
+            mByteStream.Write(bytes, 0, bytes.Length);
         }
 
         public void WriteBoolean(bool value)
         {
             byte b = (byte)(value ? 1 : 0);
-            mSendBytes.Add(b);
+            mByteStream.WriteByte(b);
         }
 
         public bool ReadBoolean()
         {
             if (CanRead(sizeof(bool)))
             {
-                bool value = BitConverter.ToBoolean(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(bool);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(bool));
+                return BitConverter.ToBoolean(CacheBytes, 0);
             }
             return false;
         }
@@ -122,9 +127,8 @@ namespace Nullspace
         {
             if (CanRead(sizeof(float)))
             {
-                float value = BitConverter.ToSingle(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(float);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(float));
+                return BitConverter.ToSingle(CacheBytes, 0);
             }
             return float.MaxValue;
         }
@@ -132,16 +136,15 @@ namespace Nullspace
         public void WriteFloat(float value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            mSendBytes.AddRange(bytes);
+            mByteStream.Write(bytes, 0, bytes.Length);
         }
 
         public double ReadDouble()
         {
             if (CanRead(sizeof(double)))
             {
-                double value = BitConverter.ToDouble(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(double);
-                return value;
+                mByteStream.Read(CacheBytes, 0, sizeof(double));
+                return BitConverter.ToDouble(CacheBytes, 0);
             }
             return double.MaxValue;
         }
@@ -149,7 +152,7 @@ namespace Nullspace
         public void WriteDouble(double value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            mSendBytes.AddRange(bytes);
+            mByteStream.Write(bytes, 0, bytes.Length);
         }
 
         public string ReadWString()
@@ -184,9 +187,16 @@ namespace Nullspace
         {
             if (CanRead(len))
             {
-                byte[] bytes = new byte[len];
-                Array.Copy(mCacheBytes, mReadIndex, bytes, 0, len);
-                mReadIndex += len;
+                byte[] bytes = null;
+                if (len < CacheBytes.Length)
+                {
+                    bytes = CacheBytes;
+                }
+                else
+                {
+                    bytes = new byte[len];
+                }
+                mByteStream.Read(bytes, 0, len);
                 return bytes;
             }
             return null;
@@ -194,29 +204,29 @@ namespace Nullspace
 
         public void WriteBytes(byte[] bytes)
         {
-            mSendBytes.AddRange(bytes);
+            if (bytes != null)
+            {
+                mByteStream.Write(bytes, 0, bytes.Length);
+            }
         }
 
         public void WriteString(string value)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);
             WriteInt32(bytes.Length);
-            foreach (byte b in bytes)
-            {
-                mSendBytes.Add(b);
-            }
+            WriteBytes(bytes);
         }
 
         public void WriteWString(string value)
         {
             byte[] bytes = Encoding.Unicode.GetBytes(value);
             WriteInt32(bytes.Length);
-            mSendBytes.AddRange(bytes);
+            WriteBytes(bytes);
         }
 
         public bool CanRead(int len)
         {
-            if (mReadIndex + len <= mCacheBytes.Length)
+            if (mByteStream.Position + len <= mByteStream.Length)
             {
                 return true;
             }

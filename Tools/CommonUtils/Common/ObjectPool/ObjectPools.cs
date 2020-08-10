@@ -3,16 +3,29 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
-    [Serializable]
-    public class ObjectPools : Singleton<ObjectPools>
+    public class ObjectPools
     {
+        public static ObjectPools Instance = null;
+
+        static ObjectPools()
+        {
+            Instance = new ObjectPools();
+            Instance.Initialize();
+        }
+
         private Dictionary<Type, ObjectPool> Pools;
         private List<Type> ClearEmptyPools;
         private int CheckTimerId;
-        private void Awake()
+
+        private ObjectPools()
         {
             Pools = new Dictionary<Type, ObjectPool>();
             ClearEmptyPools = new List<Type>();
+        }
+
+        // 一定要将 TimerTaskQueue.Instance 放在这里，不能放在构造函数
+        private void Initialize()
+        {
             CheckTimerId = TimerTaskQueue.Instance.AddTimer(2000, 2000, CheckLifeExpired);
         }
 
@@ -45,14 +58,13 @@ namespace Nullspace
             }
         }
 
-        protected override void OnDestroy()
+        public void Clear()
         {
             foreach (ObjectPool pool in Pools.Values)
             {
                 pool.Clear();
             }
             TimerTaskQueue.Instance.DelTimer(CheckTimerId);
-            base.OnDestroy();
         }
 
         private void CheckLifeExpired()

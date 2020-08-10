@@ -9,12 +9,7 @@ namespace Nullspace
     /// </summary>
     public class TimerTaskQueue
     {
-        public static TimerTaskQueue Instance = null;
-
-        static TimerTaskQueue()
-        {
-            Instance = new TimerTaskQueue();
-        }
+        public static TimerTaskQueue Instance = new TimerTaskQueue();
 
         private int mNextTimerId;
         private int mCurrentTick;

@@ -135,11 +135,30 @@ namespace Nullspace
                 case StateParameterDataType.BOOLEAN:
                     return param.Value.Equals(condition.Value);
                 case StateParameterDataType.FLOAT:
-                case StateParameterDataType.INT: // int 也当作 浮点比较
-                    // 当前值 param.Value 与 目标值 condition.Value 比较
                     return CheckFloat((float)param.Value, (float)condition.Value, condition.CompareType);
+                case StateParameterDataType.INT:
+                    return CheckInt((int)param.Value, (int)condition.Value, condition.CompareType);
             }
             return true;
+        }
+        public static bool CheckInt(int a, int b, ConditionOperationType type)
+        {
+            switch (type)
+            {
+                case ConditionOperationType.EQUAL:
+                    return a == b;
+                case ConditionOperationType.GREATER:
+                    return a > b;
+                case ConditionOperationType.GREATER_EQUAL:
+                    return a >= b;
+                case ConditionOperationType.LESS:
+                    return a < b;
+                case ConditionOperationType.LESS_EQUAL:
+                    return a <= b;
+                case ConditionOperationType.NOT_EQUAL:
+                    return a != b;
+            }
+            return false;
         }
 
         public static bool CheckFloat(float a, float b, ConditionOperationType type)

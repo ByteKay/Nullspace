@@ -88,12 +88,12 @@ namespace Nullspace
         public virtual void Clear()
         {
             // 实际上 缓存中的物体 不用调用 Released
-            //var itr = CircleCaches.Values.GetEnumerator();
-            //while (itr.MoveNext())
-            //{
-            //    ObjectCacheBase item = itr.Current;
-            //    item.Released();
-            //}
+            var itr = CircleCaches.Values.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                ObjectKey item = itr.Current;
+                item.Destroy();
+            }
             CircleCaches.Clear();
         }
 

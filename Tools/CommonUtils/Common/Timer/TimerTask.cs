@@ -1,5 +1,7 @@
 ﻿
 
+using System;
+
 namespace Nullspace
 {
     public class TimerTask : ObjectKey
@@ -32,6 +34,11 @@ namespace Nullspace
                 ObjectPools.Instance.Release(Callback);
                 Callback = null;
             }
+        }
+
+        public override void Destroy()
+        {
+            Clear();
         }
     }
 }

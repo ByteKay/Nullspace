@@ -45,6 +45,6 @@ namespace Nullspace
 
         public abstract void Initialize();
         public abstract void Clear();
-
+        public abstract void Destroy();
     }
 }
