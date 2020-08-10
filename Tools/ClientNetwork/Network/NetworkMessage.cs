@@ -187,15 +187,7 @@ namespace Nullspace
         {
             if (CanRead(len))
             {
-                byte[] bytes = null;
-                if (len < CacheBytes.Length)
-                {
-                    bytes = CacheBytes;
-                }
-                else
-                {
-                    bytes = new byte[len];
-                }
+                byte[] bytes = new byte[len];
                 mByteStream.Read(bytes, 0, len);
                 return bytes;
             }

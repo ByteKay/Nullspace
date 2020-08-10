@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 
 namespace Nullspace
 {
@@ -41,6 +42,7 @@ namespace Nullspace
         {
             Reset();
             mByteStream.Write(bytes, 0, bytes.Length);
+            mByteStream.Seek(0, SeekOrigin.Begin);
             ReadPacket();
         }
 
@@ -48,6 +50,7 @@ namespace Nullspace
         {
             Reset();
             WritePacket();
+            mByteStream.Seek(0, System.IO.SeekOrigin.Begin);
             return ReadBytes((int)mByteStream.Length);
         }
 

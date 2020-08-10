@@ -30,7 +30,7 @@ namespace Nullspace
         {
             if (ProcessHead() && ProcessContent())
             {
-                ProcessPacket();
+                NetworkEventHandler.AddPacket(mPacket);
             }
         }
 
@@ -74,13 +74,6 @@ namespace Nullspace
                 }
             } while (len < total);
             return true;
-        }
-
-        protected void ProcessPacket()
-        {
-            NetworkPacket packet = ObjectPools.Instance.Acquire<NetworkPacket>();
-            packet.BodyContent = mContents;
-            NetworkEventHandler.AddPacket(packet);
         }
 
         protected void ReceiveMessage()

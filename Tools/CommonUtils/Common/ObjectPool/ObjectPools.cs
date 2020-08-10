@@ -26,7 +26,7 @@ namespace Nullspace
         // 一定要将 TimerTaskQueue.Instance 放在这里，不能放在构造函数
         private void Initialize()
         {
-            CheckTimerId = TimerTaskQueue.Instance.AddTimer(2000, 2000, CheckLifeExpired);
+            CheckTimerId = TimerTaskQueue.Instance.AddTimer(2000, 1000 * 60 * 3, CheckLifeExpired);
         }
 
         public T Acquire<T>() where T : ObjectKey
