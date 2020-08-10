@@ -3,3 +3,8 @@ G:\UnityWorkspace\Nullspace\Tools\bin\ClientNetwork.pdb
 G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Debug\ClientNetwork.csprojResolveAssemblyReference.cache
 G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Debug\ClientNetwork.dll
 G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Debug\ClientNetwork.pdb
+F:\Unity\Nullspace\Tools\bin\ClientNetwork.dll
+F:\Unity\Nullspace\Tools\bin\ClientNetwork.pdb
+F:\Unity\Nullspace\Tools\ClientNetwork\obj\Debug\ClientNetwork.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\ClientNetwork\obj\Debug\ClientNetwork.dll
+F:\Unity\Nullspace\Tools\ClientNetwork\obj\Debug\ClientNetwork.pdb

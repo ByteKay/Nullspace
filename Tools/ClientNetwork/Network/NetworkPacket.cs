@@ -2,14 +2,17 @@
 {
     public class NetworkPacket
     {
-        public NetworkHeadFormat mHead;
+        public NetworkHead mHead;
         public byte[] mContent;
-        public AbstractNetworkClient mClient;
+
+        public NetworkClient mClient;
+
         public NetworkPacket()
         {
 
         }
-        public NetworkPacket(NetworkHeadFormat head, byte[] content, AbstractNetworkClient client)
+
+        public NetworkPacket(NetworkHead head, byte[] content, NetworkClient client)
         {
             mHead = head;
             mContent = content;

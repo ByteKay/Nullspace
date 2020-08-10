@@ -9,10 +9,11 @@ namespace Nullspace
     public class LogFileWriter
     {
         private List<string> mCacheMessages = new List<string>();
+        private List<string> mBackMessages = new List<string>();
+
         private LoggerConfig mConfig;
-        private string mDay;
+        private string mDayH;
         private string mFilePath;
-        private int mIndex = 0;
         private StreamWriter mFileStream;
         private Thread mThread = null;
         private bool isStopped = false;
@@ -20,13 +21,9 @@ namespace Nullspace
         public LogFileWriter(LoggerConfig config)
         {
             mConfig = config;
-            mDay = DateTimeUtils.FormatTime(DateTime.Now);
-            mFilePath = mConfig.FilePath;
-            mFileStream = new StreamWriter(mFilePath, true, Encoding.UTF8);
-            mFileStream.AutoFlush = false;
+            LogToNextFile();
             StartLoging();
         }
-
         public void Log(string message)
         {
             lock (this)
@@ -53,43 +50,30 @@ namespace Nullspace
         {
             while (true)
             {
-                List<string> back = null;
                 if (mCacheMessages.Count > 0)
                 {
                     lock (this)
                     {
-                        back = mCacheMessages;
-                        mCacheMessages = new List<string>();
+                        mBackMessages.AddRange(mCacheMessages);
+                        mCacheMessages.Clear();
                     }
-                }
-                if (back != null)
-                {
-                    foreach (string msg in back)
+                    int count = mBackMessages.Count;
+                    for (int i = 0; i < count; ++i)
                     {
-                        if (msg.Substring(0, 10) == mDay)
+                        if (IsSameDayH(mBackMessages[i]))
                         {
-                            mFileStream.WriteLine(msg);
+                            mFileStream.WriteLine(mBackMessages[i]);
                         }
                         else
                         {
-                            mFileStream.Flush();
-                            mFileStream.Close();
-                            RenameNextSeq();
-                            mIndex = 0;
-                            mDay = msg.Substring(0, 10);
+                            LogToNextFile();
                         }
                     }
+                    mBackMessages.Clear();
                     mFileStream.Flush();
-                    FileInfo info = new FileInfo(mFilePath);
-                    if ((info.Length >> 10) > mConfig.FileMaxSize) // kb
-                    {
-                        mFileStream.Close();
-                        RenameNextSeq();
-                    }
                 }
                 if (isStopped)
                 {
-                    mFileStream.Flush();
                     mFileStream.Close();
                     break;
                 }
@@ -98,22 +82,31 @@ namespace Nullspace
                     Thread.Sleep(mConfig.FlushInterval);
                 }
             }
-
         }
 
-        private void RenameNextSeq()
+        private bool IsSameDayH(string msg)
         {
-            string rename = null;
-            for (int i = mIndex + 1; ; ++i)
+            string dayH = StringUtils.StrTok(msg, ":");
+            if (dayH != null)
             {
-                rename = string.Format("{0}/{1}_{2}_{3}.{4}", mConfig.Directory, mConfig.FileName, mDay, i, mConfig.FileExtention);
-                if (!File.Exists(rename))
-                {
-                    mIndex = i;
-                    break;
-                }
+                return dayH == mDayH;
             }
-            File.Move(mFilePath, rename);
+            return false;
+        }
+
+        private string GetFilePath()
+        {
+            return string.Format("{0}/{1}_{2}.{3}", mConfig.Directory, mConfig.FileName, mDayH, mConfig.FileExtention);
+        }
+
+        private void LogToNextFile()
+        {
+            mDayH = DateTimeUtils.FormatTimeH(DateTime.Now);
+            mFilePath = GetFilePath();
+            if (mFileStream != null)
+            {
+                mFileStream.Close();
+            }
             mFileStream = new StreamWriter(mFilePath, true, Encoding.Unicode);
             mFileStream.AutoFlush = false;
         }

@@ -14,12 +14,10 @@ namespace Nullspace
         {
             mCacheBytes = null;
             mSendBytes = new List<byte>();
-            Initialize();
         }
 
         public abstract void ReadPacket();
         public abstract void WritePacket();
-        public abstract void Initialize();
 
         public virtual void InitializeBy(byte[] bytes)
         {
@@ -31,75 +29,75 @@ namespace Nullspace
 
         public void WriteLength()
         {
-            byte[] size = System.BitConverter.GetBytes(mSendBytes.Count);
+            byte[] size = BitConverter.GetBytes(mSendBytes.Count);
             mSendBytes.InsertRange(0, size);
         }
 
-        public Int16 ReadInt16()
+        public short ReadInt16()
         {
-            if (CanRead(sizeof(Int16)))
+            if (CanRead(sizeof(short)))
             {
-                Int16 value = System.BitConverter.ToInt16(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(Int16);
+                short value = BitConverter.ToInt16(mCacheBytes, mReadIndex);
+                mReadIndex += sizeof(short);
                 return value;
             }
-            return Int16.MaxValue;
+            return short.MaxValue;
         }
 
-        public UInt16 ReadUInt16()
+        public ushort ReadUInt16()
         {
-            if (CanRead(sizeof(Int16)))
+            if (CanRead(sizeof(ushort)))
             {
-                UInt16 value = System.BitConverter.ToUInt16(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(Int16);
+                ushort value = BitConverter.ToUInt16(mCacheBytes, mReadIndex);
+                mReadIndex += sizeof(ushort);
                 return value;
             }
-            return UInt16.MaxValue;
+            return ushort.MaxValue;
         }
 
-        public void WriteUInt16(UInt16 value)
+        public void WriteUInt16(ushort value)
         {
-            byte[] bytes = System.BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             mSendBytes.AddRange(bytes);
         }
 
-        public void WriteInt16(Int16 value)
+        public void WriteInt16(short value)
         {
-            byte[] bytes = System.BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             mSendBytes.AddRange(bytes);
         }
 
-        public Int32 ReadInt32()
+        public int ReadInt32()
         {
-            if (CanRead(sizeof(Int32)))
+            if (CanRead(sizeof(int)))
             {
-                int value = System.BitConverter.ToInt32(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(Int32);
+                int value = BitConverter.ToInt32(mCacheBytes, mReadIndex);
+                mReadIndex += sizeof(int);
                 return value;
             }
-            return Int32.MaxValue;
+            return int.MaxValue;
         }
 
         public void WriteInt32(int value)
         {
-            byte[] bytes = System.BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             mSendBytes.AddRange(bytes);
         }
 
-        public Int64 ReadInt64()
+        public long ReadInt64()
         {
-            if (CanRead(sizeof(Int64)))
+            if (CanRead(sizeof(long)))
             {
-                Int64 value = System.BitConverter.ToInt64(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(Int64);
+                long value = BitConverter.ToInt64(mCacheBytes, mReadIndex);
+                mReadIndex += sizeof(long);
                 return value;
             }
-            return Int64.MaxValue;
+            return long.MaxValue;
         }
 
-        public void WriteInt64(Int64 value)
+        public void WriteInt64(long value)
         {
-            byte[] bytes = System.BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             mSendBytes.AddRange(bytes);
         }
 
@@ -109,12 +107,12 @@ namespace Nullspace
             mSendBytes.Add(b);
         }
 
-        public Boolean ReadBoolean()
+        public bool ReadBoolean()
         {
-            if (CanRead(sizeof(Boolean)))
+            if (CanRead(sizeof(bool)))
             {
-                Boolean value = System.BitConverter.ToBoolean(mCacheBytes, mReadIndex);
-                mReadIndex += sizeof(Boolean);
+                bool value = BitConverter.ToBoolean(mCacheBytes, mReadIndex);
+                mReadIndex += sizeof(bool);
                 return value;
             }
             return false;
@@ -124,7 +122,7 @@ namespace Nullspace
         {
             if (CanRead(sizeof(float)))
             {
-                float value = System.BitConverter.ToSingle(mCacheBytes, mReadIndex);
+                float value = BitConverter.ToSingle(mCacheBytes, mReadIndex);
                 mReadIndex += sizeof(float);
                 return value;
             }
@@ -133,7 +131,7 @@ namespace Nullspace
 
         public void WriteFloat(float value)
         {
-            byte[] bytes = System.BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             mSendBytes.AddRange(bytes);
         }
 
@@ -141,7 +139,7 @@ namespace Nullspace
         {
             if (CanRead(sizeof(double)))
             {
-                double value = System.BitConverter.ToDouble(mCacheBytes, mReadIndex);
+                double value = BitConverter.ToDouble(mCacheBytes, mReadIndex);
                 mReadIndex += sizeof(double);
                 return value;
             }
@@ -150,14 +148,14 @@ namespace Nullspace
 
         public void WriteDouble(double value)
         {
-            byte[] bytes = System.BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             mSendBytes.AddRange(bytes);
         }
 
         public string ReadWString()
         {
             int len = ReadInt32();
-            if (len != Int32.MaxValue)
+            if (len != int.MaxValue)
             {
                 byte[] bytes = ReadBytes(len);
                 if (bytes != null)
@@ -171,7 +169,7 @@ namespace Nullspace
         public string ReadString()
         {
             int len = ReadInt32();
-            if (len != Int32.MaxValue)
+            if (len != int.MaxValue)
             {
                 byte[] bytes = ReadBytes(len);
                 if (bytes != null)

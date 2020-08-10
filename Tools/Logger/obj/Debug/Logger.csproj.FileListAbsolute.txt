@@ -3,3 +3,8 @@ G:\UnityWorkspace\Nullspace\Tools\bin\Logger.dll
 G:\UnityWorkspace\Nullspace\Tools\bin\Logger.pdb
 G:\UnityWorkspace\Nullspace\Tools\Logger\obj\Debug\Logger.dll
 G:\UnityWorkspace\Nullspace\Tools\Logger\obj\Debug\Logger.pdb
+F:\Unity\Nullspace\Tools\bin\Logger.pdb
+F:\Unity\Nullspace\Tools\Logger\obj\Debug\Logger.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\Logger\obj\Debug\Logger.pdb
+F:\Unity\Nullspace\Tools\bin\Logger.dll
+F:\Unity\Nullspace\Tools\Logger\obj\Debug\Logger.dll

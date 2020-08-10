@@ -35,33 +35,28 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\CommonUtils.dll</HintPath>
     </Reference>
+    <Reference Include="GameDataRuntime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\GameDataRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="StateController, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\StateController.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Network\AbstractNetworkClient.cs" />
-    <Compile Include="Network\CommandClassFactory\NetworkCommand.cs" />
-    <Compile Include="Network\CommandClassFactory\NetworkCommandFactory.cs" />
-    <Compile Include="Network\CommandClassFactory\NetworkCommandHandler.cs" />
-    <Compile Include="Network\CommandClassFactory\NetworkCommandType.cs" />
-    <Compile Include="Network\CommandEventFactory\NetworkEventHandler.cs" />
-    <Compile Include="Network\CommandEventFactory\NetworkEventHandlerDefine.cs" />
+    <Compile Include="Network\NetworkClient.cs" />
+    <Compile Include="Network\NetworkEventHandler.cs" />
     <Compile Include="Network\NetworkCommandType.cs" />
     <Compile Include="Network\NetworkConnectState.cs" />
-    <Compile Include="Network\NetworkCppClient.cs" />
-    <Compile Include="Network\NetworkCSharpClient.cs" />
     <Compile Include="Network\NetworkHeadFormat.cs" />
     <Compile Include="Network\NetworkMessage.cs" />
     <Compile Include="Network\NetworkPacket.cs" />
-    <Compile Include="Network\Test\NetCommand.cs" />
-    <Compile Include="Network\Test\TestNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

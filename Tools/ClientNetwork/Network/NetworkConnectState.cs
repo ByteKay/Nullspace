@@ -3,9 +3,12 @@ namespace Nullspace
 {
     public enum NetworkConnectState
     {
-        Already,
+        None,
+        Initialized,
+        Connectting,
         Connectted,
         Reconnectting,
         Disconnected,
+        ConnectFailed,
     }
 }

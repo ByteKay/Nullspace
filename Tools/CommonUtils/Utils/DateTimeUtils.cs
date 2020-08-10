@@ -10,9 +10,20 @@ namespace Nullspace
             return datetime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
+
         public static string FormatTime(DateTime datetime)
         {
             return datetime.ToString("yyyy-MM-dd");
+        }
+
+        public static string FormatTimeH(DateTime datetime)
+        {
+            return datetime.ToString("yyyy-MM-dd_HH");
+        }
+
+        public static string FormatTimeHMSFFF(DateTime datetime)
+        {
+            return datetime.ToString("yyyy-MM-dd_HH:mm:ss.fff");
         }
 
         public static string FormatTime(long datetime)

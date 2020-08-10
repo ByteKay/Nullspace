@@ -36,6 +36,8 @@ namespace Nullspace
         /// 关键错误
         /// </summary>
         CRITICAL = 32,
+
+        DEFAULT = INFO | WARNING | ERROR,
     }
 
 }

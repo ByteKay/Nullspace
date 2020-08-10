@@ -3,20 +3,8 @@ using System;
 
 namespace Nullspace
 {
-    public class NetworkHeadFormat : NetworkMessage
+    public class NetworkHead : NetworkMessage
     {
-        public int mType = 0;
-        public int mLength = 0;
-        public int mResult = 0;
-        public int mSession = 0;
-        public Int64 mFrom = 0;
-        public Int64 mTo = 0;
-        public Int64 mMask = 0;
-        public Int64 mAddition = 0;
-
-
-        public bool mIsInitialized = false;
-
         public static int Size()
         {
             int size = 0;
@@ -24,16 +12,25 @@ namespace Nullspace
             size += sizeof(int);
             size += sizeof(int);
             size += sizeof(int);
-            size += sizeof(Int64);
-            size += sizeof(Int64);
-            size += sizeof(Int64);
-            size += sizeof(Int64);
+            size += sizeof(long);
+            size += sizeof(long);
+            size += sizeof(long);
+            size += sizeof(long);
             return size;
         }
 
-        public NetworkHeadFormat Clone()
+        public int mType = 0;
+        public int mLength = 0;
+        public int mResult = 0;
+        public int mSession = 0;
+        public long mFrom = 0;
+        public long mTo = 0;
+        public long mMask = 0;
+        public long mAddition = 0;
+
+        public NetworkHead Clone()
         {
-            NetworkHeadFormat head = new NetworkHeadFormat();
+            NetworkHead head = new NetworkHead();
             head.mType = mType;
             head.mLength = mLength;
             head.mResult = mResult;
@@ -42,23 +39,21 @@ namespace Nullspace
             head.mSession = mSession;
             head.mAddition = mAddition;
             head.mMask = mMask;
-            mIsInitialized = true;
             mSendBytes.Clear();
             return head;
         }
 
-        public void CopyFrom(NetworkHeadFormat other)
+        public void CopyFrom(NetworkHead other)
         {
             mSendBytes.Clear();
-            this.mType = other.mType;
-            this.mLength = other.mLength;
-            this.mResult = other.mResult;
-            this.mFrom = other.mFrom;
-            this.mTo = other.mTo;
-            this.mSession = other.mSession;
-            this.mAddition = other.mAddition;
-            this.mMask = other.mMask;
-            mIsInitialized = true;
+            mType = other.mType;
+            mLength = other.mLength;
+            mResult = other.mResult;
+            mFrom = other.mFrom;
+            mTo = other.mTo;
+            mSession = other.mSession;
+            mAddition = other.mAddition;
+            mMask = other.mMask;
         }
 
         public virtual byte[] ToBytes()
@@ -106,7 +101,6 @@ namespace Nullspace
             mSession = System.Net.IPAddress.NetworkToHostOrder(mSession);
             mAddition = System.Net.IPAddress.NetworkToHostOrder(mAddition);
             mMask = System.Net.IPAddress.NetworkToHostOrder(mMask);
-            mIsInitialized = true;
         }
 
         public override void WritePacket()
@@ -120,11 +114,6 @@ namespace Nullspace
             WriteInt64(System.Net.IPAddress.HostToNetworkOrder(mTo));
             WriteInt64(System.Net.IPAddress.HostToNetworkOrder(mMask));
             WriteInt64(System.Net.IPAddress.HostToNetworkOrder(mAddition));
-        }
-
-        public override void Initialize()
-        {
-            mIsInitialized = false;
         }
 
     }

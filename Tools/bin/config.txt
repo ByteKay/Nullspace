@@ -3,3 +3,5 @@ xml_dir = GameDataXml  // 指定导出xml数据的目录
 cs_dir = GameDataCode // 指定导出csharp代码的目录
 recursive = true // 是否递归导出 excel
 ForceImmediate = true //全部即时加载并初始化
+log_config_file = log.property // 日志配置文件
+server_config_file = server.property // 服务端配置数据
