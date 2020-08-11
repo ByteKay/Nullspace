@@ -66,6 +66,9 @@
     <Compile Include="Common\Timer\FrameTimerTaskHeap.cs" />
     <Compile Include="Common\Timer\TimerTask.cs" />
     <Compile Include="Common\Timer\TimerTaskQueue.cs" />
+    <Compile Include="Common\XML\MiniParser.cs" />
+    <Compile Include="Common\XML\SecurityParser.cs" />
+    <Compile Include="Common\XML\SmallXmlParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stream\INullStream.cs" />
     <Compile Include="Stream\NullMemoryStream.cs" />

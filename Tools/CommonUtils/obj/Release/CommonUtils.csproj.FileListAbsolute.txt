@@ -6,3 +6,8 @@ G:\UnityWorkspace\Nullspace\Tools\CommonUtils\obj\Release\CommonUtils.pdb
 G:\UnityWorkspace\Nullspace\Tools\bin\CommonUtils.dll
 G:\UnityWorkspace\Nullspace\Tools\bin\CommonUtils.pdb
 G:\UnityWorkspace\Nullspace\Tools\CommonUtils\obj\Release\CommonUtils.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\bin\CommonUtils.dll
+F:\Unity\Nullspace\Tools\bin\CommonUtils.pdb
+F:\Unity\Nullspace\Tools\CommonUtils\obj\Release\CommonUtils.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\CommonUtils\obj\Release\CommonUtils.dll
+F:\Unity\Nullspace\Tools\CommonUtils\obj\Release\CommonUtils.pdb

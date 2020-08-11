@@ -10,3 +10,5 @@ G:\UnityWorkspace\Nullspace\Tools\GameDataTool\bin\GameDataTool.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataTool\obj\Release\GameDataTool.csprojResolveAssemblyReference.cache
 G:\UnityWorkspace\Nullspace\Tools\bin\GameDataTool.exe
 G:\UnityWorkspace\Nullspace\Tools\bin\GameDataTool.pdb
+F:\Unity\Nullspace\Tools\bin\GameDataTool.exe
+F:\Unity\Nullspace\Tools\bin\GameDataTool.pdb
