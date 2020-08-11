@@ -93,11 +93,6 @@ namespace Nullspace
             return result != null ? result.ToString() : null;
         }
 
-        public static T ToObject<T>(string str)
-        {
-            return (T)ToObject(str, typeof(T));
-        }
-
         public static object ToObject(string str, Type type)
         {
             if (type.IsGenericType)
@@ -183,6 +178,7 @@ namespace Nullspace
         private static object[] GenericParametersObjectOne = new object[1];
         private static object[] GenericParametersObjectTwo = new object[2];
         private static Type[] GenericParameterTypesOne = new Type[1];
+        private static Type[] GenericParameterTypesTwo = new Type[2];
         private static StringBuilder BuilderCache = new StringBuilder();
 
         static DataUtils()
@@ -276,7 +272,7 @@ namespace Nullspace
             }
         }
 
-        private static string ToMapString<T, U>(Dictionary<T, U>  map) // IEnumerable<KeyValuePair<T, U>>
+        private static string ToMapString<T, U>(Dictionary<T, U>  map)
         {
             if (map == null || map.Count == 0)
             {
@@ -325,76 +321,158 @@ namespace Nullspace
             return values;
         }
 
+        public static bool ToObject<U, V>(string str, out Dictionary<U, V> results)
+        {
+            results = new Dictionary<U, V>();
+            if (str == null)
+            {
+                return false;
+            }
+            Dictionary<string, string> strs = ToMapObject(str);
+            foreach (var item in strs)
+            {
+                U key;
+                V value;
+                ToObject(item.Key, out key);
+                ToObject(item.Value, out value);
+                results.Add(key, value);
+            }
+            return true;
+        }
+
+        public static bool ToObject<T>(string str, out List<T> v)
+        {
+            v = new List<T>();
+            if (str == null)
+            {
+                return false;
+            }
+            List<string> strs = ToListObject(str);
+            T t;
+            foreach (string item in strs)
+            {
+                ToObject(str, out t);
+                v.Add(t);
+            }
+            return true;
+        }
+
+        public static bool ToObject<T>(string str, out T v)
+        {
+            OutAction<T> outAction = ToObjectGet<T>();
+            outAction(str, out v);
+            return true;
+        }
+
+        public static T ToObject<T>(string str)
+        {
+            if (str == null)
+            {
+                return default(T);
+            }
+            T v;
+            ToObject(str, out v);
+            return v;
+        }
+
+        public static List<T> ToObjectList<T>(string str)
+        {
+            List<string> strs = ToListObject(str);
+            List<T> res = new List<T>();
+            foreach (string item in strs)
+            {
+                T t = ToObject<T>(str);
+                res.Add(t);
+            }
+            return res;
+        }
+
+        private delegate bool OutAction<T>(string a, out T b);
+
+        private static Dictionary<Type, Delegate> ToObjectGetCache = new Dictionary<Type, Delegate>();
+        private static OutAction<T> ToObjectGet<T>()
+        {
+            Type type = typeof(T);
+            if (!ToObjectGetCache.ContainsKey(type))
+            {
+                MethodInfo method = GetToObjectMethodInfoFromCache(type);
+                Delegate d = Delegate.CreateDelegate(typeof(OutAction<T>), null, method);
+                ToObjectGetCache.Add(type, d);
+
+            }
+            return ToObjectGetCache[type] as OutAction<T>;
+        }
+
         [DataReadWrite(DataReadWriteType.ToObject, typeof(byte))]
-        private static bool ToObject(string str, out byte v)
+        public static bool ToObject(string str, out byte v)
         {
             return byte.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(bool))]
-        private static bool ToObject(string str, out bool v)
+        public static bool ToObject(string str, out bool v)
         {
             return bool.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(float))]
-        private static bool ToObject(string str, out float v)
+        public static bool ToObject(string str, out float v)
         {
             return float.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(short))]
-        private static bool ToObject(string str, out short v)
+        public static bool ToObject(string str, out short v)
         {
             return short.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(int))]
-        private static bool ToObject(string str, out int v)
+        public static bool ToObject(string str, out int v)
         {
             return int.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(long))]
-        private static bool ToObject(string str, out long v)
+        public static bool ToObject(string str, out long v)
         {
             return long.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(ushort))]
-        private static bool ToObject(string str, out ushort v)
+        public static bool ToObject(string str, out ushort v)
         {
             return ushort.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(uint))]
-        private static bool ToObject(string str, out uint v)
+        public static bool ToObject(string str, out uint v)
         {
             return uint.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(ulong))]
-        private static bool ToObject(string str, out ulong v)
+        public static bool ToObject(string str, out ulong v)
         {
             return ulong.TryParse(str, out v);
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(string))]
-        private static bool ToObject(string str, out string v)
+        public static bool ToObject(string str, out string v)
         {
             v = str;
             return true;
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(DateTime))]
-        private static bool ToObject(string str, out DateTime v)
+        public static bool ToObject(string str, out DateTime v)
         {
             v = DateTimeUtils.GetTime(str);
             return true;
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Matrix4x4))]
-        private static bool ToObject(string str, out Matrix4x4 v)
+        public static bool ToObject(string str, out Matrix4x4 v)
         {
             v = Matrix4x4.zero;
             if (str != null)
@@ -427,7 +505,7 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector2))]
-        private static bool ToObject(string str, out Vector2 v)
+        public static bool ToObject(string str, out Vector2 v)
         {
             v = Vector2.zero;
             MatchCollection collection = MatchVector(str);
@@ -441,7 +519,7 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector3))]
-        private static bool ToObject(string str, out Vector3 v)
+        public static bool ToObject(string str, out Vector3 v)
         {
             v = Vector3.zero;
             MatchCollection collection = MatchVector(str);
@@ -456,7 +534,7 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector3Int))]
-        private static bool ToObject(string str, out Vector3Int v)
+        public static bool ToObject(string str, out Vector3Int v)
         {
             v = Vector3Int.zero;
             MatchCollection collection = MatchVector(str);
@@ -473,7 +551,7 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Vector4))]
-        private static bool ToObject(string str, out Vector4 v)
+        public static bool ToObject(string str, out Vector4 v)
         {
             v = Vector4.zero;
             MatchCollection collection = MatchVector(str);
@@ -489,7 +567,7 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Quaternion))]
-        private static bool ToObject(string str, out Quaternion v)
+        public static bool ToObject(string str, out Quaternion v)
         {
             v = Quaternion.identity;
             MatchCollection collection = MatchVector(str);
@@ -505,7 +583,7 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToObject, typeof(Color))]
-        private static bool ToObject(string str, out Color v)
+        public static bool ToObject(string str, out Color v)
         {
             v = Color.black;
             MatchCollection collection = MatchVector(str);
@@ -529,73 +607,73 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(byte))]
-        private static string ToString(byte v)
+        public static string ToString(byte v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(bool))]
-        private static string ToString(bool v)
+        public static string ToString(bool v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(float))]
-        private static string ToString(float v)
+        public static string ToString(float v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(short))]
-        private static string ToString(short v)
+        public static string ToString(short v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(int))]
-        private static string ToString(int v)
+        public static string ToString(int v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(long))]
-        private static string ToString(long v)
+        public static string ToString(long v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(ushort))]
-        private static string ToString(ushort v)
+        public static string ToString(ushort v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(uint))]
-        private static string ToString(uint v)
+        public static string ToString(uint v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(ulong))]
-        private static string ToString(ulong v)
+        public static string ToString(ulong v)
         {
             return string.Format("{0}", v);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(string))]
-        private static string ToString(string v)
+        public static string ToString(string v)
         {
             return v;
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(DateTime))]
-        private static string ToString(DateTime dt)
+        public static string ToString(DateTime dt)
         {
             return DateTimeUtils.FormatTimeHMS(dt);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Matrix4x4))]
-        private static string ToString(Matrix4x4 v)
+        public static string ToString(Matrix4x4 v)
         {
             return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}",
                 v.m00,
@@ -618,37 +696,37 @@ namespace Nullspace
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Vector2))]
-        private static string ToString(Vector2 v)
+        public static string ToString(Vector2 v)
         {
             return string.Format("{0},{1}", v.x, v.y);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Vector3))]
-        private static string ToString(Vector3 v)
+        public static string ToString(Vector3 v)
         {
             return string.Format("{0},{1},{2}", v.x, v.y, v.z);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Vector3Int))]
-        private static string ToString(Vector3Int v)
+        public static string ToString(Vector3Int v)
         {
             return string.Format("{0},{1},{2}", v.x, v.y, v.z);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Vector4))]
-        private static string ToString(Vector4 v)
+        public static string ToString(Vector4 v)
         {
             return string.Format("{0},{1},{2},{3}", v.x, v.y, v.z, v.w);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Quaternion))]
-        private static string ToString(Quaternion v)
+        public static string ToString(Quaternion v)
         {
             return string.Format("{0},{1},{2},{3}", v.x, v.y, v.z, v.w);
         }
 
         [DataReadWrite(DataReadWriteType.ToString, typeof(Color))]
-        private static string ToString(Color v)
+        public static string ToString(Color v)
         {
             return string.Format("{0},{1},{2},{3}", v.r, v.g, v.b, v.a);
         }

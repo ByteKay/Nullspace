@@ -38,6 +38,28 @@ namespace GameData
         public int MaxAngerValue { get; private set; }
         public int AngerGet { get; private set; }
 
+
+        protected override void ConvertAll()
+        {
+            Name = DataUtils.ToObject<string>(GetValue("Name"));
+            Title = DataUtils.ToObject<string>(GetValue("Title"));
+            Zoom1 = DataUtils.ToObject<uint>(GetValue("Zoom1"));
+            Chartlet = DataUtils.ToObject<uint>(GetValue("Chartlet"));
+            Head = DataUtils.ToObject<uint>(GetValue("Head"));
+            Color = DataUtils.ToObject<uint>(GetValue("Color"));
+            Radius = DataUtils.ToObject<uint>(GetValue("Radius"));
+            Race = DataUtils.ToObject<byte>(GetValue("Race"));
+            Sex = DataUtils.ToObject<byte>(GetValue("Sex"));
+            Type = DataUtils.ToObject<byte>(GetValue("Type"));
+            Level = DataUtils.ToObject<uint>(GetValue("Level"));
+            OfficeLevel = DataUtils.ToObject<byte>(GetValue("OfficeLevel"));
+            Exp = DataUtils.ToObject<uint>(GetValue("Exp"));
+            IsDynamic = DataUtils.ToObject<byte>(GetValue("IsDynamic"));
+            MaxHp = DataUtils.ToObject<int>(GetValue("MaxHp"));
+            InitAngerValue = DataUtils.ToObject<int>(GetValue("InitAngerValue"));
+            MaxAngerValue = DataUtils.ToObject<int>(GetValue("MaxAngerValue"));
+            AngerGet = DataUtils.ToObject<int>(GetValue("AngerGet"));
+        }
     }
 
     public class MonsterGroup : GameDataList<MonsterGroup>
@@ -66,6 +88,30 @@ namespace GameData
         public uint QuestDrop { get; private set; }
         public uint TCDrop { get; private set; }
 
+
+        protected override void ConvertAll()
+        {
+            Index = DataUtils.ToObject<uint>(GetValue("Index"));
+            Name = DataUtils.ToObject<string>(GetValue("Name"));
+            Title = DataUtils.ToObject<string>(GetValue("Title"));
+            ModelId = DataUtils.ToObject<uint>(GetValue("ModelId"));
+            Zoom = DataUtils.ToObject<int>(GetValue("Zoom"));
+            Chartlet = DataUtils.ToObject<short>(GetValue("Chartlet"));
+            Color = DataUtils.ToObject<uint>(GetValue("Color"));
+            MoveType = DataUtils.ToObject<short>(GetValue("MoveType"));
+            MoveSpeed = DataUtils.ToObject<float>(GetValue("MoveSpeed"));
+            RunSpeed = DataUtils.ToObject<float>(GetValue("RunSpeed"));
+            TurnSpeed = DataUtils.ToObject<uint>(GetValue("TurnSpeed"));
+            Height = DataUtils.ToObject<uint>(GetValue("Height"));
+            FollowRadius = DataUtils.ToObject<uint>(GetValue("FollowRadius"));
+            AttackRadius = DataUtils.ToObject<uint>(GetValue("AttackRadius"));
+            SeeRadius = DataUtils.ToObject<uint>(GetValue("SeeRadius"));
+            GroupType = DataUtils.ToObject<uint>(GetValue("GroupType"));
+            GroupLevel = DataUtils.ToObject<uint>(GetValue("GroupLevel"));
+            RenownDrop = DataUtils.ToObject<uint>(GetValue("RenownDrop"));
+            QuestDrop = DataUtils.ToObject<uint>(GetValue("QuestDrop"));
+            TCDrop = DataUtils.ToObject<uint>(GetValue("TCDrop"));
+        }
     }
 
 }

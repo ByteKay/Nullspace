@@ -56,9 +56,6 @@
     <Compile Include="Runtime\DataFormat\DataFormatConvertUtils.cs" />
     <Compile Include="Runtime\DataFormat\Properties\Properties.cs" />
     <Compile Include="Runtime\DataFormat\Properties\PropertiesXML.cs" />
-    <Compile Include="Runtime\DataFormat\XML\MiniParser.cs" />
-    <Compile Include="Runtime\DataFormat\XML\SecurityParser.cs" />
-    <Compile Include="Runtime\DataFormat\XML\SmallXmlParser.cs" />
     <Compile Include="Runtime\DataLoader\GameData.cs" />
     <Compile Include="Runtime\DataLoader\GameDataCollection.cs" />
     <Compile Include="Runtime\DataLoader\GameDataGroup.cs" />

@@ -8,3 +8,5 @@ G:\UnityWorkspace\Nullspace\Tools\bin\GameDataCheck.pdb
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\obj\Release\GameDataCheckBinary.csprojResolveAssemblyReference.cache
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\obj\Release\GameDataCheck.exe
 G:\UnityWorkspace\Nullspace\Tools\GameDataCheckBinary\obj\Release\GameDataCheck.pdb
+F:\Unity\Nullspace\Tools\bin\GameDataCheck.exe
+F:\Unity\Nullspace\Tools\bin\GameDataCheck.pdb

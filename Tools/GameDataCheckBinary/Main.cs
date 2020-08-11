@@ -18,6 +18,9 @@ namespace Nullspace
             GameDataManager.InitAllData();
             ProfilerUtils.StopProfiler(id, "GameDataManager.InitAllData", true);
             GameDataManager.ClearAllData();
+            id = ProfilerUtils.StartProfiler();
+            GameDataManager.InitAllData();
+            ProfilerUtils.StopProfiler(id, "GameDataManager.InitAllData", true);
             LogAction(InfoType.Error, "Check End ...");
             Console.ReadLine();
         }

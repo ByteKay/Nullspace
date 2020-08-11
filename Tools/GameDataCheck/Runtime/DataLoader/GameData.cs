@@ -76,7 +76,7 @@ namespace Nullspace
             mOriginData = originData;
         }
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             if (!mIsInitialized)
             {
@@ -104,70 +104,40 @@ namespace Nullspace
         }
     }
 
-    public static class DelegateFactory
-    {
-        public static Delegate CreateDelegate(this MethodInfo method, Type type)
-        {
-            return Delegate.CreateDelegate(type, method);
-        }
-
-        public static Func<TProperty> StaticPropertyGet<TProperty>(this Type source, string propertyName)
-        {
-            var propertyInfo = GetStaticPropertyInfo(source, propertyName);
-            return (Func<TProperty>)propertyInfo?.GetGetMethod()?.CreateDelegate
-            (typeof(Func<TProperty>));
-        }
-
-        public static Action<TProperty> StaticPropertySet<TProperty>(this Type source, string propertyName)
-        {
-            var propertyInfo = GetStaticPropertyInfo(source, propertyName);
-            return (Action<TProperty>)propertyInfo?.GetSetMethod(true)?.CreateDelegate
-            (typeof(Action<TProperty>));
-        }
-
-        private static PropertyInfo GetStaticPropertyInfo(Type source, string propertyName)
-        {
-            var propertyInfo = (source.GetProperty(propertyName, BindingFlags.Static) ??
-                                       source.GetProperty(propertyName, BindingFlags.Static |
-                                                          BindingFlags.NonPublic)) ??
-                                       source.GetProperty(propertyName, BindingFlags.Static |
-                                                          BindingFlags.NonPublic | BindingFlags.Public);
-            return propertyInfo;
-        }
-
-        private static PropertyInfo GetPropertyInfo(Type source, string propertyName)
-        {
-            var propertyInfo = source.GetProperty(propertyName, BindingFlags.NonPublic |
-                                                          BindingFlags.Public | BindingFlags.Instance);
-            return propertyInfo;
-        }
-
-        public static Func<TSource, TProperty> PropertyGet<TSource, TProperty>(string propertyName)
-        {
-            var source = typeof(TSource);
-            var propertyInfo = GetPropertyInfo(source, propertyName);
-            return (Func<TSource, TProperty>)propertyInfo?.GetGetMethod()?.CreateDelegate
-                   (typeof(Func<TSource, TProperty>));
-        }
-
-        public static Action<TSource, TProperty> PropertySet<TSource, TProperty>(string propertyName)
-        {
-            var source = typeof(TSource);
-            var propertyInfo = GetPropertyInfo(source, propertyName);
-            return (Action<TSource, TProperty>)propertyInfo?.GetSetMethod(true)?.CreateDelegate
-                   (typeof(Action<TSource, TProperty>));
-        }
-    }
-
-
     /// <summary>
     /// 通过 excel 导出
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public partial class GameData<T>
     {
+        protected virtual void ConvertAll() { }
 
+        public override void Initialize()
+        {
+            if (!mIsInitialized)
+            {
+                if (mOriginData != null && mOriginData.Attributes != null)
+                {
+                    ConvertAll();
+                }
+                mOriginData = null; // 释放
+                mIsInitialized = true;
+            }
+        }
 
+        protected string GetValue(string propName)
+        {
+            List<string> keyNameList = GetKeyList(GetType());
+            if (keyNameList != null && keyNameList.Contains(propName))
+            {
+                return null;
+            }
+            if (mOriginData.Attributes.ContainsKey(propName))
+            {
+                return (string)mOriginData.Attributes[propName];
+            }
+            return null;
+        }
 
     }
 

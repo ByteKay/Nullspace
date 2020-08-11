@@ -76,7 +76,7 @@ namespace Nullspace
             mOriginData = originData;
         }
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             if (!mIsInitialized)
             {
@@ -102,6 +102,44 @@ namespace Nullspace
                 mIsInitialized = true;
             }
         }
+    }
+
+    /// <summary>
+    /// 通过 excel 导出
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public partial class GameData<T>
+    {
+        protected virtual void ConvertAll() { }
+
+        public override void Initialize()
+        {
+            if (!mIsInitialized)
+            {
+                if (mOriginData != null && mOriginData.Attributes != null)
+                {
+                    ConvertAll();
+                }
+                mOriginData = null; // 释放
+                mIsInitialized = true;
+            }
+        }
+
+        protected string GetValue(string propName)
+        {
+            List<string> keyNameList = GetKeyList(GetType());
+            if (keyNameList != null && keyNameList.Contains(propName))
+            {
+                return null;
+            }
+            if (mOriginData.Attributes.ContainsKey(propName))
+            {
+                string value = (string)mOriginData.Attributes[propName];
+                return value;
+            }
+            return null;
+        }
+
     }
 
     public partial class GameData<T> : GameData where T : GameData<T>, new()

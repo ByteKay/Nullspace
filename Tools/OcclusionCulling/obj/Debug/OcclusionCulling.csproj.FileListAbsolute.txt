@@ -3,3 +3,8 @@ G:\UnityWorkspace\Nullspace\Tools\bin\OcclusionCulling.pdb
 G:\UnityWorkspace\Nullspace\Tools\OcclusionCulling\obj\Debug\OcclusionCulling.csprojResolveAssemblyReference.cache
 G:\UnityWorkspace\Nullspace\Tools\OcclusionCulling\obj\Debug\OcclusionCulling.dll
 G:\UnityWorkspace\Nullspace\Tools\OcclusionCulling\obj\Debug\OcclusionCulling.pdb
+F:\Unity\Nullspace\Tools\bin\OcclusionCulling.dll
+F:\Unity\Nullspace\Tools\bin\OcclusionCulling.pdb
+F:\Unity\Nullspace\Tools\OcclusionCulling\obj\Debug\OcclusionCulling.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\OcclusionCulling\obj\Debug\OcclusionCulling.dll
+F:\Unity\Nullspace\Tools\OcclusionCulling\obj\Debug\OcclusionCulling.pdb

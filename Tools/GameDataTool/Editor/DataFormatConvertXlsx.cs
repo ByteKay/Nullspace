@@ -28,7 +28,8 @@ namespace Nullspace
                     string.Format("cd /d {0}", csDir),
                     string.Format("set UnityEngine={0}/UnityEngine.CoreModule.dll", refDll),
                     string.Format("set GameDataRuntime={0}/GameDataRuntime.dll", refDll),
-                    string.Format("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%UnityEngine% /r:%GameDataRuntime% /out:{0}/GameDataDefine.dll /recurse:*.cs", refDll),
+                    string.Format("set CommonUtils={0}/CommonUtils.dll", refDll),
+                    string.Format("call \"C:/Windows/Microsoft.NET/Framework/v3.5/csc.exe\" -target:library /r:%CommonUtils% /r:%UnityEngine% /r:%GameDataRuntime% /out:{0}/GameDataDefine.dll /recurse:*.cs", refDll),
                     "exit"
                 };
                 string result = RunCmd(cmdList);

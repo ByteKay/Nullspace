@@ -398,6 +398,42 @@ namespace Nullspace
                 }
                 builder.Append(doubleTab).Append("}").AppendLine();
             }
+
+            builder.AppendLine();
+            builder.Append(doubleTab).AppendLine("protected override void ConvertAll()");
+            builder.Append(doubleTab).AppendLine("{");
+            List<string> keys = null;
+            if (Keys != null)
+            {
+                keys = new List<string>(Keys.Split(KeySplitChar));
+                int cnt = keys.Count;
+                for (int i = 0; i < cnt; ++i)
+                {
+                    keys[i] = keys[i].Trim();
+                }
+            }
+            for (int i = 0; i < count; ++i)
+            {
+                string name = mVariableNames[cols[i]];
+                if (keys != null && keys.Contains(name))
+                {
+                    continue;
+                }
+
+                DataTypeEnum dt = mVariableTypes[cols[i]];
+                GetType(dt, ref dataTypeString, ref readString, ref writeString);
+                string func = "ToObject";
+                // List 需要初始化
+                if (dt > DataTypeEnum.LIST)
+                {
+                    string l = StringUtils.StrTok(dataTypeString, "<");
+                    dataTypeString = StringUtils.StrTok(null, ">");
+                    func = "ToObjectList";
+                }
+                builder.Append(doubleTab).Append(tab).Append(string.Format("{0} = DataUtils.{1}<{2}>(GetValue(\"{0}\"));", name, func, dataTypeString)).AppendLine();
+            }
+            builder.Append(doubleTab).AppendLine("}");
+
             if (export_nullstream)
             {
                 builder.Append(doubleTab).Append("public int SaveToStream(NullMemoryStream stream)").AppendLine();
