@@ -63,9 +63,9 @@ namespace Nullspace
             do
             {
                 int size = mClientSocket.Receive(ptr, len, total - len, SocketFlags.None);
-                if (size == -1 || size == 0)
+                if (size == -1)
                 {
-                    StateCtl.Set(StateParamName, StateParameterValue.Connectted2Reconnectting);
+                    Reconnect(StateParameterValue.Connectted2Reconnectting);
                     return false;
                 }
                 else
@@ -113,15 +113,26 @@ namespace Nullspace
         private List<byte> mSendPack;
         private Thread mSendThread;
 
-        protected void Send(byte[] bytes)
+        public void Send(byte[] bytes)
         {
-            if (bytes != null && bytes.Length > 0)
+            if (IsConnectted())
             {
-                int len = mClientSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
-                if (len <= 0)
+                lock (mSendLock)
                 {
-                    StateCtl.Set(StateParamName, StateParameterValue.Connectted2Reconnectting);
+                    if (IsConnectted())
+                    {
+                        mNeedSendMessages.Enqueue(bytes);
+                    }
                 }
+            }
+
+        }
+
+        protected void ClearSend()
+        {
+            lock (mSendLock)
+            {
+                mNeedSendMessages.Clear();
             }
         }
 
@@ -148,8 +159,13 @@ namespace Nullspace
                         }
                         if (mSendPack.Count > 0)
                         {
-                            Send(mSendPack.ToArray());
+                            byte[] bytes = mSendPack.ToArray();
+                            int len = mClientSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
                             mSendPack.Clear();
+                            if (len < 0)
+                            {
+                                Reconnect(StateParameterValue.Connectted2Reconnectting);
+                            }
                         }
                     }
                     else
@@ -166,7 +182,7 @@ namespace Nullspace
                     DebugUtils.Log(InfoType.Warning, e.Message);
                     mReconnectImmediate = true;
                     // 重新连接
-                    StateCtl.Set(StateParamName, StateParameterValue.Connectted2Reconnectting);
+                    Reconnect(StateParameterValue.Connectted2Reconnectting);
                 }
                 Thread.Sleep(16);
             }
@@ -206,13 +222,6 @@ namespace Nullspace
             mSendPack = new List<byte>();
         }
 
-        protected void InitSocket()
-        {
-            mClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            mClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-            mClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            mClientSocket.NoDelay = true;
-        }
     }
 
     public partial class NetworkClient
@@ -250,28 +259,50 @@ namespace Nullspace
             return State == NetworkConnectState.Connectted;
         }
 
+
+
         protected bool Connect()
         {
-            bool connectted = false;
             try
             {
-                if (mClientSocket == null)
+                DebugUtils.Log(InfoType.Info, "Connect ... ");
+                if (mClientSocket != null)
                 {
-                    InitSocket();
+                    mClientSocket.Close();
                 }
+                mClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                mClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                mClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                mClientSocket.NoDelay = true;
                 IAsyncResult result = mClientSocket.BeginConnect(mAddress, mPort,
                     (IAsyncResult res) =>
                     {
-                        mClientSocket.EndConnect(res);
+                        try
+                        {
+                            mClientSocket.EndConnect(res);
+                        }
+                        catch (Exception callExcep)
+                        {
+                            DebugUtils.Log(InfoType.Error, "EndConnect Exception: " + callExcep.Message);
+                        }
                     }, mClientSocket);
                 // 这里要改写成异步
-                connectted = result.AsyncWaitHandle.WaitOne(2000, true);
+                result.AsyncWaitHandle.WaitOne(2000, true);
             }
             catch (Exception e)
             {
                 DebugUtils.Log(InfoType.Error, "Connect Exception: " + e.Message);
             }
-            return connectted;
+            return mClientSocket.Connected;
+        }
+
+        protected void Reconnect(int value)
+        {
+            if (State == NetworkConnectState.Reconnectting)
+            {
+                return;
+            }
+            StateCtl.Set(StateParamName, value);
         }
 
         protected void EnterConnectting()
@@ -284,7 +315,7 @@ namespace Nullspace
             }
             else
             {
-                StateCtl.Set(StateParamName, StateParameterValue.Connectting2Reconnectting);
+                Reconnect(StateParameterValue.Connectting2Reconnectting);
             }
         }
 
@@ -342,6 +373,7 @@ namespace Nullspace
             DelReconnectTimer();
             mReconnectTimerId = -1;
             mReconnectCount = 0;
+            DebugUtils.Log(InfoType.Info, "LeaveReconnectting");
         }
 
         protected void EnterConnectFailed()
@@ -352,6 +384,7 @@ namespace Nullspace
 
         protected void EnterConnectted()
         {
+            ClearSend();
             mSendWait.Set();
             mReceiveWait.Set();
             InitHeart();
@@ -389,8 +422,6 @@ namespace Nullspace
 
         protected void EnterAlready()
         {
-            // 初始化Socket
-            InitSocket();
             // 初始化 发送和接收 线程
             InitThread();
             // 开始连接

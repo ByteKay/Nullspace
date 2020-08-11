@@ -286,11 +286,13 @@ namespace Nullspace
             List<T> allDataList = new List<T>();
             Type type = typeof(T);
             MethodInfo method = type.GetMethod(XmlSetMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            Action<T, SecurityElement> setOriginData = Delegate.CreateDelegate(typeof(Action<T, SecurityElement>), method) as Action<T, SecurityElement>;
             foreach (SecurityElement chlid in p.Children)
             {
                 T t = new T();
-                GenericParameterArrayOne[0] = chlid;
-                method.Invoke(t, GenericParameterArrayOne);
+                setOriginData(t, chlid);
+                // GenericParameterArrayOne[0] = chlid;
+                // method.Invoke(t, GenericParameterArrayOne);
                 allDataList.Add(t);
             }
             p.Children.Clear(); // 断开引用

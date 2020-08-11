@@ -196,7 +196,7 @@ namespace Nullspace
         public static BehaviourTimeCallback PathTo(this Transform trans, float duration, List<Vector3> waypoints, NavPathType pathType = NavPathType.LinePosLineDir, int subdivisions = 5)
         {
             FixedPathController pathCtrl = new FixedPathController();
-            AbstractNavPath navPath = NavPathUtils.Create(pathType, Vector3.zero, false, null, waypoints, subdivisions);
+            AbstractNavPath navPath = NavPathUtils.Create(pathType, Vector3.zero, NavPathFlipType.None, null, waypoints, subdivisions);
             pathCtrl.StartMove(navPath, navPath.PathLength / duration, Vector3.zero, false);
             pathCtrl.mCtlPosition = trans;
             pathCtrl.mCtlRotate = trans;

@@ -13,7 +13,7 @@ namespace Nullspace
 
         public int Compare(PathTrigger x, PathTrigger y)
         {
-            return x.mTriggerLength.CompareTo(y.mTriggerLength);
+            return x.TriggerLength.CompareTo(y.TriggerLength);
         }
     }
 
@@ -25,7 +25,7 @@ namespace Nullspace
         /// <summary>
         /// 触发长度
         /// </summary>
-        public float mTriggerLength;
+        public float TriggerLength;
 
         /// <summary>
         /// 触发响应

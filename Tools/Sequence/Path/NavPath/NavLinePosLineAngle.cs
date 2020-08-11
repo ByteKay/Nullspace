@@ -11,7 +11,7 @@ namespace Nullspace
         private Vector3 mLast;          // 插值的起始方向
         private Vector3 mNext;          // 插值的结束方向
 
-        public NavLinePosLineAngle(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler, float frameCount) : base(pathData, offset, pathFlipOn, triggerHandler)
+        public NavLinePosLineAngle(NavPathData pathData, Vector3 offset, NavPathFlipType flipType, IPathTrigger triggerHandler, float frameCount) : base(pathData, offset, flipType, triggerHandler)
         {
             // 会先执行 Initialize()
             mFrameCountInv = 1.0f / frameCount;

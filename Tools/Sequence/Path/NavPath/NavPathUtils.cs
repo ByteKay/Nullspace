@@ -72,13 +72,13 @@ namespace Nullspace
             return true;
         }
 
-        public static AbstractNavPath Create(NavPathType pathType, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler, List<Vector3> waypoints, int subdivisions = 5)
+        public static AbstractNavPath Create(NavPathType pathType, Vector3 offset, NavPathFlipType flipType, IPathTrigger triggerHandler, List<Vector3> waypoints, int subdivisions = 5)
         {
             NavPathData pathData = CreatePathData(waypoints, subdivisions);
-            return Create(pathType, pathData, offset, pathFlipOn, triggerHandler);
+            return Create(pathType, pathData, offset, flipType, triggerHandler);
         }
 
-        public static AbstractNavPath Create(NavPathType pathType, NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler)
+        public static AbstractNavPath Create(NavPathType pathType, NavPathData pathData, Vector3 offset, NavPathFlipType flipType, IPathTrigger triggerHandler)
         {
             AbstractNavPath navPath = null;
             if (pathData.WayPoints.Count == 2 && pathType != NavPathType.LinePosLineDir)
@@ -89,16 +89,16 @@ namespace Nullspace
             switch (pathType)
             {
                 case NavPathType.CurvePosCurveDir:
-                    navPath = new NavCurvePosCurveDir(pathData, offset, pathFlipOn, triggerHandler);
+                    navPath = new NavCurvePosCurveDir(pathData, offset, flipType, triggerHandler);
                     break;
                 case NavPathType.LinePosLineDir:
-                    navPath = new NavCurvePosCurveDir(pathData, offset, pathFlipOn, triggerHandler);
+                    navPath = new NavCurvePosCurveDir(pathData, offset, flipType, triggerHandler);
                     break;
                 case NavPathType.LinePosLineAngle:
-                    navPath = new NavCurvePosCurveDir(pathData, offset, pathFlipOn, triggerHandler);
+                    navPath = new NavCurvePosCurveDir(pathData, offset, flipType, triggerHandler);
                     break;
                 case NavPathType.LinePosCurveDir:
-                    navPath = new NavCurvePosCurveDir(pathData, offset, pathFlipOn, triggerHandler);
+                    navPath = new NavCurvePosCurveDir(pathData, offset, flipType, triggerHandler);
                     break;
                 default:
                     DebugUtils.Log(InfoType.Error, "AbstractNavPath Create Not Supported " + EnumUtils.EnumToString(pathType));

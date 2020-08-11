@@ -103,6 +103,25 @@ namespace Nullspace
                 string value = sheet[row, colIndex];
                 if (value != null)
                 {
+                    string defaultValue = null;
+                    switch (varType)
+                    {
+                        case DataTypeEnum.BYTE:
+                        case DataTypeEnum.SHORT:
+                        case DataTypeEnum.USHORT:
+                        case DataTypeEnum.INT:
+                        case DataTypeEnum.UINT:
+                        case DataTypeEnum.LONG:
+                        case DataTypeEnum.ULONG:
+                        case DataTypeEnum.FLOAT:
+                            defaultValue = "0";
+                            break;
+                    }
+                    // 默认值不导出
+                    if (defaultValue != null && defaultValue.Equals(value))
+                    {
+                        continue;
+                    }
                     mProperties.Add(new Property(varName, value));
                 }
             }

@@ -3,8 +3,8 @@ xlsx_info_record.txt xlsx_info_record
     Test Test
     {
         FilePath = ./Excel/test.xlsx
-        SheetHash = 8989d944de77831ee410e4d332a8a3ae
-        FileHash = 530eaff3fc2ff94e8ce4a2e541931f12
+        SheetHash = 685768f4116b13b00d3cb6e4daede2c9
+        FileHash = d4066ae9bf5203ba3848ed35145bf366
     }
 
 }

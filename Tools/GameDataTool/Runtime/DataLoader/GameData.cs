@@ -1,37 +1,89 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security;
 
 namespace Nullspace
 {
-    public class GameData
+    public class PropertyWrapper
+    {
+        public string Name;
+        public Type PropertyType;
+        public Delegate Action; // DynamicInvoke, most performance cost,should avoid
+    }
+
+    public partial class GameData
     {
         protected const string KeyNameListName = "KeyNameList";
         protected const string FileUrlName = "FileUrl";
+        private static Dictionary<Type, List<string>> mTypeKeyLists = new Dictionary<Type, List<string>>();
+        protected static List<string> GetKeyList(Type type)
+        {
+            if (!mTypeKeyLists.ContainsKey(type))
+            {
+                List<string> keyNameList = type.GetField(KeyNameListName).GetValue(null) as List<string>;
+                mTypeKeyLists.Add(type, keyNameList);
+            }
+            return mTypeKeyLists[type];
+        }
+        #region not used
+        private static Dictionary<Type, List<PropertyWrapper>> mProp2Actions = new Dictionary<Type, List<PropertyWrapper>>();
+        protected static Type[] TypeParams = new Type[2];
+        protected static List<PropertyWrapper> GetWrappers(Type type)
+        {
+            if (!mProp2Actions.ContainsKey(type))
+            {
+                List<PropertyWrapper> wrappers = new List<PropertyWrapper>();
+                mProp2Actions.Add(type, wrappers);
+                PropertyInfo[] props = type.GetProperties();
+                TypeParams[0] = type;
+                foreach (PropertyInfo prop in props)
+                {
+                    MethodInfo setMethod = prop.GetSetMethod(true);
+                    PropertyWrapper wrapper = new PropertyWrapper();
+                    wrapper.Name = prop.Name;
+                    wrapper.PropertyType = prop.PropertyType;
+                    try
+                    {
+                        TypeParams[1] = prop.PropertyType;
+                        var act = typeof(Action<,>).MakeGenericType(TypeParams);
+                        wrapper.Action = Delegate.CreateDelegate(act, null, setMethod);
+                        wrappers.Add(wrapper);
+                    }
+                    catch (Exception e)
+                    {
+                        DebugUtils.Log(InfoType.Error, e.Message + e.StackTrace);
+                    }
+                }
+            }
+            return mProp2Actions[type];
+        }
+        protected static void PropertySet<Target, Value>(Delegate d, Target target, Value v)
+        {
+            Action<Target, Value> act = d as Action<Target, Value>;
+            act(target, v);
+        }
+        #endregion
+    }
 
+    public partial class GameData
+    {
         protected bool mIsInitialized = false;
         protected SecurityElement mOriginData = null;
         protected void SetOriginData(SecurityElement originData)
         {
             mOriginData = originData;
         }
-    }
 
-    /// <summary>
-    /// 通过 excel 导出
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public partial class GameData<T>
-    {
         public void Initialize()
         {
             if (!mIsInitialized)
             {
                 if (mOriginData != null && mOriginData.Attributes != null)
                 {
-                    PropertyInfo[] props = typeof(T).GetProperties();
-                    List<string> keyNameList = typeof(T).GetField(KeyNameListName).GetValue(null) as List<string>;
+                    PropertyInfo[] props = GetType().GetProperties();
+                    List<string> keyNameList = GetKeyList(GetType());
                     foreach (PropertyInfo prop in props)
                     {
                         if (keyNameList != null && keyNameList.Contains(prop.Name))

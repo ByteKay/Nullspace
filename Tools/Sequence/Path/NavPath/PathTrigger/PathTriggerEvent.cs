@@ -1,6 +1,5 @@
 ﻿
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Nullspace
 {
@@ -10,11 +9,11 @@ namespace Nullspace
     public class PathTriggerEvent : PathTrigger
     {
         // 触发回调
-        public AbstractCallback mCallback;
+        protected AbstractCallback mCallback;
 
         public PathTriggerEvent(float length, AbstractCallback callback)
         {
-            mTriggerLength = length;
+            TriggerLength = length;
             mCallback = callback;
         }
 

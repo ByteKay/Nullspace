@@ -6,7 +6,7 @@ namespace Nullspace
 {
     public class NavCurvePosCurveDir : AbstractNavPath
     {
-        public NavCurvePosCurveDir(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathData, offset, pathFlipOn, triggerHandler)
+        public NavCurvePosCurveDir(NavPathData pathData, Vector3 offset, NavPathFlipType flipType, IPathTrigger triggerHandler) : base(pathData, offset, flipType, triggerHandler)
         {
 
         }

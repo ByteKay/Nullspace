@@ -54,6 +54,7 @@
     <Compile Include="Path\MovableObject.cs" />
     <Compile Include="Path\NavPath\AbstractNavPath.cs" />
     <Compile Include="Path\NavPath\NavCurvePosCurveDir.cs" />
+    <Compile Include="Path\NavPath\NavPathFlipMode.cs" />
     <Compile Include="Path\NavPath\NavLinePosCurveDir.cs" />
     <Compile Include="Path\NavPath\NavLinePosLineAngle.cs" />
     <Compile Include="Path\NavPath\NavLinePosLineDir.cs" />

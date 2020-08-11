@@ -71,8 +71,11 @@ namespace Nullspace
 
                 }
                 Assert(type == mParameters[paraName].DataType, "wrong value type");
-                mParameters[paraName].Value = value;
-                Update(paraName);
+                if (!mParameters[paraName].Value.Equals(value))
+                {
+                    mParameters[paraName].Value = value;
+                    Update(paraName);
+                }
             }
         }
 

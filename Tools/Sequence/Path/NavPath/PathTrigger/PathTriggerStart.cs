@@ -10,7 +10,7 @@ namespace Nullspace
     {
         public PathTriggerStart(float length)
         {
-            mTriggerLength = length;
+            TriggerLength = length;
         }
 
         public override void OnDrawGizmos(Vector3 pos)

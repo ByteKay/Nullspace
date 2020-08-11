@@ -1,7 +1,8 @@
 /****************************************
 * The Class Is Generated Automatically By GameDataTool, 
 * Don't Modify It Manually.
-* DateTime: 2020-08-08.
+* DateTime: 2020-08-11.
+Later: Export Method InitializeFromXml(SecurityElement element), reduce reflection count
 ****************************************/
 
 using System;
@@ -48,10 +49,10 @@ namespace GameData
         public string Name { get; private set; }
         public string Title { get; private set; }
         public uint ModelId { get; private set; }
-        public uint Zoom { get; private set; }
-        public uint Chartlet { get; private set; }
+        public int Zoom { get; private set; }
+        public short Chartlet { get; private set; }
         public uint Color { get; private set; }
-        public byte MoveType { get; private set; }
+        public short MoveType { get; private set; }
         public float MoveSpeed { get; private set; }
         public float RunSpeed { get; private set; }
         public uint TurnSpeed { get; private set; }

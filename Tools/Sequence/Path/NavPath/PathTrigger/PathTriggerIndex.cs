@@ -9,12 +9,12 @@ namespace Nullspace
     public class PathTriggerIndex : PathTrigger
     {
         // 触发器索引Id，见 RFPathTriggerData
-        public int mTriggerId;
+        protected int mTriggerId;
 
         public PathTriggerIndex(int id, float length)
         {
             mTriggerId = id;
-            mTriggerLength = length;
+            TriggerLength = length;
         }
 
         public override void OnDrawGizmos(Vector3 pos)

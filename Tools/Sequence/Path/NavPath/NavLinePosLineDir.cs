@@ -6,7 +6,7 @@ namespace Nullspace
 {
     public class NavLinePosLineDir : AbstractNavPath
     {
-        public NavLinePosLineDir(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler) : base(pathData, offset, pathFlipOn, triggerHandler)
+        public NavLinePosLineDir(NavPathData pathData, Vector3 offset, NavPathFlipType flipType, IPathTrigger triggerHandler) : base(pathData, offset, flipType, triggerHandler)
         {
 #if UNITY_EDITOR
             mMovedTime = 0;

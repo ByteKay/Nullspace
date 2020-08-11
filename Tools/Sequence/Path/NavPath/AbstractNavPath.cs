@@ -42,7 +42,7 @@ namespace Nullspace
             cnt = mTriggers.Count;
             for (int i = 0; i < cnt; ++i)
             {
-                mTriggers[i].OnDrawGizmos(TriggerPos(mTriggers[i].mTriggerLength));
+                mTriggers[i].OnDrawGizmos(TriggerPos(mTriggers[i].TriggerLength));
             }
             Gizmos.DrawSphere(CurInfo.linePos, 0.5f);
         }
@@ -84,11 +84,7 @@ namespace Nullspace
                 result = len1 / len2 * all + mPathData.WayPoints[i - 1];
             }
             result = result + mOffset;
-            if (bFlipped)
-            {
-                result.x = -1 * result.x;
-                result.z = -1 * result.z;
-            }
+            NavPathFlipUtils.Flip(bFlipType, ref result);
             return result;
         }
 
@@ -118,7 +114,7 @@ namespace Nullspace
             while (mTriggers.Count > 0)
             {
                 // 是否存在被触发发的触发器
-                if (mTriggers[0].mTriggerLength < mPathLengthMoved)
+                if (mTriggers[0].TriggerLength < mPathLengthMoved)
                 {
                     // float distance = mPathLengthMoved - mTriggers[0].mTriggerLength;
                     // 触发器处理
@@ -288,8 +284,8 @@ namespace Nullspace
     public abstract partial class AbstractNavPath
     {      
         protected Vector3 mOffset;                  // 路径偏移     
-        protected bool bFlipped;                    // 是否开启镜像
-        protected NavPathData mPathData;               // 路径数据   
+        protected NavPathFlipType bFlipType;        // 开启镜像
+        protected NavPathData mPathData;            // 路径数据   
         protected float mPathLengthMoved;           // 运行时已经移动的长度
         protected int mCurrentWaypointIndex;        // 运行时当前的路点索引
         protected Vector3[] mWaypointAppend;        // 首尾两点的控制点
@@ -301,10 +297,10 @@ namespace Nullspace
         /// <param name="pathData">见 NavPathData </param>
         /// <param name="offset">路径偏移</param>
         /// <param name="pathFlipOn">路径中心对称(x, y, z) -> (-x, y, -z)</param>
-        public AbstractNavPath(NavPathData pathData, Vector3 offset, bool pathFlipOn, IPathTrigger triggerHandler)
+        public AbstractNavPath(NavPathData pathData, Vector3 offset, NavPathFlipType flipType, IPathTrigger triggerHandler)
         {
             mOffset = offset;
-            bFlipped = pathFlipOn;
+            bFlipType = flipType;
             mPathLengthMoved = 0.0f;
             mCurrentWaypointIndex = 0;
             mTriggers = new List<PathTrigger>();
@@ -424,11 +420,7 @@ namespace Nullspace
         protected Vector3 GetWaypoint(int index)
         {
             Vector3 pos = mPathData.WayPoints[index] + mOffset;
-            if (bFlipped)
-            {
-                pos.x = -pos.x;
-                pos.z = -pos.z;
-            }
+            NavPathFlipUtils.Flip(bFlipType, ref pos);
             return pos;
         }
 
