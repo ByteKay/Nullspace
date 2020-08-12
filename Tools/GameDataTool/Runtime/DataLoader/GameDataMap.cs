@@ -26,16 +26,17 @@ namespace Nullspace
         protected static void SetData(List<T> allDatas)
         {
             mDataMap = new Dictionary<M, T>();
-            M key1 = default(M);
-            uint key2 = uint.MaxValue;
-            List<string> keyNameList = typeof(T).GetField(KeyNameListName).GetValue(null) as List<string>;
+
+            object keyObj1 = default(M);
+            object keyObj2 = uint.MaxValue;
             bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
             {
-                int cnt = AssignKeyProp(t, keyNameList, ref key1, ref key2);
+                int cnt = t.InitializeKeys(ref keyObj1, ref keyObj2);
+                M key1 = (M)keyObj1;
                 if (isImmediateInitialized)
                 {
-                    t.Initialize();
+                    t.InitializeNoneKey();
                 }
                 if (!mDataMap.ContainsKey(key1))
                 {
@@ -66,7 +67,7 @@ namespace Nullspace
                 if (Data.ContainsKey(m))
                 {
                     T res = Data[m];
-                    res.Initialize();
+                    res.InitializeNoneKey();
                     return res;
                 }
                 else
@@ -101,16 +102,18 @@ namespace Nullspace
         protected static void SetData(List<T> allDatas)
         {
             mDataMapMap = new Dictionary<M, Dictionary<N, T>>();
-            M key1 = default(M);
-            N key2 = default(N);
-            List<string> keyNameList = typeof(T).GetField(KeyNameListName).GetValue(null) as List<string>;
+            object keyObj1 = default(M);
+            object keyObj2 = default(N);
             bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
             {
-                int cnt = AssignKeyProp(t, keyNameList, ref key1, ref key2);
+
+                int cnt = t.InitializeKeys(ref keyObj1, ref keyObj2);
+                M key1 = (M)keyObj1;
+                N key2 = (N)keyObj2;
                 if (isImmediateInitialized)
                 {
-                    t.Initialize();
+                    t.InitializeNoneKey();
                 }
                 if (!mDataMapMap.ContainsKey(key1))
                 {
@@ -146,7 +149,7 @@ namespace Nullspace
                     if (Data[m].ContainsKey(n))
                     {
                         T res = Data[m][n];
-                        res.Initialize();
+                        res.InitializeNoneKey();
                         return res;
                     }
                     else

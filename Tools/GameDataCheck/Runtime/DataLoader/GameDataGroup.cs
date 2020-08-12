@@ -22,19 +22,20 @@ namespace Nullspace
                 return mDataMapList;
             }
         }
+
         protected static void SetData(List<T> allDatas)
         {
             mDataMapList = new Dictionary<M, GameDataCollection<T>>();
-            M key1 = default(M);
-            uint key2 = uint.MaxValue;
-            List<string> keyNameList = typeof(T).GetField(KeyNameListName).GetValue(null) as List<string>;
+            object keyObj1 = default(M);
+            object keyObj2 = uint.MaxValue;
             bool isImmediateInitialized = IsImmediateLoad();
             foreach (T t in allDatas)
             {
-                int cnt = AssignKeyProp(t, keyNameList, ref key1, ref key2);
+                int cnt = t.InitializeKeys(ref keyObj1, ref keyObj2);
+                M key1 = (M)keyObj1;
                 if (isImmediateInitialized)
                 {
-                    t.Initialize();
+                    t.InitializeNoneKey();
                 }
                 if (!mDataMapList.ContainsKey(key1))
                 {
@@ -44,6 +45,7 @@ namespace Nullspace
             }
             LogLoadedEnd("" + mDataMapList.Count);
         }
+
         protected static void Clear()
         {
             if (mDataMapList != null)

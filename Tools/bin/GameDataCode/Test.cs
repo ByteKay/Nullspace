@@ -1,7 +1,7 @@
 /****************************************
 * The Class Is Generated Automatically By GameDataTool, 
 * Don't Modify It Manually.
-* DateTime: 2020-08-11.
+* DateTime: 2020-08-12.
 Later: Export Method InitializeFromXml(SecurityElement element), reduce reflection count
 ****************************************/
 

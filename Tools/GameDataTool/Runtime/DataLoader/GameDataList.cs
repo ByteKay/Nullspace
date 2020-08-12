@@ -39,7 +39,7 @@ namespace Nullspace
             {
                 foreach (T t in allDatas)
                 {
-                    t.Initialize();
+                    t.InitializeNoneKey();
                 }
             }
             mDataList = new GameDataCollection<T>();

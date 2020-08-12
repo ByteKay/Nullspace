@@ -57,7 +57,7 @@ namespace Nullspace
                 T t = (T)mItr.Current;
                 if (t != null)
                 {
-                    t.Initialize();
+                    t.InitializeNoneKey();
                 }
                 return t;
             }

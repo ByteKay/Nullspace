@@ -5,11 +5,8 @@
 Later: Export Method InitializeFromXml(SecurityElement element), reduce reflection count
 ****************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Nullspace;
-using UnityEngine;
 namespace GameData
 {
     public class MonsterProperty : GameDataMap<uint, uint, MonsterProperty>
@@ -38,8 +35,7 @@ namespace GameData
         public int MaxAngerValue { get; private set; }
         public int AngerGet { get; private set; }
 
-
-        protected override void ConvertAll()
+        protected override void Convert()
         {
             Name = DataUtils.ToObject<string>(GetValue("Name"));
             Title = DataUtils.ToObject<string>(GetValue("Title"));
@@ -89,7 +85,7 @@ namespace GameData
         public uint TCDrop { get; private set; }
 
 
-        protected override void ConvertAll()
+        protected override void Convert()
         {
             Index = DataUtils.ToObject<uint>(GetValue("Index"));
             Name = DataUtils.ToObject<string>(GetValue("Name"));

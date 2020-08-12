@@ -43,7 +43,9 @@ namespace Nullspace
         {
             if (!FileLoaded.ContainsKey(fileName))
             {
+                int id = ProfilerUtils.StartProfiler();
                 SecurityElement root = LoadXml(fileName);
+                ProfilerUtils.StopProfiler(id, "InitByFile LoadXml Cost", true);
                 if (root != null)
                 {
                     FileLoaded.Add(fileName, root);
@@ -232,6 +234,7 @@ namespace Nullspace
         private static SecurityElement LoadXmlFile(string filePath)
         {
             filePath += XmlFileSuffix;
+
             if (System.IO.File.Exists(filePath))
             {
                 return LoadXmlContent(System.IO.File.ReadAllText(filePath));
