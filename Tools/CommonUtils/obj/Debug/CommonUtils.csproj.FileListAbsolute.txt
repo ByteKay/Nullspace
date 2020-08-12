@@ -7,3 +7,4 @@ F:\Unity\Nullspace\Tools\bin\CommonUtils.dll
 F:\Unity\Nullspace\Tools\bin\CommonUtils.pdb
 F:\Unity\Nullspace\Tools\CommonUtils\obj\Debug\CommonUtils.dll
 F:\Unity\Nullspace\Tools\CommonUtils\obj\Debug\CommonUtils.pdb
+F:\Unity\Nullspace\Tools\CommonUtils\obj\Debug\CommonUtils.csprojResolveAssemblyReference.cache

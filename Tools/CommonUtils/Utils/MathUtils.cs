@@ -124,6 +124,19 @@ namespace Nullspace
             return res;
         }
 
+        public static int Clamp(int v, int min, int max)
+        {
+            return v < min ? min : (v > max ? max : v);
+        }
+        public static float Clamp(float v, float min, float max)
+        {
+            return v < min ? min : (v > max ? max : v);
+        }
+        public static short Clamp(short v, short min, short max)
+        {
+            return v < min ? min : (v > max ? max : v);
+        }
+
         public static float Interpolation(float left, float right, float t)
         {
             bool needRevert = left > right;

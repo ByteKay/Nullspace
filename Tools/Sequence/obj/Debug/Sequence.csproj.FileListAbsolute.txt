@@ -4,7 +4,7 @@ G:\UnityWorkspace\Nullspace\Tools\bin\Sequence.pdb
 G:\UnityWorkspace\Nullspace\Tools\Sequence\obj\Debug\Sequence.dll
 G:\UnityWorkspace\Nullspace\Tools\Sequence\obj\Debug\Sequence.pdb
 F:\Unity\Nullspace\Tools\Sequence\obj\Debug\Sequence.csprojResolveAssemblyReference.cache
-F:\Unity\Nullspace\Tools\Sequence\obj\Debug\Sequence.dll
 F:\Unity\Nullspace\Tools\Sequence\obj\Debug\Sequence.pdb
-F:\Unity\Nullspace\Tools\bin\Sequence.dll
 F:\Unity\Nullspace\Tools\bin\Sequence.pdb
+F:\Unity\Nullspace\Tools\bin\Sequence.exe
+F:\Unity\Nullspace\Tools\Sequence\obj\Debug\Sequence.exe

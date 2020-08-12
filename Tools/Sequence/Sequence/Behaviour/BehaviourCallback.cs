@@ -1,31 +1,50 @@
 ﻿
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Nullspace
 {
-
-    public class BehaviourSort : IComparer<BehaviourTimeCallback>
+    /// <summary>
+    /// 基于时间点为 0 开始处理
+    /// </summary>
+    public class BehaviourCallback
     {
-        public int Compare(BehaviourTimeCallback x, BehaviourTimeCallback y)
+        internal static BehaviourSort SortInstance = new BehaviourSort();
+        internal class BehaviourSort : IComparer<BehaviourCallback>
         {
-            return x.StartTime.CompareTo(y.StartTime);
+            public int Compare(BehaviourCallback x, BehaviourCallback y)
+            {
+                return x.StartTime.CompareTo(y.StartTime);
+            }
         }
-    }
-
-    public class BehaviourTimeCallback
-    {
-        public float StartTime;
+        // 开始执行时间点
+        internal float StartTime;
+        // 持续时长
         protected float Duration;
+        // EndTime = StartTime + Duration。结束时间点
         protected float EndTime;
+        // 开始回调
         protected AbstractCallback BeginCallback;
+        // 处理回调，可持续
         protected AbstractCallback ProcessCallback;
+        // 结束回调
         protected AbstractCallback EndCallback;
+        // 当前已走过的时长。相对起始时间0
         protected float TimeElappsed;
+        // 当前状态：只有三个状态
         protected ThreeState State;
-        protected bool IsOneShot; // 只执行一次.起始时间等于结束时间
-        public object Obj { get; set; }
-        public BehaviourTimeCallback(AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
+        // 只执行一次.起始时间等于结束时间
+        protected bool IsOneShot;
+        internal BehaviourCallback(float startTime, float duration, AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
+        {
+            TimeElappsed = 0;
+            State = ThreeState.Ready;
+            BeginCallback = begin;
+            ProcessCallback = process;
+            EndCallback = end;
+            SetStartTime(startTime, duration);
+        }
+
+        internal BehaviourCallback(AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
         {
             TimeElappsed = 0;
             State = ThreeState.Ready;
@@ -35,42 +54,39 @@ namespace Nullspace
             SetStartTime(0, 0);
         }
 
-        public BehaviourTimeCallback Begin(AbstractCallback begin)
+        internal BehaviourCallback Begin(AbstractCallback begin)
         {
             BeginCallback = begin;
             return this;
         }
-
-        public BehaviourTimeCallback Process(AbstractCallback process)
+        internal BehaviourCallback Process(AbstractCallback process)
         {
             ProcessCallback = process;
             return this;
         }
-        public BehaviourTimeCallback End(AbstractCallback end)
+        internal BehaviourCallback End(AbstractCallback end)
         {
             EndCallback = end;
             return this;
         }
-        public void SetStartTime(float startTime, float duration)
+        internal void SetStartTime(float startTime, float duration)
         {
             StartTime = startTime;
             Duration = duration;
             EndTime = StartTime + Duration;
             IsOneShot = StartTime == EndTime;
         }
-
-        public virtual void Reset()
+        internal virtual void Reset()
         {
             TimeElappsed = 0;
             State = ThreeState.Ready;
         }
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="timeLine">absolute time</param>
         /// <returns>执行结束，返回 false; 否之，返回 true</returns>
-        public bool Update(float timeLine)
+        internal bool Update(float timeLine)
         {
             if (State == ThreeState.Finished)
             {
@@ -103,36 +119,32 @@ namespace Nullspace
                     }
                     else
                     {
-                        Debug.Assert(State == ThreeState.Playing, "wrong");
+                        DebugUtils.Assert(State == ThreeState.Playing, "wrong");
                         Process();
                     }
                 }
             }
             return State != ThreeState.Finished;
         }
-
-        public bool IsPlaying { get { return State == ThreeState.Playing; } }
-        public bool IsFinished { get { return State == ThreeState.Finished; } }
-        public float Elappsed { get { return Mathf.Clamp(TimeElappsed - StartTime, 0, Duration); } }
-
-        public float Percent { get { return Mathf.Clamp((TimeElappsed - StartTime) / Duration, 0, 1); } }
-
-        public virtual void Begin()
+        internal bool IsPlaying { get { return State == ThreeState.Playing; } }
+        internal bool IsFinished { get { return State == ThreeState.Finished; } }
+        internal float Elappsed { get { return MathUtils.Clamp(TimeElappsed - StartTime, 0, Duration); } }
+        internal float Percent { get { return MathUtils.Clamp((TimeElappsed - StartTime) / Duration, 0, 1); } }
+        internal virtual void Begin()
         {
             if (BeginCallback != null)
             {
                 BeginCallback.Run();
             }
         }
-
-        public virtual void Process()
+        internal virtual void Process()
         {
             if (ProcessCallback != null)
             {
                 ProcessCallback.Run();
             }
         }
-        public virtual void End()
+        internal virtual void End()
         {
             if (EndCallback != null)
             {
@@ -140,4 +152,5 @@ namespace Nullspace
             }
         }
     }
+
 }

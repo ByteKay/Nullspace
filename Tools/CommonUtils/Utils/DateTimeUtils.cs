@@ -84,6 +84,11 @@ namespace Nullspace
         {
             return FormatTime(DateTime.UtcNow);
         }
+
+        public static string GetDateTimeStringHMS()
+        {
+            return FormatTimeHMS(DateTime.UtcNow);
+        }
     }
 }
 
