@@ -2,15 +2,20 @@
 
 namespace Nullspace
 {
-    public abstract class AbstractCallback : ObjectKey
+    public static class CallbackUtils
     {
-        public static AbstractCallback Create(Action action)
+        public static void Release(AbstractCallback callback)
+        {
+            ObjectPools.Instance.Release(callback);
+        }
+
+        public static AbstractCallback Acquire(Action action)
         {
             Callback callback = ObjectPools.Instance.Acquire<Callback>();
             callback.Handler = action;
             return callback;
         }
-        public static AbstractCallback Create<T>(Action<T> action, T arg1)
+        public static AbstractCallback Acquire<T>(Action<T> action, T arg1)
         {
             Callback<T> callback = ObjectPools.Instance.Acquire<Callback<T>>();
             callback.Handler = action;
@@ -18,7 +23,7 @@ namespace Nullspace
             return callback;
         }
 
-        public static AbstractCallback Create<U, V>(Action<U, V> action, U arg1, V arg2)
+        public static AbstractCallback Acquire<U, V>(Action<U, V> action, U arg1, V arg2)
         {
             Callback<U, V> callback = ObjectPools.Instance.Acquire<Callback<U, V>>();
             callback.Handler = action;
@@ -26,7 +31,7 @@ namespace Nullspace
             callback.Arg2 = arg2;
             return callback;
         }
-        public static AbstractCallback Create<U, V, W>(Action<U, V, W> action, U arg1, V arg2, W arg3)
+        public static AbstractCallback Acquire<U, V, W>(Action<U, V, W> action, U arg1, V arg2, W arg3)
         {
             Callback<U, V, W> callback = ObjectPools.Instance.Acquire<Callback<U, V, W>>();
             callback.Handler = action;
@@ -35,7 +40,7 @@ namespace Nullspace
             callback.Arg3 = arg3;
             return callback;
         }
-        public static AbstractCallback Create<U, V, W, T>(Action<U, V, W, T> action, U arg1, V arg2, W arg3, T arg4)
+        public static AbstractCallback Acquire<U, V, W, T>(Action<U, V, W, T> action, U arg1, V arg2, W arg3, T arg4)
         {
             Callback<U, V, W, T> callback = ObjectPools.Instance.Acquire<Callback<U, V, W, T>>();
             callback.Handler = action;
@@ -45,8 +50,10 @@ namespace Nullspace
             callback.Arg4 = arg4;
             return callback;
         }
+    }
 
-
+    public abstract class AbstractCallback : ObjectKey
+    {
         public abstract Delegate Handler
         {
             get;

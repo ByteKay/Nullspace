@@ -2,39 +2,39 @@
 {
     public class SequenceTree : IUpdate
     {
-        private SequenceSingle Root = null;
-        private SequenceSingle Current = null;
+        private SequenceSingle mRoot = null;
+        private SequenceSingle mCurrent = null;
 
         internal SequenceTree()
         {
 
         }
 
-        public bool IsPlaying { get { return Current != null; } }
+        public bool IsPlaying { get { return mCurrent != null; } }
         public void Update(float deltaTime)
         {
-            if (Current != null)
+            if (mCurrent != null)
             {
-                Current.Update(deltaTime);
+                mCurrent.Update(deltaTime);
             }
         }
         internal void SetRoot(SequenceSingle root)
         {
-            Root = root;
-            Current = root;
+            mRoot = root;
+            mCurrent = root;
         }
         internal void MoveNext()
         {
-            if (Current != null)
+            if (mCurrent != null)
             {
-                Current.ConsumeChild();
+                mCurrent.ConsumeChild();
             }
         }
         internal void ChangeToBrother()
         {
-            if (Current != null)
+            if (mCurrent != null)
             {
-                Current = Current.NextBrother;
+                mCurrent = mCurrent.NextBrother;
             }
         }
 

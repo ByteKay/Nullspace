@@ -19,67 +19,67 @@ namespace Nullspace
         // 开始执行时间点
         internal float StartTime;
         // 持续时长
-        protected float Duration;
+        protected float mDuration;
         // EndTime = StartTime + Duration。结束时间点
-        protected float EndTime;
+        protected float mEndTime;
         // 开始回调
-        protected AbstractCallback BeginCallback;
+        protected AbstractCallback mBeginCallback;
         // 处理回调，可持续
-        protected AbstractCallback ProcessCallback;
+        protected AbstractCallback mProcessCallback;
         // 结束回调
-        protected AbstractCallback EndCallback;
+        protected AbstractCallback mEndCallback;
         // 当前已走过的时长。相对起始时间0
-        protected float TimeElappsed;
+        protected float mTimeElappsed;
         // 当前状态：只有三个状态
-        protected ThreeState State;
+        protected ThreeState mState;
         // 只执行一次.起始时间等于结束时间
-        protected bool IsOneShot;
+        protected bool mIsOneShot;
         internal BehaviourCallback(float startTime, float duration, AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
         {
-            TimeElappsed = 0;
-            State = ThreeState.Ready;
-            BeginCallback = begin;
-            ProcessCallback = process;
-            EndCallback = end;
+            mTimeElappsed = 0;
+            mState = ThreeState.Ready;
+            mBeginCallback = begin;
+            mProcessCallback = process;
+            mEndCallback = end;
             SetStartTime(startTime, duration);
         }
 
         internal BehaviourCallback(AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
         {
-            TimeElappsed = 0;
-            State = ThreeState.Ready;
-            BeginCallback = begin;
-            ProcessCallback = process;
-            EndCallback = end;
+            mTimeElappsed = 0;
+            mState = ThreeState.Ready;
+            mBeginCallback = begin;
+            mProcessCallback = process;
+            mEndCallback = end;
             SetStartTime(0, 0);
         }
 
         internal BehaviourCallback Begin(AbstractCallback begin)
         {
-            BeginCallback = begin;
+            mBeginCallback = begin;
             return this;
         }
         internal BehaviourCallback Process(AbstractCallback process)
         {
-            ProcessCallback = process;
+            mProcessCallback = process;
             return this;
         }
         internal BehaviourCallback End(AbstractCallback end)
         {
-            EndCallback = end;
+            mEndCallback = end;
             return this;
         }
         internal void SetStartTime(float startTime, float duration)
         {
             StartTime = startTime;
-            Duration = duration;
-            EndTime = StartTime + Duration;
-            IsOneShot = StartTime == EndTime;
+            mDuration = duration;
+            mEndTime = StartTime + mDuration;
+            mIsOneShot = StartTime == mEndTime;
         }
         internal virtual void Reset()
         {
-            TimeElappsed = 0;
-            State = ThreeState.Ready;
+            mTimeElappsed = 0;
+            mState = ThreeState.Ready;
         }
         /// <summary>
         /// 
@@ -88,67 +88,67 @@ namespace Nullspace
         /// <returns>执行结束，返回 false; 否之，返回 true</returns>
         internal bool Update(float timeLine)
         {
-            if (State == ThreeState.Finished)
+            if (mState == ThreeState.Finished)
             {
                 return false;
             }
             // 这里是绝对时长
-            TimeElappsed = timeLine;
-            if (TimeElappsed >= StartTime)
+            mTimeElappsed = timeLine;
+            if (mTimeElappsed >= StartTime)
             {
-                if (IsOneShot)
+                if (mIsOneShot)
                 {
                     // 此时 Duration == 0, 调用 Percent 可能会有问题
                     Process();
-                    State = ThreeState.Finished;
+                    mState = ThreeState.Finished;
                 }
                 else
                 {
-                    if (State == ThreeState.Ready)
+                    if (mState == ThreeState.Ready)
                     {
                         Begin();
-                        State = ThreeState.Playing;
+                        mState = ThreeState.Playing;
                     }
-                    if (TimeElappsed > EndTime)
+                    if (mTimeElappsed > mEndTime)
                     {
-                        if (State == ThreeState.Playing)
+                        if (mState == ThreeState.Playing)
                         {
-                            State = ThreeState.Finished;
+                            mState = ThreeState.Finished;
                             End();
                         }
                     }
                     else
                     {
-                        DebugUtils.Assert(State == ThreeState.Playing, "wrong");
+                        DebugUtils.Assert(mState == ThreeState.Playing, "wrong");
                         Process();
                     }
                 }
             }
-            return State != ThreeState.Finished;
+            return mState != ThreeState.Finished;
         }
-        internal bool IsPlaying { get { return State == ThreeState.Playing; } }
-        internal bool IsFinished { get { return State == ThreeState.Finished; } }
-        internal float Elappsed { get { return MathUtils.Clamp(TimeElappsed - StartTime, 0, Duration); } }
-        internal float Percent { get { return MathUtils.Clamp((TimeElappsed - StartTime) / Duration, 0, 1); } }
+        internal bool IsPlaying { get { return mState == ThreeState.Playing; } }
+        internal bool IsFinished { get { return mState == ThreeState.Finished; } }
+        internal float Elappsed { get { return MathUtils.Clamp(mTimeElappsed - StartTime, 0, mDuration); } }
+        internal float Percent { get { return MathUtils.Clamp((mTimeElappsed - StartTime) / mDuration, 0, 1); } }
         internal virtual void Begin()
         {
-            if (BeginCallback != null)
+            if (mBeginCallback != null)
             {
-                BeginCallback.Run();
+                mBeginCallback.Run();
             }
         }
         internal virtual void Process()
         {
-            if (ProcessCallback != null)
+            if (mProcessCallback != null)
             {
-                ProcessCallback.Run();
+                mProcessCallback.Run();
             }
         }
         internal virtual void End()
         {
-            if (EndCallback != null)
+            if (mEndCallback != null)
             {
-                EndCallback.Run();
+                mEndCallback.Run();
             }
         }
     }

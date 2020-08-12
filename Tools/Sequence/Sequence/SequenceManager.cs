@@ -9,7 +9,6 @@ namespace Nullspace
     {
         public static SequenceManager Instance = new SequenceManager();
 
-        private Stopwatch mStopWatch;
         public static SequenceTree CreateTree()
         {
             SequenceTree seqTree = new SequenceTree();
@@ -31,12 +30,13 @@ namespace Nullspace
             return sb;
         }
 
-        private List<IUpdate> Behaviours;
-        private List<int> FinishedList = new List<int>();
-        
+        private List<IUpdate> mBehaviours;
+        private List<int> mFinishedList = new List<int>();
+        private Stopwatch mStopWatch;
+
         private SequenceManager()
         {
-            Behaviours = new List<IUpdate>();
+            mBehaviours = new List<IUpdate>();
             mStopWatch = new Stopwatch();
         }
 
@@ -46,36 +46,36 @@ namespace Nullspace
             mStopWatch.Reset();
             mStopWatch.Start();
 
-            int count = Behaviours.Count;
-            FinishedList.Clear();
+            int count = mBehaviours.Count;
+            mFinishedList.Clear();
             for (int i = 0; i < count; ++i)
             {
-                IUpdate sb = Behaviours[i];
+                IUpdate sb = mBehaviours[i];
                 sb.Update(seconds);
                 if (!sb.IsPlaying)
                 {
-                    FinishedList.Add(i);
+                    mFinishedList.Add(i);
                 }
             }
-            count = FinishedList.Count;
+            count = mFinishedList.Count;
             if (count > 0)
             {
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    Behaviours.RemoveAt(i);
+                    mBehaviours.RemoveAt(i);
                 }
             }
         }
 
         public void Clear()
         {
-            Behaviours.Clear();
+            mBehaviours.Clear();
         }
 
         private void AddSequence(IUpdate seq)
         {
             // 这里即使 Update 调用到这里，不会打断 循环
-            Behaviours.Add(seq);
+            mBehaviours.Add(seq);
         }
     }
 }

@@ -9,24 +9,34 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             DebugUtils.SetLogAction(LogAction);
-
-            SequenceSingle sequence = SequenceManager.CreateSingle();
-            sequence.Append(new SingleCallback(AbstractCallback.Create(Test0)), 0);
-            sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(AbstractCallback.Create(Test1, "kay")), 0);
-            sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(AbstractCallback.Create(Test2, 1, 3)), 0);
-            sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(AbstractCallback.Create(Test3, "yang", 2, false)), 0);
-            sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(AbstractCallback.Create(Test4, "kayyang", 1, true, 2.0f)), 0);
-            sequence.PrependInterval(1);
-            sequence.OnCompletion(AbstractCallback.Create(OnCompletion));
+            TestSingleSequence();
             while (true)
             {
                 SequenceManager.Instance.Update();
                 Thread.Sleep(16);
             }
+        }
+
+        private static void TestParallelSequence()
+        {
+            //SequenceParallel parallel = SequenceManager.CreateParallel();
+            //parallel.PrependInterval(2);
+        }
+
+        private static void TestSingleSequence()
+        {
+            SequenceSingle sequence = SequenceManager.CreateSingle();
+            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test0)), 0);
+            sequence.PrependInterval(1);
+            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test1, "kay")), 0);
+            sequence.PrependInterval(1);
+            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test2, 1, 3)), 0);
+            sequence.PrependInterval(1);
+            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test3, "yang", 2, false)), 0);
+            sequence.PrependInterval(1);
+            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test4, "kayyang", 1, true, 2.0f)), 0);
+            sequence.PrependInterval(1);
+            sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
         }
 
         public static void Test0()

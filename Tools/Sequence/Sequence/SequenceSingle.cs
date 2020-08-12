@@ -7,30 +7,44 @@ namespace Nullspace
 
     public class SequenceSingle : IUpdate
     {
-        private LinkedList<SingleCallback> Behaviours;
-        private AbstractCallback OnCompleted;
-        private SingleCallback Current;
-        private float MaxDuration;
-        private float TimeElappsed;
-        internal SequenceSingle()
+        private LinkedList<SingleCallback> mBehaviours;
+        private AbstractCallback mOnCompleted;
+        private SingleCallback mCurrent;
+        private float mMaxDuration;
+        private float mTimeLine;
+        internal SequenceSingle NextBrother { get; set; }
+        internal void Next()
         {
-            Behaviours = new LinkedList<SingleCallback>();
-            OnCompleted = null;
-            Current = null;
-            MaxDuration = 0;
-            TimeElappsed = 0;
+            mCurrent = null;
+            ConsumeChild();
         }
 
-        public bool IsPlaying { get { return Current != null; } }
+        internal SequenceSingle()
+        {
+            mBehaviours = new LinkedList<SingleCallback>();
+            mOnCompleted = null;
+            mCurrent = null;
+            mMaxDuration = 0;
+            mTimeLine = 0;
+            NextBrother = null;
+        }
+
+        public bool IsPlaying
+        {
+            get
+            {
+                return mCurrent != null;
+            }
+        }
 
         public void Append(SingleCallback callback, float duration, bool playImmediate = false)
         {
             // 以当前最大结束时间作为开始时间点
-            callback.SetStartTime(MaxDuration, duration);
+            callback.SetStartTime(mMaxDuration, duration);
             // 设置所属 sequence
             callback.Single = this;
-            Behaviours.AddLast(callback);
-            MaxDuration += duration;
+            mBehaviours.AddLast(callback);
+            mMaxDuration += duration;
             if (playImmediate)
             {
                 ConsumeChild();
@@ -44,13 +58,13 @@ namespace Nullspace
 
         public void OnCompletion(AbstractCallback onCompletion)
         {
-            OnCompleted = onCompletion;
+            mOnCompleted = onCompletion;
         }
 
         public void Stop()
         {
-            Current = null;
-            Behaviours.Clear();
+            mCurrent = null;
+            mBehaviours.Clear();
         }
 
         /// <summary>
@@ -60,40 +74,30 @@ namespace Nullspace
         public void Update(float deltaTime)
         {
             ConsumeChild();
-            if (Current != null)
+            if (mCurrent != null)
             {
-                TimeElappsed += deltaTime;
-                Current.Update(TimeElappsed);
-            }
-            else
-            {
-                if (OnCompleted != null)
-                {
-                    OnCompleted.Run();
-                }
+                mTimeLine += deltaTime;
+                mCurrent.Update(mTimeLine);
             }
         }
-
-        internal SequenceSingle NextBrother { get; set; }
 
         internal void ConsumeChild()
         {
-            if ((Current == null || Current.IsFinished))
+            if ((mCurrent == null || mCurrent.IsFinished))
             {
-                Current = null;
+                mCurrent = null;
             }
-            if (Current == null && Behaviours.Count > 0)
+            if (mCurrent == null && mBehaviours.Count > 0)
             {
-                Current = Behaviours.First.Value;
-                Behaviours.RemoveFirst();
+                mCurrent = mBehaviours.First.Value;
+                mBehaviours.RemoveFirst();
+            }
+            if (mCurrent == null && mOnCompleted != null)
+            {
+                mOnCompleted.Run();
             }
         }
 
-        internal void Next()
-        {
-            Current = null;
-            ConsumeChild();
-        }
 
     }
 
