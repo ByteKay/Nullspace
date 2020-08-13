@@ -239,7 +239,7 @@ namespace Nullspace
         /// <param name="relateCurrentPos">length是否相对当前位置</param>
         /// <param name="length">长度值</param>
         /// <param name="callback">触发器回调</param>
-        public void InsertTriggerByLength(bool relateCurrentPos, float length, AbstractCallback callback)
+        public void InsertTriggerByLength(bool relateCurrentPos, float length, Callback callback)
         {
             if (callback == null)
             {
@@ -264,7 +264,7 @@ namespace Nullspace
         /// <param name="speed">速度</param>
         /// <param name="time">时间</param>
         /// <param name="callback">触发器回调</param>
-        public void InsertTriggerByTime(bool relateCurrentPos, float speed, float time, AbstractCallback callback)
+        public void InsertTriggerByTime(bool relateCurrentPos, float speed, float time, Callback callback)
         {
             InsertTriggerByLength(relateCurrentPos, speed * time, callback);
         }
@@ -275,7 +275,7 @@ namespace Nullspace
         /// <param name="relateCurrentPos">是否相对当前位置</param>
         /// <param name="percent">路径长度值的占比</param>
         /// <param name="callback">触发器回调</param>
-        public void InsertTriggerByPercent(bool relateCurrentPos, float percent, AbstractCallback callback)
+        public void InsertTriggerByPercent(bool relateCurrentPos, float percent, Callback callback)
         {
             InsertTriggerByLength(relateCurrentPos, percent * mPathData.PathLength, callback);
         }

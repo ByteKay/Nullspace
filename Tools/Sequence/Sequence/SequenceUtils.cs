@@ -8,7 +8,7 @@ namespace Nullspace
     {
         public static BehaviourCallback MoveTo(this Transform trans, Vector3 end)
         {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            Callback4<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback4<Transform, Vector3, Vector3, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.position;
             callback.Arg3 = end;
@@ -20,7 +20,7 @@ namespace Nullspace
 
         public static BehaviourCallback LocalMoveTo(this Transform trans, Vector3 end)
         {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            Callback4<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback4<Transform, Vector3, Vector3, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.localPosition;
             callback.Arg3 = end;
@@ -32,7 +32,7 @@ namespace Nullspace
 
         public static BehaviourCallback LocalScaleTo(this Transform trans, Vector3 end)
         {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            Callback4<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback4<Transform, Vector3, Vector3, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.localScale;
             callback.Arg3 = end;
@@ -44,7 +44,7 @@ namespace Nullspace
 
         public static BehaviourCallback LocalEulerTo(this Transform trans, Vector3 end)
         {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            Callback4<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback4<Transform, Vector3, Vector3, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.localEulerAngles;
             callback.Arg3 = end;
@@ -56,7 +56,7 @@ namespace Nullspace
 
         public static BehaviourCallback EulerTo(this Transform trans, Vector3 end)
         {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            Callback4<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback4<Transform, Vector3, Vector3, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.eulerAngles;
             callback.Arg3 = end;
@@ -68,7 +68,7 @@ namespace Nullspace
 
         public static BehaviourCallback LocalRotateTo(this Transform trans, Quaternion end)
         {
-            Callback<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback<Transform, Quaternion, Quaternion, BehaviourCallback>();
+            Callback4<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback4<Transform, Quaternion, Quaternion, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.localRotation;
             callback.Arg3 = end;
@@ -80,7 +80,7 @@ namespace Nullspace
 
         public static BehaviourCallback RotateTo(this Transform trans, Quaternion end)
         {
-            Callback<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback<Transform, Quaternion, Quaternion, BehaviourCallback>();
+            Callback4<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback4<Transform, Quaternion, Quaternion, BehaviourCallback>();
             callback.Arg1 = trans;
             callback.Arg2 = trans.rotation;
             callback.Arg3 = end;

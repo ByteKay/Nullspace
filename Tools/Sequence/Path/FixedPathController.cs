@@ -126,7 +126,7 @@ namespace Nullspace
         }
 
         // 指定时间插入
-        public void RegisterTrigger(float time, AbstractCallback callback)
+        public void RegisterTrigger(float time, Callback callback)
         {
             float length = mLineSpeed * time;
             mNavPath.InsertTriggerByLength(false, length, callback);

@@ -8,7 +8,7 @@ namespace Nullspace
         protected float mTimeLine;
         private List<BehaviourCallback> mBehaviours;
         private ThreeState mState;
-        private AbstractCallback mOnCompletedCallback;
+        private Callback mOnCompletedCallback;
         private float mPrependTime;
         private float mMaxDuration;
 
@@ -36,7 +36,7 @@ namespace Nullspace
             }
         }
 
-        public void InsertCallback(float time, AbstractCallback callback, float duration = 0)
+        public void InsertCallback(float time, Callback callback, float duration = 0)
         {
             if (mState == ThreeState.Ready)
             {
@@ -54,7 +54,7 @@ namespace Nullspace
             }
         }
 
-        public void OnComplete(AbstractCallback callback)
+        public void OnComplete(Callback callback)
         {
             mOnCompletedCallback = callback;
         }

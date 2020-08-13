@@ -6,11 +6,11 @@ namespace Nullspace
     /// </summary>
     public class SingleCallback : BehaviourCallback
     {
-        internal SingleCallback(float startTime, float duration, AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null) : base(startTime, duration, begin, process, end)
+        internal SingleCallback(float startTime, float duration, Callback begin = null, Callback process = null, Callback end = null) : base(startTime, duration, begin, process, end)
         {
 
         }
-        internal SingleCallback(AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null) : base( begin, process, end)
+        internal SingleCallback(Callback begin = null, Callback process = null, Callback end = null) : base( begin, process, end)
         {
 
         }

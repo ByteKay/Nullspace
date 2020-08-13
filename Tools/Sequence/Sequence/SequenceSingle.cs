@@ -8,7 +8,7 @@ namespace Nullspace
     public class SequenceSingle : IUpdate
     {
         private LinkedList<SingleCallback> mBehaviours;
-        private AbstractCallback mOnCompleted;
+        private Callback mOnCompleted;
         private SingleCallback mCurrent;
         private float mMaxDuration;
         private float mTimeLine;
@@ -56,7 +56,7 @@ namespace Nullspace
             Append(new SingleCallback(), duration);
         }
 
-        public void OnCompletion(AbstractCallback onCompletion)
+        public void OnCompletion(Callback onCompletion)
         {
             mOnCompleted = onCompletion;
         }

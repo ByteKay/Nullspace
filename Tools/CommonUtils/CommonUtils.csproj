@@ -41,8 +41,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\CallbackWrapper\AbstractCallback.cs" />
     <Compile Include="Common\CallbackWrapper\Callback.cs" />
+    <Compile Include="Common\CallbackWrapper\Callback0.cs" />
     <Compile Include="Common\CallbackWrapper\CallbackT.cs" />
     <Compile Include="Common\CallbackWrapper\CallbackTU.cs" />
     <Compile Include="Common\CallbackWrapper\CallbackTUV.cs" />

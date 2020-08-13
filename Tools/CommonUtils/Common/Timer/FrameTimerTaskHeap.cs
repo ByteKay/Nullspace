@@ -25,7 +25,7 @@ namespace Nullspace
 
         public int AddTimer(int start, int interval, Action handler)
         {
-            Callback callback = ObjectPools.Instance.Acquire<Callback>();
+            Callback0 callback = ObjectPools.Instance.Acquire<Callback0>();
             callback.Handler = handler;
             var p = GetTimerData(callback, start, interval);
             return AddTimer(p);
@@ -33,7 +33,7 @@ namespace Nullspace
 
         public int AddTimer<T>(int start, int interval, Action<T> handler, T arg1)
         {
-            Callback<T> callback = ObjectPools.Instance.Acquire<Callback<T>>();
+            Callback1<T> callback = ObjectPools.Instance.Acquire<Callback1<T>>();
             callback.Arg1 = arg1;
             callback.Handler = handler;
             TimerTask p = GetTimerData(callback, start, interval);
@@ -42,7 +42,7 @@ namespace Nullspace
 
         public int AddTimer<T, U>(int start, int interval, Action<T, U> handler, T arg1, U arg2)
         {
-            Callback<T, U> callback = ObjectPools.Instance.Acquire<Callback<T, U>>();
+            Callback2<T, U> callback = ObjectPools.Instance.Acquire<Callback2<T, U>>();
             callback.Arg1 = arg1;
             callback.Arg2 = arg2;
             callback.Handler = handler;
@@ -52,7 +52,7 @@ namespace Nullspace
 
         public int AddTimer<T, U, V>(int start, int interval, Action<T, U, V> handler, T arg1, U arg2, V arg3)
         {
-            Callback<T, U, V> callback = ObjectPools.Instance.Acquire<Callback<T, U, V>>();
+            Callback3<T, U, V> callback = ObjectPools.Instance.Acquire<Callback3<T, U, V>>();
             callback.Arg1 = arg1;
             callback.Arg2 = arg2;
             callback.Arg3 = arg3;
@@ -62,7 +62,7 @@ namespace Nullspace
         }
         public int AddTimer<T, U, V, W>(int start, int interval, Action<T, U, V> handler, T arg1, U arg2, V arg3, W arg4)
         {
-            Callback<T, U, V, W> callback = ObjectPools.Instance.Acquire<Callback<T, U, V, W>>();
+            Callback4<T, U, V, W> callback = ObjectPools.Instance.Acquire<Callback4<T, U, V, W>>();
             callback.Arg1 = arg1;
             callback.Arg2 = arg2;
             callback.Arg3 = arg3;
@@ -148,7 +148,7 @@ namespace Nullspace
             return p.TimerId;
         }
 
-        private TimerTask GetTimerData(AbstractCallback callback, int start, int interval)
+        private TimerTask GetTimerData(Callback callback, int start, int interval)
         {
             TimerTask task = ObjectPools.Instance.Acquire<TimerTask>();
             task.Callback = callback;

@@ -2,7 +2,7 @@
 
 namespace Nullspace
 {
-    public class Callback<T, U, V, W> : AbstractCallback
+    public class Callback4<T, U, V, W> : Callback
     {
         private Action<T, U, V, W> mAction;
         public T Arg1 { get; set; }

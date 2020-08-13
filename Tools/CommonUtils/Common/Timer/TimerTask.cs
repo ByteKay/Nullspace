@@ -12,7 +12,7 @@ namespace Nullspace
 
         public int NextTick { get; set; }
 
-        public AbstractCallback Callback { get; set; }
+        public Callback Callback { get; set; }
 
         public void DoAction()
         {

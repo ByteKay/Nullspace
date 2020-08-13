@@ -121,7 +121,7 @@ namespace Nullspace
     public class BTTSimpleTimerNode<T> : BehaviourTreeNode<T>
     {
         private BTTimerTask mTimerTask;
-        public BTTSimpleTimerNode(float interval, AbstractCallback callback) : base()
+        public BTTSimpleTimerNode(float interval, Callback callback) : base()
         {
             mTimerTask = new BTTimerTask(interval, callback);
         }

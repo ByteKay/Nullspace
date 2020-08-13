@@ -9,9 +9,9 @@ namespace Nullspace
     public class PathTriggerEvent : PathTrigger
     {
         // 触发回调
-        protected AbstractCallback mCallback;
+        protected Callback mCallback;
 
-        public PathTriggerEvent(float length, AbstractCallback callback)
+        public PathTriggerEvent(float length, Callback callback)
         {
             TriggerLength = length;
             mCallback = callback;

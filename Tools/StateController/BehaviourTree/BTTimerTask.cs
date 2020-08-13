@@ -10,9 +10,9 @@ namespace Nullspace
         private float mCurrentSeconds;
         private float mInterval;
         private float mNextSeconds;
-        private AbstractCallback mCallback = null;
+        private Callback mCallback = null;
         private bool isStop;
-        public BTTimerTask(float interval, AbstractCallback callback)
+        public BTTimerTask(float interval, Callback callback)
         {
             mCallback = callback;
             mCurrentSeconds = DateTimeUtils.GetTimeStampSeconds();

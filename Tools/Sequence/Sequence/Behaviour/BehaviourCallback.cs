@@ -23,18 +23,18 @@ namespace Nullspace
         // EndTime = StartTime + Duration。结束时间点
         protected float mEndTime;
         // 开始回调
-        protected AbstractCallback mBeginCallback;
+        protected Callback mBeginCallback;
         // 处理回调，可持续
-        protected AbstractCallback mProcessCallback;
+        protected Callback mProcessCallback;
         // 结束回调
-        protected AbstractCallback mEndCallback;
+        protected Callback mEndCallback;
         // 当前已走过的时长。相对起始时间0
         protected float mTimeElappsed;
         // 当前状态：只有三个状态
         protected ThreeState mState;
         // 只执行一次.起始时间等于结束时间
         protected bool mIsOneShot;
-        internal BehaviourCallback(float startTime, float duration, AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null)
+        internal BehaviourCallback(float startTime, float duration, Callback begin = null, Callback process = null, Callback end = null)
         {
             mTimeElappsed = 0;
             mState = ThreeState.Ready;
@@ -44,7 +44,7 @@ namespace Nullspace
             SetStartTime(startTime, duration);
         }
 
-        internal BehaviourCallback(AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null)
+        internal BehaviourCallback(Callback begin = null, Callback process = null, Callback end = null)
         {
             mTimeElappsed = 0;
             mState = ThreeState.Ready;
@@ -54,17 +54,17 @@ namespace Nullspace
             SetStartTime(0, 0);
         }
 
-        internal BehaviourCallback Begin(AbstractCallback begin)
+        internal BehaviourCallback Begin(Callback begin)
         {
             mBeginCallback = begin;
             return this;
         }
-        internal BehaviourCallback Process(AbstractCallback process)
+        internal BehaviourCallback Process(Callback process)
         {
             mProcessCallback = process;
             return this;
         }
-        internal BehaviourCallback End(AbstractCallback end)
+        internal BehaviourCallback End(Callback end)
         {
             mEndCallback = end;
             return this;
