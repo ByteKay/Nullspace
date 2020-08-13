@@ -6,7 +6,10 @@ namespace Nullspace
     /// </summary>
     public class TimeCallback : BehaviourCallback
     {
-        private int mCurrentSeconds = 0;
+        protected float mLastTimeLine = 0;
+        protected float mInterval = float.MaxValue;
+        // 
+        protected bool mIsTimeContinuous = false;
 
         internal TimeCallback(float startTime, float duration, AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null) : base(startTime, duration, begin, process, end)
         {
@@ -18,20 +21,30 @@ namespace Nullspace
 
         }
 
+        protected internal override void SetStartTime(float startTime, float duration)
+        {
+            base.SetStartTime(startTime, duration);
+            mLastTimeLine = startTime;
+        }
+
         internal override void Reset()
         {
             base.Reset();
-            mCurrentSeconds = 0;
+            mLastTimeLine = StartTime;
         }
 
         internal override void Process()
         {
-            int elappsedSeconds = (int)mTimeElappsed - (int)StartTime;
-            if (elappsedSeconds > mCurrentSeconds)
+            if (CanProcess())
             {
-                mCurrentSeconds = elappsedSeconds;
+                mLastTimeLine = mTimeElappsed;
                 base.Process();
             }
+        }
+
+        internal bool CanProcess()
+        {
+            return (mTimeElappsed - mLastTimeLine) > mInterval;
         }
     }
 

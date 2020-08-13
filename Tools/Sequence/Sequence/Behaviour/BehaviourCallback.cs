@@ -34,7 +34,7 @@ namespace Nullspace
         protected ThreeState mState;
         // 只执行一次.起始时间等于结束时间
         protected bool mIsOneShot;
-        internal BehaviourCallback(float startTime, float duration, AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
+        internal BehaviourCallback(float startTime, float duration, AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null)
         {
             mTimeElappsed = 0;
             mState = ThreeState.Ready;
@@ -44,7 +44,7 @@ namespace Nullspace
             SetStartTime(startTime, duration);
         }
 
-        internal BehaviourCallback(AbstractCallback process = null, AbstractCallback begin = null, AbstractCallback end = null)
+        internal BehaviourCallback(AbstractCallback begin = null, AbstractCallback process = null, AbstractCallback end = null)
         {
             mTimeElappsed = 0;
             mState = ThreeState.Ready;
@@ -69,20 +69,23 @@ namespace Nullspace
             mEndCallback = end;
             return this;
         }
-        internal void SetStartTime(float startTime, float duration)
+
+        protected internal virtual void SetStartTime(float startTime, float duration)
         {
             StartTime = startTime;
             mDuration = duration;
             mEndTime = StartTime + mDuration;
             mIsOneShot = StartTime == mEndTime;
         }
+
         internal virtual void Reset()
         {
             mTimeElappsed = 0;
             mState = ThreeState.Ready;
         }
+
         /// <summary>
-        /// 
+        /// 每帧都会执行
         /// </summary>
         /// <param name="timeLine">absolute time</param>
         /// <returns>执行结束，返回 false; 否之，返回 true</returns>
@@ -99,7 +102,9 @@ namespace Nullspace
                 if (mIsOneShot)
                 {
                     // 此时 Duration == 0, 调用 Percent 可能会有问题
+                    Begin();
                     Process();
+                    End();
                     mState = ThreeState.Finished;
                 }
                 else

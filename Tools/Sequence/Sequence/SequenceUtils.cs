@@ -6,6 +6,106 @@ namespace Nullspace
 {
     internal static class SequenceUtils
     {
+        public static BehaviourCallback MoveTo(this Transform trans, Vector3 end)
+        {
+            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.position;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)MoveTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback LocalMoveTo(this Transform trans, Vector3 end)
+        {
+            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.localPosition;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)LocalMoveTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback LocalScaleTo(this Transform trans, Vector3 end)
+        {
+            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.localScale;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)LocalScaleTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback LocalEulerTo(this Transform trans, Vector3 end)
+        {
+            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.localEulerAngles;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)LocalEulerTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback EulerTo(this Transform trans, Vector3 end)
+        {
+            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.eulerAngles;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)EulerTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback LocalRotateTo(this Transform trans, Quaternion end)
+        {
+            Callback<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback<Transform, Quaternion, Quaternion, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.localRotation;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Quaternion, Quaternion, BehaviourCallback>)LocalRotateTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback RotateTo(this Transform trans, Quaternion end)
+        {
+            Callback<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback<Transform, Quaternion, Quaternion, BehaviourCallback>();
+            callback.Arg1 = trans;
+            callback.Arg2 = trans.rotation;
+            callback.Arg3 = end;
+            callback.Handler = (Action<Transform, Quaternion, Quaternion, BehaviourCallback>)RotateTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+        
+        //public static BehaviourCallback PathTo(this Transform trans, float duration, List<Vector3> waypoints, NavPathType pathType = NavPathType.LinePosLineDir, int subdivisions = 5)
+        //{
+        //    FixedPathController pathCtrl = new FixedPathController();
+        //    AbstractNavPath navPath = NavPathUtils.Create(pathType, Vector3.zero, NavPathFlipType.None, null, waypoints, subdivisions);
+        //    pathCtrl.StartMove(navPath, navPath.PathLength / duration, Vector3.zero, false);
+        //    pathCtrl.mCtlPosition = trans;
+        //    pathCtrl.mCtlRotate = trans;
+
+        //    Callback<FixedPathController, BehaviourCallback> callback = new Callback<FixedPathController, BehaviourCallback>();
+        //    callback.Arg1 = pathCtrl;
+        //    callback.Handler = (Action<FixedPathController, BehaviourCallback>)PathTo;
+        //    BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+        //    callback.Arg2 = beh;
+        //    return beh;
+        //}
+
         public static BehaviourCallback MoveXTo(this Transform trans, float x)
         {
             Vector3 pos = trans.position;
@@ -25,17 +125,6 @@ namespace Nullspace
             return trans.MoveTo(pos);
         }
 
-        public static BehaviourCallback MoveTo(this Transform trans, Vector3 end)
-        {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.position;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)MoveTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
-        }
         public static BehaviourCallback LocalMoveXTo(this Transform trans, float x)
         {
             Vector3 pos = trans.localPosition;
@@ -55,17 +144,6 @@ namespace Nullspace
             return trans.LocalMoveTo(pos);
         }
 
-        public static BehaviourCallback LocalMoveTo(this Transform trans, Vector3 end)
-        {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.localPosition;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)LocalMoveTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
-        }
 
         public static BehaviourCallback LocalScaleXTo(this Transform trans, float x)
         {
@@ -88,17 +166,6 @@ namespace Nullspace
             return trans.LocalScaleTo(scale);
         }
 
-        public static BehaviourCallback LocalScaleTo(this Transform trans, Vector3 end)
-        {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.localScale;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)LocalScaleTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
-        }
 
 
         public static BehaviourCallback LocalEulerXTo(this Transform trans, float x)
@@ -120,18 +187,6 @@ namespace Nullspace
             Vector3 localEulers = trans.localEulerAngles;
             localEulers.z = z;
             return trans.LocalEulerTo(localEulers);
-        }
-
-        public static BehaviourCallback LocalEulerTo(this Transform trans, Vector3 end)
-        {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.localEulerAngles;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)LocalEulerTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
         }
 
 
@@ -156,58 +211,6 @@ namespace Nullspace
             return trans.EulerTo(eulers);
         }
 
-        public static BehaviourCallback EulerTo(this Transform trans, Vector3 end)
-        {
-            Callback<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback<Transform, Vector3, Vector3, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.eulerAngles;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Vector3, Vector3, BehaviourCallback>)EulerTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
-        }
-
-        public static BehaviourCallback LocalRotateTo(this Transform trans, Quaternion end)
-        {
-            Callback<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback<Transform, Quaternion, Quaternion, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.localRotation;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Quaternion, Quaternion, BehaviourCallback>)LocalRotateTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
-        }
-
-        public static BehaviourCallback RotateTo(this Transform trans, Quaternion end)
-        {
-            Callback<Transform, Quaternion, Quaternion, BehaviourCallback> callback = new Callback<Transform, Quaternion, Quaternion, BehaviourCallback>();
-            callback.Arg1 = trans;
-            callback.Arg2 = trans.rotation;
-            callback.Arg3 = end;
-            callback.Handler = (Action<Transform, Quaternion, Quaternion, BehaviourCallback>)RotateTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg4 = beh;
-            return beh;
-        }
-
-
-        public static BehaviourCallback PathTo(this Transform trans, float duration, List<Vector3> waypoints, NavPathType pathType = NavPathType.LinePosLineDir, int subdivisions = 5)
-        {
-            FixedPathController pathCtrl = new FixedPathController();
-            AbstractNavPath navPath = NavPathUtils.Create(pathType, Vector3.zero, NavPathFlipType.None, null, waypoints, subdivisions);
-            pathCtrl.StartMove(navPath, navPath.PathLength / duration, Vector3.zero, false);
-            pathCtrl.mCtlPosition = trans;
-            pathCtrl.mCtlRotate = trans;
-
-            Callback<FixedPathController, BehaviourCallback> callback = new Callback<FixedPathController, BehaviourCallback>();
-            callback.Arg1 = pathCtrl;
-            callback.Handler = (Action<FixedPathController, BehaviourCallback>)PathTo;
-            BehaviourCallback beh = new BehaviourCallback(callback);
-            callback.Arg2 = beh;
-            return beh;
-        }
 
         private static void PathTo(FixedPathController pathCtl, BehaviourCallback beh)
         {

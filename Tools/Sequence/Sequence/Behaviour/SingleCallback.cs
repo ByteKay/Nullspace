@@ -2,7 +2,7 @@
 namespace Nullspace
 {
     /// <summary>
-    /// 回调
+    /// 每帧回调
     /// </summary>
     public class SingleCallback : BehaviourCallback
     {
