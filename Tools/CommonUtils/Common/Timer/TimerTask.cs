@@ -6,13 +6,13 @@ namespace Nullspace
 {
     public class TimerTask : ObjectKey
     {
-        public int TimerId { get; set; }
+        internal int TimerId { get; set; }
 
-        public int Interval { get; set; }
+        internal int Interval { get; set; }
 
-        public int NextTick { get; set; }
+        internal int NextTick { get; set; }
 
-        public Callback Callback { get; set; }
+        internal Callback Callback { get; set; }
 
         public void DoAction()
         {

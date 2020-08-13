@@ -5,47 +5,47 @@ namespace Nullspace
 {
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        private static T _instance;
-        private static object _lock = new object();
-        private static bool applicationIsQuitting = false;
+        private static T mInstance;
+        private static object _mLock = new object();
+        private static bool mApplicationIsQuitting = false;
         public static T Instance
         {
             get
             {
-                lock (_lock)
+                lock (_mLock)
                 {
-                    if (_instance == null)
+                    if (mInstance == null)
                     {
-                        _instance = (T)FindObjectOfType(typeof(T));
+                        mInstance = (T)FindObjectOfType(typeof(T));
 
                         if (FindObjectsOfType(typeof(T)).Length > 1)
                         {
-                            return _instance;
+                            return mInstance;
                         }
 
-                        if (_instance == null)
+                        if (mInstance == null)
                         {
                             GameObject singleton = new GameObject();
-                            _instance = singleton.AddComponent<T>();
+                            mInstance = singleton.AddComponent<T>();
                             singleton.name = "(singleton) " + typeof(T).ToString();
 
                             DontDestroyOnLoad(singleton);
                         }
                     }
 
-                    return _instance;
+                    return mInstance;
                 }
             }
         }
 
         protected virtual void OnDestroy()
         {
-            applicationIsQuitting = true;
+            mApplicationIsQuitting = true;
         }
 
         public static bool IsDestroy()
         {
-            return applicationIsQuitting;
+            return mApplicationIsQuitting;
         }
 
 

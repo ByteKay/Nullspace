@@ -3,26 +3,26 @@ namespace Nullspace
 {
     public abstract class ObjectKey
     {
-        private static uint CurrentSize = 0;
-        private static uint NextKey { get { return CurrentSize++; } }
+        private static uint mCurrentSize = 0;
+        private static uint mNextKey { get { return mCurrentSize++; } }
 
-        private float ReleasedTimePoint;
-        private bool IsReleased;
+        private float mReleasedTimePoint;
+        private bool mIsReleased;
         public ObjectKey()
         {
-            Key = NextKey;
+            Key = mNextKey;
             // 构造的时候，会放进缓存先。所以，构造的时刻就是 释放的时刻
-            IsReleased = true;
-            ReleasedTimePoint = DateTimeUtils.GetTimeStampSeconds();
+            mIsReleased = true;
+            mReleasedTimePoint = DateTimeUtils.GetTimeStampSeconds();
         }
 
         public uint Key { get; set; }
 
         public void Acquired()
         {
-            if (IsReleased)
+            if (mIsReleased)
             {
-                IsReleased = false;
+                mIsReleased = false;
                 Initialize();
             }
         }
@@ -30,17 +30,17 @@ namespace Nullspace
         // 这个只能通过 ObjectPools.Instance.Release --> ObjectPool.Release -> Release 过来
         public void Released()
         {
-            if (!IsReleased)
+            if (!mIsReleased)
             {
                 Clear();
-                ReleasedTimePoint = DateTimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
-                IsReleased = true;
+                mReleasedTimePoint = DateTimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
+                mIsReleased = true;
             }
         }
 
         public bool IsExpired(float life)
         {
-            return DateTimeUtils.GetTimeStampSeconds() - ReleasedTimePoint >= life;
+            return DateTimeUtils.GetTimeStampSeconds() - mReleasedTimePoint >= life;
         }
 
         public abstract void Initialize();
