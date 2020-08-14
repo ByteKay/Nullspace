@@ -48,6 +48,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeController", "TimeController\TimeController.csproj", "{9876EA7D-F99E-43CB-BAD0-E1668613722B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysXSample", "PhysXSample\PhysXSample.csproj", "{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9876EA7D-F99E-43CB-BAD0-E1668613722B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
