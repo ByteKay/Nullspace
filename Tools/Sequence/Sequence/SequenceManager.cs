@@ -30,27 +30,31 @@ namespace Nullspace
             return sb;
         }
 
-        private List<IUpdate> mBehaviours;
+        private List<ISequnceUpdate> mBehaviours;
         private List<int> mFinishedList = new List<int>();
         private Stopwatch mStopWatch;
 
         private SequenceManager()
         {
-            mBehaviours = new List<IUpdate>();
+            mBehaviours = new List<ISequnceUpdate>();
             mStopWatch = new Stopwatch();
         }
 
-        public void Update()
+        public void Tick()
         {
             float seconds = mStopWatch.ElapsedMilliseconds * 0.001f;
             mStopWatch.Reset();
             mStopWatch.Start();
+            Update(seconds);
+        }
 
+        public void Update(float seconds)
+        {
             int count = mBehaviours.Count;
             mFinishedList.Clear();
             for (int i = 0; i < count; ++i)
             {
-                IUpdate sb = mBehaviours[i];
+                ISequnceUpdate sb = mBehaviours[i];
                 sb.Update(seconds);
                 if (!sb.IsPlaying)
                 {
@@ -72,7 +76,7 @@ namespace Nullspace
             mBehaviours.Clear();
         }
 
-        private void AddSequence(IUpdate seq)
+        private void AddSequence(ISequnceUpdate seq)
         {
             // 这里即使 Update 调用到这里，不会打断 循环
             mBehaviours.Add(seq);

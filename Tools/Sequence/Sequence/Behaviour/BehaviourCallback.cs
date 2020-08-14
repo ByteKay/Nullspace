@@ -32,8 +32,9 @@ namespace Nullspace
         protected float mTimeElappsed;
         // 当前状态：只有三个状态
         protected ThreeState mState;
-        // 只执行一次.起始时间等于结束时间
-        protected bool mIsOneShot;
+        // 此行为所属序列实例
+        internal ISequnceUpdate mSequence;
+
         internal BehaviourCallback(float startTime, float duration, Callback begin = null, Callback process = null, Callback end = null)
         {
             mTimeElappsed = 0;
@@ -59,11 +60,13 @@ namespace Nullspace
             mBeginCallback = begin;
             return this;
         }
+
         internal BehaviourCallback Process(Callback process)
         {
             mProcessCallback = process;
             return this;
         }
+
         internal BehaviourCallback End(Callback end)
         {
             mEndCallback = end;
@@ -75,7 +78,6 @@ namespace Nullspace
             StartTime = startTime;
             mDuration = duration;
             mEndTime = StartTime + mDuration;
-            mIsOneShot = StartTime == mEndTime;
         }
 
         internal virtual void Reset()
@@ -99,34 +101,23 @@ namespace Nullspace
             mTimeElappsed = timeLine;
             if (mTimeElappsed >= StartTime)
             {
-                if (mIsOneShot)
+                if (mState == ThreeState.Ready)
                 {
-                    // 此时 Duration == 0, 调用 Percent 可能会有问题
                     Begin();
-                    Process();
-                    End();
-                    mState = ThreeState.Finished;
+                    mState = ThreeState.Playing;
+                }
+                if (mTimeElappsed >= mEndTime)
+                {
+                    if (mState == ThreeState.Playing)
+                    {
+                        mState = ThreeState.Finished;
+                        End();
+                    }
                 }
                 else
                 {
-                    if (mState == ThreeState.Ready)
-                    {
-                        Begin();
-                        mState = ThreeState.Playing;
-                    }
-                    if (mTimeElappsed > mEndTime)
-                    {
-                        if (mState == ThreeState.Playing)
-                        {
-                            mState = ThreeState.Finished;
-                            End();
-                        }
-                    }
-                    else
-                    {
-                        DebugUtils.Assert(mState == ThreeState.Playing, "wrong");
-                        Process();
-                    }
+                    DebugUtils.Assert(mState == ThreeState.Playing, "wrong");
+                    Process();
                 }
             }
             return mState != ThreeState.Finished;
@@ -154,6 +145,11 @@ namespace Nullspace
             if (mEndCallback != null)
             {
                 mEndCallback.Run();
+            }
+            if (mSequence != null)
+            {
+                // 执行下一个
+                mSequence.Next();
             }
         }
     }

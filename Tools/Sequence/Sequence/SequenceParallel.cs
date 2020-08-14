@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
-    public class SequenceParallel : IUpdate
+    public class SequenceParallel : ISequnceUpdate
     {
         protected float mTimeLine;
         private List<BehaviourCallback> mBehaviours;
@@ -22,6 +22,15 @@ namespace Nullspace
             mMaxDuration = 0.0f;
         }
 
+        void ISequnceUpdate.Next()
+        {
+            // todo
+        }
+
+        /// <summary>
+        /// 整体后延
+        /// </summary>
+        /// <param name="interval">秒</param>
         public void PrependInterval(float interval)
         {
             mPrependTime = interval;
@@ -33,14 +42,6 @@ namespace Nullspace
             {
                 // 以当前最大结束时间作为开始时间点
                 Insert(mMaxDuration, callback, duration);
-            }
-        }
-
-        public void InsertCallback(float time, Callback callback, float duration = 0)
-        {
-            if (mState == ThreeState.Ready)
-            {
-                Insert(time, new BehaviourCallback(callback), duration);
             }
         }
 
@@ -61,7 +62,16 @@ namespace Nullspace
 
         public bool IsPlaying { get { return mState == ThreeState.Playing; } }
 
-        public void Update(float time)
+        /// <summary>
+        /// 一次只会有一个行为执行
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        void ISequnceUpdate.Update(float deltaTime)
+        {
+            Update(deltaTime);
+        }
+        
+        internal void Update(float time)
         {
             if (mState == ThreeState.Ready)
             {
@@ -85,10 +95,13 @@ namespace Nullspace
                         completed = false;
                     }
                 }
-                if (completed && mOnCompletedCallback != null)
+                if (completed)
                 {
                     mState = ThreeState.Finished;
-                    mOnCompletedCallback.Run();
+                    if (mOnCompletedCallback != null)
+                    {
+                        mOnCompletedCallback.Run();
+                    }
                 }
             }
         }
@@ -105,6 +118,7 @@ namespace Nullspace
         public void Kill()
         {
             mState = ThreeState.Finished;
+            mBehaviours.Clear();
         }
 
     }

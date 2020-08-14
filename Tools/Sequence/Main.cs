@@ -12,7 +12,7 @@ namespace Nullspace
             TestSingleSequence();
             while (true)
             {
-                SequenceManager.Instance.Update();
+                SequenceManager.Instance.Tick();
                 Thread.Sleep(16);
             }
         }
@@ -26,15 +26,15 @@ namespace Nullspace
         private static void TestSingleSequence()
         {
             SequenceSingle sequence = SequenceManager.CreateSingle();
-            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test0)), 0);
+            sequence.Append(new UpdateCallback(CallbackUtils.Acquire(Test0)), 0);
             sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test1, "kay")), 0);
+            sequence.Append(new UpdateCallback(CallbackUtils.Acquire(Test1, "kay")), 0);
             sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test2, 1, 3)), 0);
+            sequence.Append(new UpdateCallback(CallbackUtils.Acquire(Test2, 1, 3)), 0);
             sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test3, "yang", 2, false)), 0);
+            sequence.Append(new UpdateCallback(CallbackUtils.Acquire(Test3, "yang", 2, false)), 0);
             sequence.PrependInterval(1);
-            sequence.Append(new SingleCallback(CallbackUtils.Acquire(Test4, "kayyang", 1, true, 2.0f)), 0);
+            sequence.Append(new UpdateCallback(CallbackUtils.Acquire(Test4, "kayyang", 1, true, 2.0f)), 0);
             sequence.PrependInterval(1);
             sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
         }

@@ -3,30 +3,24 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
-
-
-    public class SequenceSingle : IUpdate
+    public class SequenceSingle : ISequnceUpdate
     {
-        private LinkedList<SingleCallback> mBehaviours;
+        private LinkedList<UpdateCallback> mBehaviours;
         private Callback mOnCompleted;
-        private SingleCallback mCurrent;
+        private UpdateCallback mCurrent;
         private float mMaxDuration;
         private float mTimeLine;
-        internal SequenceSingle NextBrother { get; set; }
-        internal void Next()
-        {
-            mCurrent = null;
-            ConsumeChild();
-        }
+        // for tree
+        internal SequenceSingle NextSibling { get; set; }
 
         internal SequenceSingle()
         {
-            mBehaviours = new LinkedList<SingleCallback>();
+            mBehaviours = new LinkedList<UpdateCallback>();
             mOnCompleted = null;
             mCurrent = null;
             mMaxDuration = 0;
             mTimeLine = 0;
-            NextBrother = null;
+            NextSibling = null;
         }
 
         public bool IsPlaying
@@ -37,23 +31,19 @@ namespace Nullspace
             }
         }
 
-        public void Append(SingleCallback callback, float duration, bool playImmediate = false)
+        public void PrependInterval(float interval)
+        {
+            Append(new UpdateCallback(), interval);
+        }
+
+        public void Append(UpdateCallback callback, float duration)
         {
             // 以当前最大结束时间作为开始时间点
             callback.SetStartTime(mMaxDuration, duration);
             // 设置所属 sequence
-            callback.Single = this;
+            callback.mSequence = this;
             mBehaviours.AddLast(callback);
             mMaxDuration += duration;
-            if (playImmediate)
-            {
-                ConsumeChild();
-            }
-        }
-
-        public void PrependInterval(float duration)
-        {
-            Append(new SingleCallback(), duration);
         }
 
         public void OnCompletion(Callback onCompletion)
@@ -61,17 +51,38 @@ namespace Nullspace
             mOnCompleted = onCompletion;
         }
 
-        public void Stop()
+        public void Kill()
         {
             mCurrent = null;
+            mTimeLine = 0;
             mBehaviours.Clear();
+        }
+
+        void ISequnceUpdate.Next()
+        {
+            Next();
+        }
+
+        internal void Next()
+        {
+            mCurrent = null;
+            ConsumeChild();
         }
 
         /// <summary>
         /// 一次只会有一个行为执行
         /// </summary>
         /// <param name="deltaTime"></param>
-        public void Update(float deltaTime)
+        void ISequnceUpdate.Update(float deltaTime)
+        {
+            Update(deltaTime);
+        }
+
+        /// <summary>
+        /// 一次只会有一个行为执行
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        internal void Update(float deltaTime)
         {
             ConsumeChild();
             if (mCurrent != null)
@@ -97,7 +108,6 @@ namespace Nullspace
                 mOnCompleted.Run();
             }
         }
-
 
     }
 

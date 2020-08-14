@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Nullspace
 {
-
     public class PathTriggerData : GameDataMap<int, PathTriggerData>
     {
         public static readonly string FileUrl = "NavPathData#PathTriggerDatas";

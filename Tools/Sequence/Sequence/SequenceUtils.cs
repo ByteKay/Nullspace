@@ -212,7 +212,7 @@ namespace Nullspace
         }
 
 
-        private static void PathTo(FixedPathController pathCtl, BehaviourCallback beh)
+        private static void PathTo(NavPathController pathCtl, BehaviourCallback beh)
         {
             pathCtl.Update(Time.deltaTime);
         }

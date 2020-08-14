@@ -3,16 +3,8 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public enum TargetType
+    public partial class NavTargetController
     {
-        NONE = 0,
-        POINT = 1,
-        MOVABLE = 2
-    }
-
-    public partial class MovableObject
-    {
-
         /// <summary>
         /// 到达边界处理
         /// </summary>
@@ -70,7 +62,7 @@ namespace Nullspace
     /// 目标对象处理。
     /// 这里冗余在一起，方便后面不重复 new 。而 会缓存
     /// </summary>
-    public partial class MovableObject
+    public partial class NavTargetController
     {
 
         /// <summary>
@@ -78,7 +70,7 @@ namespace Nullspace
         /// </summary>
         public void SetTarget()
         {
-            TargetType = TargetType.NONE;
+            TargetType = NavTargetType.NONE;
             IsCheckReached = false;
         }
 
@@ -93,16 +85,16 @@ namespace Nullspace
             targetPos.y = 0;
             TargetPos = targetPos;
             IsCheckReached = true;
-            TargetType = TargetType.POINT;
+            TargetType = NavTargetType.POINT;
         }
 
         /// <summary>
         /// 设置移动物体为对象目标
         /// </summary>
-        public void SetTarget(MovableObject follow)
+        public void SetTarget(NavTargetController follow)
         {
             TargetFollow = follow;
-            TargetType = TargetType.MOVABLE;
+            TargetType = NavTargetType.MOVABLE;
             IsCheckReached = true;
         }
 
@@ -114,9 +106,9 @@ namespace Nullspace
         {
             switch (TargetType)
             {
-                case TargetType.POINT:
+                case NavTargetType.POINT:
                     return TargetPos;
-                case TargetType.MOVABLE:
+                case NavTargetType.MOVABLE:
                     Vector3 p = TargetFollow != null ? TargetFollow.transform.position : Vector3.zero;
                     p.y = 0;
                     return p;
@@ -132,9 +124,9 @@ namespace Nullspace
         {
             switch (TargetType)
             {
-                case TargetType.POINT:
+                case NavTargetType.POINT:
                     return NormalBound.Contains(TargetPos);
-                case TargetType.MOVABLE:
+                case NavTargetType.MOVABLE:
                     if (TargetFollow != null && TargetFollow.gameObject.activeSelf)
                     {
                         Vector3 pos = TargetFollow.transform.position;
@@ -148,7 +140,7 @@ namespace Nullspace
 
     }
 
-    public partial class MovableObject : MonoBehaviour
+    public partial class NavTargetController : MonoBehaviour
     {
         public static float Height = 0;
         /// <summary>
@@ -200,12 +192,12 @@ namespace Nullspace
         /// 朝目标移动
         /// </summary>
         private Vector3 TargetPos;  // 目标为点
-        private MovableObject TargetFollow;// 目标为移动物体
+        private NavTargetController TargetFollow;// 目标为移动物体
 
         /// <summary>
         /// 目标类别
         /// </summary>
-        private TargetType TargetType;
+        private NavTargetType TargetType;
 
         /// <summary>
         /// 是否激活状态
@@ -330,7 +322,7 @@ namespace Nullspace
                 Pos = NormalBound.ClosestPoint(Pos);
             }
 
-            if (TargetType == TargetType.NONE)
+            if (TargetType == NavTargetType.NONE)
             {
                 SetTarget();
             }
@@ -491,7 +483,7 @@ namespace Nullspace
         }
     }
 
-    public partial class MovableObject
+    public partial class NavTargetController
     {
         /// <summary>
         /// 缓存 射线实例，避免太多 new

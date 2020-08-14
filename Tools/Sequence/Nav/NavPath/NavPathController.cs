@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class FixedPathController
+    public class NavPathController
     {
         // 在路径上移动：位置改变和事件触发
         public NavPathType mPathType;
@@ -23,7 +23,7 @@ namespace Nullspace
         // 正在执行中处理
         private bool bLocked;
 
-        public FixedPathController()
+        public NavPathController()
         {
             mNavPath = null;
             bLocked = false;

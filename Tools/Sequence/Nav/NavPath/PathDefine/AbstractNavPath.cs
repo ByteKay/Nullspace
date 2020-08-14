@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Nullspace
 {
@@ -84,7 +83,7 @@ namespace Nullspace
                 result = len1 / len2 * all + mPathData.WayPoints[i - 1];
             }
             result = result + mOffset;
-            NavPathFlipUtils.Flip(bFlipType, ref result);
+            NavPathUtils.Flip(bFlipType, ref result);
             return result;
         }
 
@@ -183,7 +182,7 @@ namespace Nullspace
                 }
                 else
                 {
-                    Debug.Log("RegisterTriggers" + " nil RFPathTriggerData " + id);
+                    DebugUtils.Log(InfoType.Info, "RegisterTriggers" + " nil RFPathTriggerData " + id);
                 }
             }
         }
@@ -420,7 +419,7 @@ namespace Nullspace
         protected Vector3 GetWaypoint(int index)
         {
             Vector3 pos = mPathData.WayPoints[index] + mOffset;
-            NavPathFlipUtils.Flip(bFlipType, ref pos);
+            NavPathUtils.Flip(bFlipType, ref pos);
             return pos;
         }
 
