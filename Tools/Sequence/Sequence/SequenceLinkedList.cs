@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace Nullspace
@@ -10,9 +11,7 @@ namespace Nullspace
         private BehaviourCallback mCurrent;
         private float mMaxDuration;
         private float mTimeLine;
-        // for tree
-        internal SequenceLinkedList NextSibling { get; set; }
-
+        private ISequnceUpdate mSibling;
         internal SequenceLinkedList()
         {
             mBehaviours = new LinkedList<BehaviourCallback>();
@@ -20,7 +19,7 @@ namespace Nullspace
             mCurrent = null;
             mMaxDuration = 0;
             mTimeLine = 0;
-            NextSibling = null;
+            mSibling = null;
         }
 
         public bool IsPlaying
@@ -31,11 +30,24 @@ namespace Nullspace
             }
         }
 
+        public ISequnceUpdate Sibling
+        {
+            get
+            {
+                return mSibling;
+            }
+
+            set
+            {
+                mSibling = value;
+            }
+        }
+
         public void AppendInterval(float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             EmptyCallback ec = new EmptyCallback(mMaxDuration, duration);
-            AddCallback(ec, duration);
+            Append(ec, duration);
         }
 
         public void Append(Callback process, float duration)
@@ -45,7 +57,7 @@ namespace Nullspace
             // 以当前最大结束时间作为开始时间点
             bc.SetStartDurationTime(mMaxDuration, duration);
             // 设置所属 sequence
-            AddCallback(bc, duration);
+            Append(bc, duration);
         }
 
         public void Append(Callback begin, Callback end, float duration)
@@ -55,7 +67,7 @@ namespace Nullspace
             // 以当前最大结束时间作为开始时间点
             bc.SetStartDurationTime(mMaxDuration, duration);
             // 设置所属 sequence
-            AddCallback(bc, duration);
+            Append(bc, duration);
         }
 
         public void Append(Callback begin, Callback process, Callback end, float duration)
@@ -65,7 +77,7 @@ namespace Nullspace
             // 以当前最大结束时间作为开始时间点
             bc.SetStartDurationTime(mMaxDuration, duration);
             // 设置所属 sequence
-            AddCallback(bc, duration);
+            Append(bc, duration);
         }
 
         public void AppendFrame(Callback process, float duration, float interval, bool forceProcess)
@@ -91,7 +103,7 @@ namespace Nullspace
             fc.SetIntervalTime(interval);
             fc.SetForceProcess(forceProcess);
             // 设置所属 sequence
-            AddCallback(fc, duration);
+            Append(fc, duration);
         }
 
         // duration targetFrameCount
@@ -104,17 +116,16 @@ namespace Nullspace
             fc.SetStartDurationTime(mMaxDuration, duration);
             fc.SetFrameCount(targetFrameCount);
             fc.SetForceProcess(forceProcess);
-            AddCallback(fc, duration);
+            Append(fc, duration);
         }
 
-        private void AddCallback(BehaviourCallback callback, float duration)
+        public void Append(BehaviourCallback callback, float duration)
         {
             // 设置所属 sequence
             callback.mSequence = this;
             mBehaviours.AddLast(callback);
             mMaxDuration += duration;
         }
-
 
         public void OnCompletion(Callback onCompletion)
         {
@@ -130,10 +141,10 @@ namespace Nullspace
 
         void ISequnceUpdate.Next()
         {
-            Next();
+            NextCallback();
         }
 
-        internal void Next()
+        internal void NextCallback()
         {
             mCurrent = null;
             ConsumeChild();
@@ -182,7 +193,6 @@ namespace Nullspace
             }
 
         }
-
     }
 
 }

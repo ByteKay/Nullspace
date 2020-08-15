@@ -21,7 +21,7 @@ namespace Nullspace
         // 持续时长
         protected float mDuration;
         // EndTime = StartTime + Duration。结束时间点
-        protected float mEndTime;
+        internal float EndTime;
         // 开始回调
         protected Callback mBeginCallback;
         // 处理回调，可持续
@@ -66,7 +66,7 @@ namespace Nullspace
         {
             StartTime = startTime;
             mDuration = duration;
-            mEndTime = StartTime + mDuration;
+            EndTime = StartTime + mDuration;
         }
 
         internal virtual void Reset()
@@ -95,7 +95,7 @@ namespace Nullspace
                     Begin();
 
                 }
-                if (mTimeElappsed >= mEndTime)
+                if (mTimeElappsed >= EndTime)
                 {
                     if (mState == ThreeState.Playing)
                     {

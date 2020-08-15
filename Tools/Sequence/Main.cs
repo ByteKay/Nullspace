@@ -9,7 +9,8 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             DebugUtils.SetLogAction(LogAction);
-            TestSingleSequence();
+            // TestSingleSequence();
+            TestParallelSequence();
             while (true)
             {
                 SequenceManager.Instance.Tick();
@@ -17,10 +18,25 @@ namespace Nullspace
             }
         }
 
+
         private static void TestParallelSequence()
         {
-            //SequenceParallel parallel = SequenceManager.CreateParallel();
-            //parallel.PrependInterval(2);
+            SequenceParallel sequence = SequenceManager.CreateParallel();
+            sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
+            // 整体延迟 1 秒
+            sequence.PrependInterval(2);
+            // 只有开始和结束，持续1秒
+            sequence.Append(CallbackUtils.Acquire(TestBegin), CallbackUtils.Acquire(TestEnd), 0);
+            // 每帧调用且持续一秒
+            sequence.Append(CallbackUtils.Acquire(Test1Process, "kay"), 1);
+            // 执行开始和结束, 每帧调用且持续一秒
+            sequence.Append(CallbackUtils.Acquire(Test2Begin, 1, 3), CallbackUtils.Acquire(Test2Process, 1, 3), CallbackUtils.Acquire(Test2End, 1, 3), 1);
+            // 持续6秒，每两秒执行一次 Process
+            sequence.AppendFrame(CallbackUtils.Acquire(Test3, "yang", 2, false), 6, 2.0f, true);
+            // 持续6秒，执行10次 Process
+            float endTime = sequence.AppendFrame(CallbackUtils.Acquire(Test4Begin), CallbackUtils.Acquire(Test4), CallbackUtils.Acquire(Test4End), 6, 10, true);
+            // Sequence 结束后 回调处理
+            sequence.InsertFrame(0, CallbackUtils.Acquire(InsertTestBegin), CallbackUtils.Acquire(InsertTest), CallbackUtils.Acquire(InsertTestEnd), endTime, 20, true);
         }
 
         private static void TestSingleSequence()
@@ -40,6 +56,23 @@ namespace Nullspace
             sequence.AppendFrame(CallbackUtils.Acquire(Test4Begin), CallbackUtils.Acquire(Test4), CallbackUtils.Acquire(Test4End), 6, 10, true);
             // Sequence 结束后 回调处理
             sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
+        }
+
+        private static int mCounter = 0;
+        public static void InsertTestBegin()
+        {
+            DebugUtils.Log(InfoType.Info, "InsertTestBegin");
+        }
+
+        public static void InsertTest()
+        {
+            mCounter++;
+            DebugUtils.Log(InfoType.Info, "InsertTest : " + mCounter);
+        }
+
+        public static void InsertTestEnd()
+        {
+            DebugUtils.Log(InfoType.Info, "InsertTestEnd");
         }
 
         public static void TestBegin()

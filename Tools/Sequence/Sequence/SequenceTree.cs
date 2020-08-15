@@ -1,10 +1,12 @@
-﻿namespace Nullspace
+﻿using System;
+
+namespace Nullspace
 {
     public class SequenceTree : ISequnceUpdate
     {
-        private SequenceLinkedList mRoot;
-        private SequenceLinkedList mCurrent;
-
+        private ISequnceUpdate mRoot;
+        private ISequnceUpdate mCurrent;
+        private ISequnceUpdate mSibling;
         internal SequenceTree()
         {
             mRoot = null;
@@ -12,6 +14,19 @@
         }
 
         public bool IsPlaying { get { return mCurrent != null; } }
+
+        public ISequnceUpdate Sibling
+        {
+            get
+            {
+                return mSibling;
+            }
+
+            set
+            {
+                mSibling = value;
+            }
+        }
 
         public void Kill()
         {
@@ -28,10 +43,14 @@
             if (mCurrent != null)
             {
                 mCurrent.Update(deltaTime);
+                if (!mCurrent.IsPlaying)
+                {
+                    mCurrent = mCurrent.Sibling;
+                }
             }
         }
 
-        internal void SetRoot(SequenceLinkedList root)
+        internal void SetRoot(ISequnceUpdate root)
         {
             mRoot = root;
             mCurrent = root;
@@ -39,23 +58,7 @@
 
         void ISequnceUpdate.Next()
         {
-            MoveNext();
-        }
-
-        internal void MoveNext()
-        {
-            if (mCurrent != null)
-            {
-                mCurrent.ConsumeChild();
-            }
-        }
-
-        internal void ToSibling()
-        {
-            if (mCurrent != null)
-            {
-                mCurrent = mCurrent.NextSibling;
-            }
+             // todo
         }
 
     }
