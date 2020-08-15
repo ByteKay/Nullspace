@@ -46,7 +46,7 @@ namespace Nullspace
         public void AppendInterval(float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
-            EmptyCallback ec = new EmptyCallback(mMaxDuration, duration);
+            DelayCallback ec = new DelayCallback(mMaxDuration, duration);
             Append(ec, duration);
         }
 
