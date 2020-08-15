@@ -26,18 +26,19 @@ namespace Nullspace
         private static void TestSingleSequence()
         {
             SequenceLinkedList sequence = SequenceManager.CreateSingle();
-            // 持续1秒
-            sequence.PrependInterval(1);
+            // 整体延迟 1 秒
+            sequence.AppendInterval(4);
             // 只有开始和结束，持续1秒
             sequence.Append(CallbackUtils.Acquire(TestBegin), CallbackUtils.Acquire(TestEnd), 0);
             // 每帧调用且持续一秒
             sequence.Append(CallbackUtils.Acquire(Test1Process, "kay"), 1);
             // 执行开始和结束, 每帧调用且持续一秒
             sequence.Append(CallbackUtils.Acquire(Test2Begin, 1, 3), CallbackUtils.Acquire(Test2Process, 1, 3), CallbackUtils.Acquire(Test2End, 1, 3), 1);
-            // 每帧调用且持续一秒
+            // 持续6秒，每两秒执行一次 Process
             sequence.AppendFrame(CallbackUtils.Acquire(Test3, "yang", 2, false), 6, 2.0f, true);
+            // 持续6秒，执行10次 Process
             sequence.AppendFrame(CallbackUtils.Acquire(Test4Begin), CallbackUtils.Acquire(Test4), CallbackUtils.Acquire(Test4End), 6, 10, true);
-            //sequence.Append(CallbackUtils.Acquire(Test4, "kayyang", 1, true, 2.0f), 0);
+            // Sequence 结束后 回调处理
             sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
         }
 

@@ -1,11 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nullspace
 {
     internal static class SequenceUtils
     {
+        public static BehaviourCallback FillAmount(this Image img, float startV, float endV)
+        {
+            Callback4<Image, float, float, BehaviourCallback> callback = new Callback4<Image, float, float, BehaviourCallback>();
+            callback.Arg1 = img;
+            callback.Arg2 = startV;
+            callback.Arg3 = endV;
+            callback.Handler = (Action<Image, float, float, BehaviourCallback>)FillAmount;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        private static void FillAmount(Image img, float start, float end, BehaviourCallback bc)
+        {
+            img.fillAmount = MathUtils.Interpolation(start, end, bc.Percent);
+        }
+
         public static BehaviourCallback MoveTo(this Transform trans, Vector3 end)
         {
             Callback4<Transform, Vector3, Vector3, BehaviourCallback> callback = new Callback4<Transform, Vector3, Vector3, BehaviourCallback>();

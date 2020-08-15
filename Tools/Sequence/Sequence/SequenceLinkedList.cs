@@ -10,8 +10,6 @@ namespace Nullspace
         private BehaviourCallback mCurrent;
         private float mMaxDuration;
         private float mTimeLine;
-        private float mPrependTime;
-        private bool mIsPlaying;
         // for tree
         internal SequenceLinkedList NextSibling { get; set; }
 
@@ -22,23 +20,22 @@ namespace Nullspace
             mCurrent = null;
             mMaxDuration = 0;
             mTimeLine = 0;
-            mPrependTime = 0;
             NextSibling = null;
-            mIsPlaying = false;
         }
 
         public bool IsPlaying
         {
             get
             {
-                return mIsPlaying;
+                return mCurrent != null;
             }
         }
 
-
-        public void PrependInterval(float interval)
+        public void AppendInterval(float duration)
         {
-            mPrependTime = interval;
+            DebugUtils.Assert(duration >= 0, "");
+            EmptyCallback ec = new EmptyCallback(mMaxDuration, duration);
+            AddCallback(ec, duration);
         }
 
         public void Append(Callback process, float duration)
@@ -48,9 +45,7 @@ namespace Nullspace
             // 以当前最大结束时间作为开始时间点
             bc.SetStartDurationTime(mMaxDuration, duration);
             // 设置所属 sequence
-            bc.mSequence = this;
-            mBehaviours.AddLast(bc);
-            mMaxDuration += duration;
+            AddCallback(bc, duration);
         }
 
         public void Append(Callback begin, Callback end, float duration)
@@ -60,9 +55,7 @@ namespace Nullspace
             // 以当前最大结束时间作为开始时间点
             bc.SetStartDurationTime(mMaxDuration, duration);
             // 设置所属 sequence
-            bc.mSequence = this;
-            mBehaviours.AddLast(bc);
-            mMaxDuration += duration;
+            AddCallback(bc, duration);
         }
 
         public void Append(Callback begin, Callback process, Callback end, float duration)
@@ -72,9 +65,7 @@ namespace Nullspace
             // 以当前最大结束时间作为开始时间点
             bc.SetStartDurationTime(mMaxDuration, duration);
             // 设置所属 sequence
-            bc.mSequence = this;
-            mBehaviours.AddLast(bc);
-            mMaxDuration += duration;
+            AddCallback(bc, duration);
         }
 
         public void AppendFrame(Callback process, float duration, float interval, bool forceProcess)
@@ -100,9 +91,7 @@ namespace Nullspace
             fc.SetIntervalTime(interval);
             fc.SetForceProcess(forceProcess);
             // 设置所属 sequence
-            fc.mSequence = this;
-            mBehaviours.AddLast(fc);
-            mMaxDuration += duration;
+            AddCallback(fc, duration);
         }
 
         // duration targetFrameCount
@@ -115,11 +104,17 @@ namespace Nullspace
             fc.SetStartDurationTime(mMaxDuration, duration);
             fc.SetFrameCount(targetFrameCount);
             fc.SetForceProcess(forceProcess);
+            AddCallback(fc, duration);
+        }
+
+        private void AddCallback(BehaviourCallback callback, float duration)
+        {
             // 设置所属 sequence
-            fc.mSequence = this;
-            mBehaviours.AddLast(fc);
+            callback.mSequence = this;
+            mBehaviours.AddLast(callback);
             mMaxDuration += duration;
         }
+
 
         public void OnCompletion(Callback onCompletion)
         {
@@ -159,16 +154,11 @@ namespace Nullspace
         /// <param name="deltaTime"></param>
         internal void Update(float deltaTime)
         {
-            mIsPlaying = true;
             mTimeLine += deltaTime;
-            if (mTimeLine < mPrependTime)
-            {
-                return;
-            }
             ConsumeChild();
             if (mCurrent != null)
             {
-                mCurrent.Update(mTimeLine - mPrependTime);
+                mCurrent.Update(mTimeLine);
             }
         }
 
@@ -185,7 +175,6 @@ namespace Nullspace
             }
             if (mCurrent == null)
             {
-                mIsPlaying = false;
                 if (mOnCompleted != null)
                 {
                     mOnCompleted.Run();
