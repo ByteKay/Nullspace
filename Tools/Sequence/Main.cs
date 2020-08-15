@@ -9,7 +9,7 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             DebugUtils.SetLogAction(LogAction);
-            // TestSingleSequence();
+            TestSingleSequence();
             TestParallelSequence();
             while (true)
             {
@@ -23,7 +23,7 @@ namespace Nullspace
         {
             SequenceParallel sequence = SequenceManager.CreateParallel();
             sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
-            // 整体延迟 1 秒
+            // 整体延迟 2 秒
             sequence.PrependInterval(2);
             // 只有开始和结束，持续1秒
             sequence.Append(CallbackUtils.Acquire(TestBegin), CallbackUtils.Acquire(TestEnd), 0);
@@ -42,7 +42,7 @@ namespace Nullspace
         private static void TestSingleSequence()
         {
             SequenceLinkedList sequence = SequenceManager.CreateSingle();
-            // 整体延迟 1 秒
+            // 整体延迟 4 秒
             sequence.AppendInterval(4);
             // 只有开始和结束，持续1秒
             sequence.Append(CallbackUtils.Acquire(TestBegin), CallbackUtils.Acquire(TestEnd), 0);
