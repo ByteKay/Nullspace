@@ -49,7 +49,7 @@ namespace Nullspace
         {
             if (mState == ThreeState.Ready)
             {
-                callback.SetStartTime(time, duration);
+                callback.SetStartDurationTime(time, duration);
                 mBehaviours.Add(callback);
                 mMaxDuration = Math.Max(mMaxDuration, time + duration);
             }

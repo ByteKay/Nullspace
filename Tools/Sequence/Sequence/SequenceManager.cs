@@ -23,9 +23,9 @@ namespace Nullspace
             return sb;
         }
 
-        public static SequenceSingle CreateSingle()
+        public static SequenceLinkedList CreateSingle()
         {
-            SequenceSingle sb = new SequenceSingle();
+            SequenceLinkedList sb = new SequenceLinkedList();
             Instance.AddSequence(sb);
             return sb;
         }
@@ -38,6 +38,7 @@ namespace Nullspace
         {
             mBehaviours = new List<ISequnceUpdate>();
             mStopWatch = new Stopwatch();
+            mStopWatch.Start();
         }
 
         public void Tick()

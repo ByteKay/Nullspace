@@ -78,9 +78,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sequence\Behaviour\BehaviourCallback.cs" />
     <Compile Include="Sequence\Behaviour\BehaviourCallbackUtils.cs" />
-    <Compile Include="Sequence\Behaviour\UpdateCallback.cs" />
     <Compile Include="Sequence\Behaviour\FrameCountCallback.cs" />
-    <Compile Include="Sequence\Behaviour\TimeIntervalCallback.cs" />
     <Compile Include="Sequence\ISequnceUpdate.cs" />
     <Compile Include="Sequence\SequenceParallel.cs" />
     <Compile Include="Sequence\SequenceManager.cs" />

@@ -2,8 +2,8 @@
 {
     public class SequenceTree : ISequnceUpdate
     {
-        private SequenceSingle mRoot;
-        private SequenceSingle mCurrent;
+        private SequenceLinkedList mRoot;
+        private SequenceLinkedList mCurrent;
 
         internal SequenceTree()
         {
@@ -31,7 +31,7 @@
             }
         }
 
-        internal void SetRoot(SequenceSingle root)
+        internal void SetRoot(SequenceLinkedList root)
         {
             mRoot = root;
             mCurrent = root;

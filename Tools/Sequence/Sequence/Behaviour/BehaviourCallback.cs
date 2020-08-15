@@ -34,17 +34,6 @@ namespace Nullspace
         protected ThreeState mState;
         // 此行为所属序列实例
         internal ISequnceUpdate mSequence;
-
-        internal BehaviourCallback(float startTime, float duration, Callback begin = null, Callback process = null, Callback end = null)
-        {
-            mTimeElappsed = 0;
-            mState = ThreeState.Ready;
-            mBeginCallback = begin;
-            mProcessCallback = process;
-            mEndCallback = end;
-            SetStartTime(startTime, duration);
-        }
-
         internal BehaviourCallback(Callback begin = null, Callback process = null, Callback end = null)
         {
             mTimeElappsed = 0;
@@ -52,7 +41,7 @@ namespace Nullspace
             mBeginCallback = begin;
             mProcessCallback = process;
             mEndCallback = end;
-            SetStartTime(0, 0);
+            SetStartDurationTime(0, 0);
         }
 
         internal BehaviourCallback Begin(Callback begin)
@@ -73,7 +62,7 @@ namespace Nullspace
             return this;
         }
 
-        protected internal virtual void SetStartTime(float startTime, float duration)
+        protected internal virtual void SetStartDurationTime(float startTime, float duration)
         {
             StartTime = startTime;
             mDuration = duration;
@@ -104,13 +93,12 @@ namespace Nullspace
                 if (mState == ThreeState.Ready)
                 {
                     Begin();
-                    mState = ThreeState.Playing;
+
                 }
                 if (mTimeElappsed >= mEndTime)
                 {
                     if (mState == ThreeState.Playing)
                     {
-                        mState = ThreeState.Finished;
                         End();
                     }
                 }
@@ -124,14 +112,30 @@ namespace Nullspace
         }
         internal bool IsPlaying { get { return mState == ThreeState.Playing; } }
         internal bool IsFinished { get { return mState == ThreeState.Finished; } }
-        internal float Elappsed { get { return MathUtils.Clamp(mTimeElappsed - StartTime, 0, mDuration); } }
-        internal float Percent { get { return MathUtils.Clamp((mTimeElappsed - StartTime) / mDuration, 0, 1); } }
+        public float Elappsed { get { return Percent * mDuration; } }
+        public virtual float Percent
+        {
+            get
+            {
+                if (IsFinished)
+                {
+                    return 1;
+                }
+                if (!IsPlaying)
+                {
+                    return 0;
+                }
+                return MathUtils.Clamp((mTimeElappsed - StartTime) / mDuration, 0, 1);
+            }
+        }
         internal virtual void Begin()
         {
             if (mBeginCallback != null)
             {
+                // 先执行 Begin ，后设置状态
                 mBeginCallback.Run();
             }
+            mState = ThreeState.Playing;
         }
         internal virtual void Process()
         {
@@ -142,6 +146,8 @@ namespace Nullspace
         }
         internal virtual void End()
         {
+            // 先设置状态，后执行 End 
+            mState = ThreeState.Finished;
             if (mEndCallback != null)
             {
                 mEndCallback.Run();

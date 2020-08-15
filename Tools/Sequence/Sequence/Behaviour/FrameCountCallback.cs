@@ -4,7 +4,11 @@ namespace Nullspace
     /// <summary>
     /// 按帧数调用：注意最后一帧可能发生在 End 回调
     /// 
-    /// mTargetFrameCount = 0 时，表示 Process 不执行
+    /// 1. 执行 Process 的 次数 mTargetFrameCount
+    ///     2.1 直接设置次数 mTargetFrameCount: SetFrameCount
+    ///     2.2 时间间隔转化 mTargetFrameCount：SetIntervalTime
+    /// 2. mTargetFrameCount = 0 时，表示 Process 不执行
+    /// 3. 每帧执行且仅执行一次 Process ，使用基类 UpdateCallback
     /// 
     /// </summary>
     public class FrameCountCallback : BehaviourCallback
@@ -13,26 +17,14 @@ namespace Nullspace
         protected int mElappsedFrameCount = 0;
         // 目标帧数
         protected int mTargetFrameCount = 0;
+        // 可能process并没有执行完指定的次数，是否需要执行剩余的次数
+        protected bool mForceProcess;
         // 每秒多少帧， 提升精度，使用 double 
         protected double mFrameCountPerSecond = 0;
 
-        /// <summary>
-        /// duration 与 targetFrameCount 对应
-        /// </summary>
-        /// <param name="startTime">起始时间点</param>
-        /// <param name="duration">持续时长</param>
-        /// <param name="targetFrameCount">持续帧数</param>
-        /// <param name="begin">开始时回调</param>
-        /// <param name="process">过程中回调</param>
-        /// <param name="end">结束时回调</param>
-        internal FrameCountCallback(float startTime, float duration, int targetFrameCount, Callback begin = null, Callback process = null, Callback end = null) : base(startTime, duration, begin, process, end)
+        internal FrameCountCallback(Callback begin = null, Callback process = null, Callback end = null) : base(begin, process, end)
         {
-            SetFrameCount(targetFrameCount);
-        }
 
-        internal FrameCountCallback(Callback begin = null, Callback process = null, Callback end = null) : base( begin, process, end)
-        {
-            SetFrameCount(0);
         }
 
         internal void SetFrameCount(int targetFrameCount)
@@ -41,9 +33,27 @@ namespace Nullspace
             ResetFrameCountPerSecond();
         }
 
-        protected internal override void SetStartTime(float startTime, float duration)
+        internal void SetIntervalTime(float interval)
         {
-            base.SetStartTime(startTime, duration);
+            if (interval > 0)
+            {
+                mTargetFrameCount = (int)(mDuration / interval);
+            }
+            else
+            {
+                mTargetFrameCount = int.MaxValue;
+            }
+            ResetFrameCountPerSecond();
+        }
+
+        internal void SetForceProcess(bool forceProcess)
+        {
+            mForceProcess = forceProcess;
+        }
+
+        protected internal override void SetStartDurationTime(float startTime, float duration)
+        {
+            base.SetStartDurationTime(startTime, duration);
             ResetFrameCountPerSecond();
         }
 
@@ -80,14 +90,39 @@ namespace Nullspace
                 elappsedFrames = elappsedFrames - mElappsedFrameCount;
                 for (int i = 0; i < elappsedFrames; ++i)
                 {
+                    mElappsedFrameCount++;
                     base.Process();
                 }
-                mElappsedFrameCount += elappsedFrames;
             }
-            else
+        }
+        // 按帧数计算百分比
+        public override float Percent
+        {
+            get
             {
-                DebugUtils.Log(InfoType.Warning, "Process elappsedFrames > mTargetFrameCount");
+                if (IsFinished)
+                {
+                    return 1;
+                }
+                if (!IsPlaying)
+                {
+                    return 0;
+                }
+                return MathUtils.Clamp(mElappsedFrameCount / mTargetFrameCount, 0, 1);
             }
+        }
+
+        /// <summary>
+        /// 强制执行 Process 到 mTargetFrameCount 次数
+        /// </summary>
+        internal override void End()
+        {
+            while (mForceProcess && mElappsedFrameCount < mTargetFrameCount)
+            {
+                mElappsedFrameCount++;
+                base.Process();
+            }
+            base.End();
         }
 
     }
