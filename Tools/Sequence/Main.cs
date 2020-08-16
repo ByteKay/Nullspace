@@ -43,7 +43,7 @@ namespace Nullspace
         {
             SequenceLinkedList sequence = SequenceManager.CreateSingle();
             // 整体延迟 4 秒
-            sequence.AppendInterval(4);
+            sequence.Pause(4);
             // 只有开始和结束，持续1秒
             sequence.Append(CallbackUtils.Acquire(TestBegin), CallbackUtils.Acquire(TestEnd), 0);
             // 每帧调用且持续一秒

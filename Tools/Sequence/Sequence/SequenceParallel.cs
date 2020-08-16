@@ -61,7 +61,6 @@ namespace Nullspace
         {
             if (mState == ThreeState.Ready)
             {
-                mBehaviours.Sort(BehaviourCallback.SortInstance);
                 mState = ThreeState.Playing;
             }
             if (IsPlaying)
@@ -257,22 +256,17 @@ namespace Nullspace
 
         public float Append(BehaviourCallback callback, float duration)
         {
-            if (mState == ThreeState.Ready)
-            {
-                // 以当前最大结束时间作为开始时间点
-                Insert(mMaxDuration, callback, duration);
-            }
+            // 以当前最大结束时间作为开始时间点
+            Insert(mMaxDuration, callback, duration);
             return mMaxDuration;
         }
 
         public float Insert(float time, BehaviourCallback callback, float duration)
         {
-            if (mState == ThreeState.Ready)
-            {
-                callback.SetStartDurationTime(time, duration);
-                mBehaviours.Add(callback);
-                mMaxDuration = Math.Max(mMaxDuration, time + duration);
-            }
+            callback.SetStartDurationTime(time, duration);
+            mBehaviours.Add(callback);
+            mMaxDuration = Math.Max(mMaxDuration, time + duration);
+            mBehaviours.Sort(BehaviourCallback.SortInstance);
             return callback.EndTime;
         }
 

@@ -1,14 +1,87 @@
 ﻿
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Nullspace
 {
-    public class SequenceLinkedList : ISequnceUpdate
+    /// <summary>
+    /// for decorator
+    /// </summary>
+    public partial class SequenceLinkedList
+    {
+        public void Pause(string tag)
+        {
+            // 是否为当前暂停器
+            if (Current != null)
+            {
+                PauseCallback pc = Current as PauseCallback;
+                if (pc != null && pc.Tag == tag)
+                {
+                    DebugUtils.Log(InfoType.Warning, "duplicated tag: " + tag);
+                    return;
+                }
+            }
+            // 队列中查找
+            IEnumerator itr = mBehaviours.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                PauseCallback pc = itr.Current as PauseCallback;
+                if (pc != null && pc.Tag == tag)
+                {
+                    DebugUtils.Log(InfoType.Warning, "duplicated tag: " + tag);
+                    return;
+                }
+            }
+            // unique tag
+            float duration = 100000000f;
+            PauseCallback ec = new PauseCallback(tag, mMaxDuration, duration);
+            Append(ec, duration);
+        }
+
+        /// <summary>
+        /// 这里指挥清理一个，添加的时候确保只有一个 Tag
+        /// </summary>
+        /// <param name="tag"></param>
+        public bool Resume(string tag)
+        {
+            // 是否为当前暂停器
+            if (Current != null)
+            {
+                PauseCallback pc = Current as PauseCallback;
+                if (pc != null && pc.Tag == tag)
+                {
+                    NextCallback();
+                    return true;
+                }
+            }
+            // 队列中查找
+            IEnumerator itr = mBehaviours.GetEnumerator();
+            while (itr.MoveNext())
+            {
+                PauseCallback pc = itr.Current as PauseCallback;
+                if (pc != null && pc.Tag == tag)
+                {
+                    mBehaviours.Remove((BehaviourCallback)itr.Current);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void Cooldown(float duration)
+        {
+            DebugUtils.Assert(duration >= 0, "");
+            CooldownCallback ec = new CooldownCallback(mMaxDuration, duration);
+            Append(ec, duration);
+        }
+    }
+
+    public partial class SequenceLinkedList : ISequnceUpdate
     {
         private LinkedList<BehaviourCallback> mBehaviours;
         private Callback mOnCompleted;
-        private BehaviourCallback mCurrent;
+        internal BehaviourCallback Current;
         private float mMaxDuration;
         private float mTimeLine;
         private ISequnceUpdate mSibling;
@@ -16,7 +89,7 @@ namespace Nullspace
         {
             mBehaviours = new LinkedList<BehaviourCallback>();
             mOnCompleted = null;
-            mCurrent = null;
+            Current = null;
             mMaxDuration = 0;
             mTimeLine = 0;
             mSibling = null;
@@ -26,7 +99,7 @@ namespace Nullspace
         {
             get
             {
-                return mCurrent != null;
+                return Current != null;
             }
         }
 
@@ -43,10 +116,12 @@ namespace Nullspace
             }
         }
 
-        public void AppendInterval(float duration)
+        internal float MaxDuration { get { return mMaxDuration; } }
+
+        public void Pause(float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
-            DelayCallback ec = new DelayCallback(mMaxDuration, duration);
+            PauseCallback ec = new PauseCallback(mMaxDuration, duration);
             Append(ec, duration);
         }
 
@@ -119,6 +194,7 @@ namespace Nullspace
             Append(fc, duration);
         }
 
+
         public void Append(BehaviourCallback callback, float duration)
         {
             // 设置所属 sequence
@@ -134,7 +210,7 @@ namespace Nullspace
 
         public void Kill()
         {
-            mCurrent = null;
+            Current = null;
             mTimeLine = 0;
             mBehaviours.Clear();
         }
@@ -146,7 +222,7 @@ namespace Nullspace
 
         internal void NextCallback()
         {
-            mCurrent = null;
+            Current = null;
             ConsumeChild();
         }
 
@@ -167,24 +243,24 @@ namespace Nullspace
         {
             mTimeLine += deltaTime;
             ConsumeChild();
-            if (mCurrent != null)
+            if (Current != null)
             {
-                mCurrent.Update(mTimeLine);
+                Current.Update(mTimeLine);
             }
         }
 
         internal void ConsumeChild()
         {
-            if ((mCurrent == null || mCurrent.IsFinished))
+            if ((Current == null || Current.IsFinished))
             {
-                mCurrent = null;
+                Current = null;
             }
-            if (mCurrent == null && mBehaviours.Count > 0)
+            if (Current == null && mBehaviours.Count > 0)
             {
-                mCurrent = mBehaviours.First.Value;
+                Current = mBehaviours.First.Value;
                 mBehaviours.RemoveFirst();
             }
-            if (mCurrent == null)
+            if (Current == null)
             {
                 if (mOnCompleted != null)
                 {

@@ -1,21 +1,43 @@
 ﻿
 namespace Nullspace
 {
-    // 延迟
-    public class DelayCallback : BehaviourCallback
+    public class TimeCallback : BehaviourCallback
     {
-        internal DelayCallback(float startTime, float duration) : base(null, null, null)
+        internal TimeCallback() : base(null, null, null)
         {
-            SetStartDurationTime(startTime, duration);
+
         }
+        internal virtual string Tag { get; set; }
+        internal virtual bool CanBeInterruptted() { return false; }
     }
 
-    // 等待
-    public class WaitCallback : BehaviourCallback
+    // 冷却 duration 秒
+    public class CooldownCallback : TimeCallback
     {
-        internal WaitCallback(float startTime, float duration) : base(null, null, null)
+        internal CooldownCallback(float startTime, float duration) : base()
         {
             SetStartDurationTime(startTime, duration);
         }
+
+        // 不能都被打断
+        internal override bool CanBeInterruptted() { return false; }
+    }
+
+    // 暂定 duration 秒
+    public class PauseCallback : TimeCallback
+    {
+        internal PauseCallback(float startTime, float duration) : base()
+        {
+            SetStartDurationTime(startTime, duration);
+        }
+
+        internal PauseCallback(string tag, float startTime, float duration) : base()
+        {
+            SetStartDurationTime(startTime, duration);
+            Tag = tag;
+        }
+
+        // 能都被打断
+        internal override bool CanBeInterruptted() { return true; }
     }
 }

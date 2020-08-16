@@ -42,6 +42,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\GameDataRuntime.dll</HintPath>
     </Reference>
+    <Reference Include="StateController, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\StateController.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -85,6 +89,7 @@
     <Compile Include="Sequence\Behaviour\TimeCallback.cs" />
     <Compile Include="Sequence\Behaviour\FrameCountCallback.cs" />
     <Compile Include="Sequence\ISequnceUpdate.cs" />
+    <Compile Include="Sequence\SequenceDecorator.cs" />
     <Compile Include="Sequence\SequenceParallel.cs" />
     <Compile Include="Sequence\SequenceManager.cs" />
     <Compile Include="Sequence\SequenceUtils.cs" />
