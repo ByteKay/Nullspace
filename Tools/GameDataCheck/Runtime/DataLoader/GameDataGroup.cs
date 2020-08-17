@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace Nullspace
@@ -72,5 +73,21 @@ namespace Nullspace
             return null;
         }
 
+        public static List<T> Select(Predicate<T> match)
+        {
+            List<T> results = new List<T>();
+            foreach (GameDataCollection<T> ts in Data.Values)
+            {
+                foreach (T t in ts)
+                {
+                    t.InitializeNoneKey();
+                    if (match(t))
+                    {
+                        results.Add(t);
+                    }
+                }
+            }
+            return results;
+        }
     }
 }

@@ -56,5 +56,19 @@ namespace Nullspace
                 DebugUtils.Log(InfoType.Info, string.Format("Clear {0}", typeof(T).FullName));
             }
         }
+
+        public static List<T> Select(Predicate<T> match)
+        {
+            List<T> results = new List<T>();
+            foreach (T t in Data)
+            {
+                t.InitializeNoneKey();
+                if (match(t))
+                {
+                    results.Add(t);
+                }
+            }
+            return results;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace Nullspace
@@ -77,6 +78,20 @@ namespace Nullspace
             }
             DebugUtils.Log(InfoType.Error, string.Format("Data Null : {0}", typeof(T).FullName));
             return null;
+        }
+
+        public static List<T> Select(Predicate<T> match)
+        {
+            List<T> results = new List<T>();
+            foreach (T t in Data.Values)
+            {
+                t.InitializeNoneKey();
+                if (match(t))
+                {
+                    results.Add(t);
+                }
+            }
+            return results;
         }
     }
 
@@ -165,6 +180,21 @@ namespace Nullspace
             DebugUtils.Log(InfoType.Error, string.Format("Data Null : {0}", typeof(T).FullName));
             return null;
         }
-
+        public static List<T> Select(Predicate<T> match)
+        {
+            List<T> results = new List<T>();
+            foreach (Dictionary<N, T> tmap in Data.Values)
+            {
+                foreach (T t in tmap.Values)
+                {
+                    t.InitializeNoneKey();
+                    if (match(t))
+                    {
+                        results.Add(t);
+                    }
+                }
+            }
+            return results;
+        }
     }
 }
