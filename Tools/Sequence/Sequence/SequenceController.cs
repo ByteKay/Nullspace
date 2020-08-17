@@ -5,12 +5,12 @@ namespace Nullspace
     /// 装饰一个 Sequence
     /// 暂停 和 冷却
     /// </summary>
-    public class SequenceDecorator : ISequnceUpdate
+    public class SequenceController : ISequnceUpdate
     {
         protected ISequnceUpdate mDecoratorSequence;
         protected SequenceLinkedList mCheckSequence;
 
-        internal SequenceDecorator(ISequnceUpdate sequnce)
+        internal SequenceController(ISequnceUpdate sequnce)
         {
             mDecoratorSequence = sequnce;
             mCheckSequence = null;

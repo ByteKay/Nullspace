@@ -112,7 +112,8 @@ namespace Nullspace
         }
         internal bool IsPlaying { get { return mState == ThreeState.Playing; } }
         internal bool IsFinished { get { return mState == ThreeState.Finished; } }
-        public float Elappsed { get { return Percent * mDuration; } }
+        public float ElappsedTime { get { return Percent * mDuration; } }
+        public float RemainTime { get { return RemainPercent * mDuration; } }
         public virtual float Percent
         {
             get
@@ -128,6 +129,14 @@ namespace Nullspace
                 return MathUtils.Clamp((mTimeElappsed - StartTime) / mDuration, 0, 1);
             }
         }
+        public float RemainPercent
+        {
+            get
+            {
+                return 1 - Percent;
+            }
+        }
+
         internal virtual void Begin()
         {
             if (mBeginCallback != null)

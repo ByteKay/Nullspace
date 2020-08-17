@@ -34,9 +34,9 @@ namespace Nullspace
             // 持续6秒，每两秒执行一次 Process
             sequence.AppendFrame(CallbackUtils.Acquire(Test3, "yang", 2, false), 6, 2.0f, true);
             // 持续6秒，执行10次 Process
-            float endTime = sequence.AppendFrame(CallbackUtils.Acquire(Test4Begin), CallbackUtils.Acquire(Test4), CallbackUtils.Acquire(Test4End), 6, 10, true);
+            sequence.AppendFrame(CallbackUtils.Acquire(Test4Begin), CallbackUtils.Acquire(Test4), CallbackUtils.Acquire(Test4End), 6, 10, true);
             // Sequence 结束后 回调处理
-            sequence.InsertFrame(0, CallbackUtils.Acquire(InsertTestBegin), CallbackUtils.Acquire(InsertTest), CallbackUtils.Acquire(InsertTestEnd), endTime, 20, true);
+            sequence.InsertFrame(0, CallbackUtils.Acquire(InsertTestBegin), CallbackUtils.Acquire(InsertTest), CallbackUtils.Acquire(InsertTestEnd), 10, 20, true);
         }
 
         private static void TestSingleSequence()

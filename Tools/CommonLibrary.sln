@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeController", "TimeContr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysXSample", "PhysXSample\PhysXSample.csproj", "{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuffManager", "BuffManager\BuffManager.csproj", "{BB681929-D84B-416B-9D89-FC1FFD3A2F2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CF761F1-F7AC-4FC7-8B0A-0F872DA17C22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB681929-D84B-416B-9D89-FC1FFD3A2F2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB681929-D84B-416B-9D89-FC1FFD3A2F2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB681929-D84B-416B-9D89-FC1FFD3A2F2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB681929-D84B-416B-9D89-FC1FFD3A2F2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

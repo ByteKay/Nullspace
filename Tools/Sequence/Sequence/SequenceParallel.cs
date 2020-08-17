@@ -6,12 +6,13 @@ namespace Nullspace
     public class SequenceParallel : ISequnceUpdate
     {
         protected float mTimeLine;
-        private List<BehaviourCallback> mBehaviours;
-        private ThreeState mState;
-        private Callback mOnCompletedCallback;
-        private float mPrependTime;
-        private float mMaxDuration;
-        private ISequnceUpdate mSibling;
+        protected List<BehaviourCallback> mBehaviours;
+        protected ThreeState mState;
+        protected Callback mOnCompletedCallback;
+        protected float mPrependTime;
+        protected float mMaxDuration;
+        protected ISequnceUpdate mSibling;
+
         internal SequenceParallel()
         {
             mTimeLine = 0;
@@ -57,7 +58,7 @@ namespace Nullspace
             Update(deltaTime);
         }
 
-        internal void Update(float time)
+        protected internal virtual void Update(float time)
         {
             if (mState == ThreeState.Ready)
             {
@@ -71,16 +72,16 @@ namespace Nullspace
                     return;
                 }
                 float timeElappsed = mTimeLine - mPrependTime;
-                bool completed = true;
-                foreach (BehaviourCallback beh in mBehaviours)
+                bool completion = true;
+                for (int i = 0; i < mBehaviours.Count; ++i)
                 {
                     // 只要有一个没执行完，就代表没结束
-                    if (!beh.IsFinished && beh.Update(timeElappsed))
+                    if (!mBehaviours[i].IsFinished && mBehaviours[i].Update(timeElappsed))
                     {
-                        completed = false;
+                        completion = false;
                     }
                 }
-                if (completed)
+                if (completion)
                 {
                     mState = ThreeState.Finished;
                     if (mOnCompletedCallback != null)
@@ -104,7 +105,7 @@ namespace Nullspace
         }
 
         /// <summary>
-        /// 整体后延
+        /// 整体后延。确保最开始设置，否则  InsertDelay 有问题
         /// </summary>
         /// <param name="interval">秒</param>        
         public void PrependInterval(float interval)
@@ -112,7 +113,23 @@ namespace Nullspace
             mPrependTime = interval;
         }
 
-        public float Append(Callback process, float duration)
+        /// <summary>
+        /// 相对当前 mPrependTime 的时间 delay。先设置好 mPrependTime
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <param name="process"></param>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        public BehaviourCallback InsertDelay(float delay, Callback process, float duration)
+        {
+            DebugUtils.Assert(duration >= 0, "");
+            BehaviourCallback bc = new BehaviourCallback(null, process, null);
+            bc.SetStartDurationTime(mPrependTime + delay, duration);
+            // 设置所属 sequence
+            return Insert(mPrependTime + delay, bc, duration);
+        }
+
+        public BehaviourCallback Append(Callback process, float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(null, process, null);
@@ -121,8 +138,8 @@ namespace Nullspace
             // 设置所属 sequence
             return Append(bc, duration);
         }
-
-        public float Append(Callback begin, Callback end, float duration)
+        
+        public BehaviourCallback Append(Callback begin, Callback end, float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(begin, null, end);
@@ -132,7 +149,7 @@ namespace Nullspace
             return Append(bc, duration);
         }
 
-        public float Append(Callback begin, Callback process, Callback end, float duration)
+        public BehaviourCallback Append(Callback begin, Callback process, Callback end, float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(begin, process, end);
@@ -142,20 +159,20 @@ namespace Nullspace
             return Append(bc, duration);
         }
 
-        public float AppendFrame(Callback process, float duration, float interval, bool forceProcess)
+        public BehaviourCallback AppendFrame(Callback process, float duration, float interval, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             return AppendFrame(null, process, null, duration, interval, forceProcess);
         }
 
-        public float AppendFrame(Callback process, float duration, int targetFrameCount, bool forceProcess)
+        public BehaviourCallback AppendFrame(Callback process, float duration, int targetFrameCount, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             return AppendFrame(null, process, null, duration, targetFrameCount, forceProcess);
         }
 
         // duration / interval
-        public float AppendFrame(Callback begin, Callback process, Callback end, float duration, float interval, bool forceProcess)
+        public BehaviourCallback AppendFrame(Callback begin, Callback process, Callback end, float duration, float interval, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             DebugUtils.Assert(interval > 0, "");
@@ -169,7 +186,7 @@ namespace Nullspace
         }
 
         // duration targetFrameCount
-        public float AppendFrame(Callback begin, Callback process, Callback end, float duration, int targetFrameCount, bool forceProcess)
+        public BehaviourCallback AppendFrame(Callback begin, Callback process, Callback end, float duration, int targetFrameCount, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             DebugUtils.Assert(targetFrameCount >= 0, "");
@@ -183,56 +200,56 @@ namespace Nullspace
 
         //////////////////////////////////////////////////////////////////////////////
 
-        public float Insert(float time, Callback process, float duration)
+        public BehaviourCallback Insert(float time, Callback process, float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(null, process, null);
             // 以当前最大结束时间作为开始时间点
-            bc.SetStartDurationTime(mMaxDuration, duration);
+            bc.SetStartDurationTime(time, duration);
             // 设置所属 sequence
             return Insert(time, bc, duration);
         }
 
-        public float Insert(float time, Callback begin, Callback end, float duration)
+        public BehaviourCallback Insert(float time, Callback begin, Callback end, float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(begin, null, end);
             // 以当前最大结束时间作为开始时间点
-            bc.SetStartDurationTime(mMaxDuration, duration);
+            bc.SetStartDurationTime(time, duration);
             // 设置所属 sequence
             return Insert(time, bc, duration);
         }
 
-        public float Insert(float time, Callback begin, Callback process, Callback end, float duration)
+        public BehaviourCallback Insert(float time, Callback begin, Callback process, Callback end, float duration)
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(begin, process, end);
             // 以当前最大结束时间作为开始时间点
-            bc.SetStartDurationTime(mMaxDuration, duration);
+            bc.SetStartDurationTime(time, duration);
             // 设置所属 sequence
             return Insert(time, bc, duration);
         }
 
-        public float InsertFrame(float time, Callback process, float duration, float interval, bool forceProcess)
+        public BehaviourCallback InsertFrame(float time, Callback process, float duration, float interval, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             return InsertFrame(time, null, process, null, duration, interval, forceProcess);
         }
 
-        public float InsertFrame(float time, Callback process, float duration, int targetFrameCount, bool forceProcess)
+        public BehaviourCallback InsertFrame(float time, Callback process, float duration, int targetFrameCount, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             return InsertFrame(time, null, process, null, duration, targetFrameCount, forceProcess);
         }
 
         // duration / interval
-        public float InsertFrame(float time, Callback begin, Callback process, Callback end, float duration, float interval, bool forceProcess)
+        public BehaviourCallback InsertFrame(float time, Callback begin, Callback process, Callback end, float duration, float interval, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             DebugUtils.Assert(interval > 0, "");
             FrameCountCallback fc = new FrameCountCallback(begin, process, end);
             // 以当前最大结束时间作为开始时间点
-            fc.SetStartDurationTime(mMaxDuration, duration);
+            fc.SetStartDurationTime(time, duration);
             fc.SetIntervalTime(interval);
             fc.SetForceProcess(forceProcess);
             // 设置所属 sequence
@@ -240,13 +257,13 @@ namespace Nullspace
         }
 
         // duration targetFrameCount
-        public float InsertFrame(float time, Callback begin, Callback process, Callback end, float duration, int targetFrameCount, bool forceProcess)
+        public BehaviourCallback InsertFrame(float time, Callback begin, Callback process, Callback end, float duration, int targetFrameCount, bool forceProcess)
         {
             DebugUtils.Assert(duration > 0, "");
             DebugUtils.Assert(targetFrameCount >= 0, "");
             FrameCountCallback fc = new FrameCountCallback(begin, process, end);
             // 以当前最大结束时间作为开始时间点
-            fc.SetStartDurationTime(mMaxDuration, duration);
+            fc.SetStartDurationTime(time, duration);
             fc.SetFrameCount(targetFrameCount);
             fc.SetForceProcess(forceProcess);
             return Insert(time, fc, duration);
@@ -254,23 +271,20 @@ namespace Nullspace
 
         //////////////////////////////////////////////////////////////////////
 
-        public float Append(BehaviourCallback callback, float duration)
+        public BehaviourCallback Append(BehaviourCallback callback, float duration)
         {
             // 以当前最大结束时间作为开始时间点
-            Insert(mMaxDuration, callback, duration);
-            return mMaxDuration;
+            return Insert(mMaxDuration, callback, duration);
         }
 
-        public float Insert(float time, BehaviourCallback callback, float duration)
+        public BehaviourCallback Insert(float time, BehaviourCallback callback, float duration)
         {
             callback.SetStartDurationTime(time, duration);
             mBehaviours.Add(callback);
             mMaxDuration = Math.Max(mMaxDuration, time + duration);
             mBehaviours.Sort(BehaviourCallback.SortInstance);
-            return callback.EndTime;
+            return callback;
         }
-
-
 
     }
 }
