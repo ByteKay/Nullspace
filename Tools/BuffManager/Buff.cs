@@ -4,32 +4,19 @@ using UnityEngine;
 
 namespace Nullspace
 {
-    public class Buff : IBehaviourContext
+    public class Buff
     {
         public event Action OnRemove;
         public Action OnTick;
 
-        public List<BuffClock> Clocks = new List<BuffClock>();
+        // SequenceParallelRemove Clocks;
+
+       public List<BuffClock> Clocks = new List<BuffClock>();
 
         public BuffTemplate buffTemplate;
 
         public IntEventField BaseStackSize = new IntEventField();
         public IntEventField StackSize = new IntEventField();
-
-        public bool HasActiveClock
-        {
-            get
-            {
-                for (int i = 0; i < Clocks.Count; i++)
-                {
-                    if (Clocks[i].GetType() == typeof(BuffClockDecaying))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
 
         public float DisplayPercent
         {

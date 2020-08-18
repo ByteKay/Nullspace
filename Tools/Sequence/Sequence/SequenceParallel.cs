@@ -5,6 +5,9 @@ namespace Nullspace
 {
     public class SequenceParallel : ISequnceUpdate
     {
+        // single thread
+        protected List<BehaviourCallback> AddBehaviourCaches = new List<BehaviourCallback>();
+
         protected float mTimeLine;
         protected List<BehaviourCallback> mBehaviours;
         protected ThreeState mState;
@@ -12,7 +15,7 @@ namespace Nullspace
         protected float mPrependTime;
         protected float mMaxDuration;
         protected ISequnceUpdate mSibling;
-
+        protected bool mUpdateLocker;
         internal SequenceParallel()
         {
             mTimeLine = 0;
@@ -22,7 +25,24 @@ namespace Nullspace
             mPrependTime = 0.0f;
             mMaxDuration = 0.0f;
             mSibling = null;
+            mUpdateLocker = false;
         }
+
+        protected void LockUpdate()
+        {
+            mUpdateLocker = true;
+        }
+
+        protected void UnLockUpdate()
+        {
+            mUpdateLocker = false;
+        }
+
+        protected bool IsLockUpdate()
+        {
+            return mUpdateLocker;
+        }
+
         public ISequnceUpdate Sibling
         {
             get
@@ -73,6 +93,7 @@ namespace Nullspace
                 }
                 float timeElappsed = mTimeLine - mPrependTime;
                 bool completion = true;
+                LockUpdate();
                 for (int i = 0; i < mBehaviours.Count; ++i)
                 {
                     // 只要有一个没执行完，就代表没结束
@@ -80,7 +101,11 @@ namespace Nullspace
                     {
                         completion = false;
                     }
+                    // 这里就算结束也不删除，可重播
                 }
+                UnLockUpdate();
+                bool hasAdd = ResolveAdd();
+                completion = completion && !hasAdd;
                 if (completion)
                 {
                     mState = ThreeState.Finished;
@@ -90,6 +115,21 @@ namespace Nullspace
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>是否存在未处理的behaviour</returns>
+        protected bool ResolveAdd()
+        {
+            bool res = AddBehaviourCaches.Count > 0;
+            foreach (BehaviourCallback bc in AddBehaviourCaches)
+            {
+                mBehaviours.Add(bc);
+            }
+            AddBehaviourCaches.Clear();
+            return res;
         }
 
         public void Replay()
@@ -113,8 +153,17 @@ namespace Nullspace
             mPrependTime = interval;
         }
 
+        /// <returns></returns>
+        public BehaviourCallback InsertImmediate(Callback process, float duration)
+        {
+            // 设置所属 sequence
+            return InsertDelay(0, process, duration);
+        }
+
         /// <summary>
-        /// 相对当前 mPrependTime 的时间 delay。先设置好 mPrependTime
+        /// 如果 mTimeLine <= mPrependTime, 相对于 mPrependTime
+        /// 如果 mTimeLine >= mPrependTime, 相对于 mTimeLine
+        /// 先设置好 mPrependTime
         /// </summary>
         /// <param name="delay"></param>
         /// <param name="process"></param>
@@ -124,7 +173,7 @@ namespace Nullspace
         {
             DebugUtils.Assert(duration >= 0, "");
             BehaviourCallback bc = new BehaviourCallback(null, process, null);
-            bc.SetStartDurationTime(mPrependTime + delay, duration);
+            bc.SetStartDurationTime((mTimeLine < mPrependTime ? mPrependTime : mTimeLine) + delay, duration);
             // 设置所属 sequence
             return Insert(mPrependTime + delay, bc, duration);
         }
@@ -280,9 +329,15 @@ namespace Nullspace
         public BehaviourCallback Insert(float time, BehaviourCallback callback, float duration)
         {
             callback.SetStartDurationTime(time, duration);
-            mBehaviours.Add(callback);
             mMaxDuration = Math.Max(mMaxDuration, time + duration);
-            mBehaviours.Sort(BehaviourCallback.SortInstance);
+            if (IsLockUpdate())
+            {
+                AddBehaviourCaches.Add(callback);
+            }
+            else
+            {
+                mBehaviours.Add(callback);
+            }
             return callback;
         }
 

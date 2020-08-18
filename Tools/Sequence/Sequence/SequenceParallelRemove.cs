@@ -6,10 +6,7 @@ namespace Nullspace
 {
     public class SequenceParallelRemove : SequenceParallel
     {
-        private static List<int> RemoveCompetionBehaviourCaches = new List<int>();
-        // single thread
-        private List<BehaviourCallback> BehaviourCaches = new List<BehaviourCallback>();
-        protected bool mInternalLock = false;
+        protected List<BehaviourCallback> RemoveBehaviourCaches = new List<BehaviourCallback>();
 
         protected override internal void Update(float time)
         {
@@ -25,31 +22,22 @@ namespace Nullspace
                     return;
                 }
                 float timeElappsed = mTimeLine - mPrependTime;
-                BehaviourCaches.Clear();
-                mInternalLock = true;
-                RemoveCompetionBehaviourCaches.Clear();
+                AddBehaviourCaches.Clear();
+                LockUpdate();
                 for (int i = 0; i < mBehaviours.Count; ++i)
                 {
-                    // 只要有一个没执行完，就代表没结束
                     if (!mBehaviours[i].IsFinished)
                     {
                         mBehaviours[i].Update(timeElappsed);
                     }
                     if (mBehaviours[i].IsFinished)
                     {
-                        RemoveCompetionBehaviourCaches.Add(i);
+                        Remove(mBehaviours[i]);
                     }
                 }
-                mInternalLock = false;
-                for (int i = RemoveCompetionBehaviourCaches.Count - 1; i >= 0; --i)
-                {
-                    mBehaviours.RemoveAt(RemoveCompetionBehaviourCaches[i]);
-                }
-                foreach (BehaviourCallback bc in BehaviourCaches)
-                {
-                    mBehaviours.Remove(bc);
-                }
-                BehaviourCaches.Clear();
+                UnLockUpdate();
+                ResolveRemove();
+                ResolveAdd();
                 if (mBehaviours.Count == 0)
                 {
                     mState = ThreeState.Finished;
@@ -60,12 +48,12 @@ namespace Nullspace
                 }
             }
         }
-
+        
         public void Remove(BehaviourCallback bc)
         {
-            if (mInternalLock)
+            if (IsLockUpdate())
             {
-                BehaviourCaches.Add(bc);
+                RemoveBehaviourCaches.Add(bc);
             }
             else
             {
@@ -73,5 +61,15 @@ namespace Nullspace
             }
         }
 
+        protected bool ResolveRemove()
+        {
+            bool res = AddBehaviourCaches.Count > 0;
+            foreach (BehaviourCallback bc in AddBehaviourCaches)
+            {
+                mBehaviours.Add(bc);
+            }
+            AddBehaviourCaches.Clear();
+            return res;
+        }
     }
 }
