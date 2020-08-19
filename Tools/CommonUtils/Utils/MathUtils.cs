@@ -136,7 +136,12 @@ namespace Nullspace
         {
             return v < min ? min : (v > max ? max : v);
         }
-
+        public static Color Interpolation(Color left, Color right, float t)
+        {
+            if (t < 0) t = 0;
+            else if (t > 1) t = 1;
+            return left + t * (right - left);
+        }
         public static float Interpolation(float left, float right, float t)
         {
             bool needRevert = left > right;

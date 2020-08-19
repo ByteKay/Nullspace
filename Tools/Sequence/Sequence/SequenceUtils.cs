@@ -19,6 +19,42 @@ namespace Nullspace
             return beh;
         }
 
+        public static BehaviourCallback ColorAlphaTo(this Material mat, float startV, float endV)
+        {
+            Callback4<Material, float, float, BehaviourCallback> callback = new Callback4<Material, float, float, BehaviourCallback>();
+            callback.Arg1 = mat;
+            callback.Arg2 = startV;
+            callback.Arg3 = endV;
+            callback.Handler = (Action<Material, float, float, BehaviourCallback>)ColorAlphaTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+
+        public static BehaviourCallback ColorTo(this Material mat, Color startV, Color endV)
+        {
+            Callback4<Material, Color, Color, BehaviourCallback> callback = new Callback4<Material, Color, Color, BehaviourCallback>();
+            callback.Arg1 = mat;
+            callback.Arg2 = startV;
+            callback.Arg3 = endV;
+            callback.Handler = (Action<Material, Color, Color, BehaviourCallback>)ColorTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg4 = beh;
+            return beh;
+        }
+        private static void ColorAlphaTo(Material mat, float start, float end, BehaviourCallback bc)
+        {
+            float a = MathUtils.Interpolation(start, end, bc.Percent);
+            Color c = mat.color;
+            c.a = a;
+            mat.color = c;
+        }
+
+        private static void ColorTo(Material mat, Color start, Color end, BehaviourCallback bc)
+        {
+            mat.color = MathUtils.Interpolation(start, end, bc.Percent);
+        }
+
         private static void FillAmount(Image img, float start, float end, BehaviourCallback bc)
         {
             img.fillAmount = MathUtils.Interpolation(start, end, bc.Percent);
