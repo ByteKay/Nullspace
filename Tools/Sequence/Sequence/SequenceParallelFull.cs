@@ -3,20 +3,21 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
-    public class SequenceParallel : ISequnceUpdate
+    public class SequenceParallelFull : ISequnceUpdate
     {
         // single thread
         protected List<BehaviourCallback> AddBehaviourCaches = new List<BehaviourCallback>();
 
         protected float mTimeLine;
-        protected List<BehaviourCallback> mBehaviours;
-        protected ThreeState mState;
         protected Callback mOnCompletedCallback;
         protected float mPrependTime;
         protected float mMaxDuration;
         protected ISequnceUpdate mSibling;
         protected bool mUpdateLocker;
-        internal SequenceParallel()
+        protected List<BehaviourCallback> mBehaviours;
+
+        protected ThreeState mState;
+        internal SequenceParallelFull()
         {
             mTimeLine = 0;
             mState = ThreeState.Ready;

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace Nullspace
 {
-    public class NetworkMessage : ObjectKey
+    public class NetworkMessage : ObjectBase
     {
         public static byte[] CacheBytes = new byte[1024];
         protected MemoryStream mByteStream;
@@ -15,18 +14,19 @@ namespace Nullspace
             Reset();
         }
 
-        public override void Initialize()
+        protected override void Acquire()
         {
             Reset();
         }
 
-        public override void Clear()
+        protected override void Release()
         {
             Reset();
         }
 
         public override void Destroy()
         {
+            Reset();
             mByteStream.Close();
         }
 

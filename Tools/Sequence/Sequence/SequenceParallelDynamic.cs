@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
-    public class SequenceParallelRemove : SequenceParallel
+    public class SequenceParallelDynamic : SequenceParallelFull
     {
         protected List<BehaviourCallback> RemoveBehaviourCaches = new List<BehaviourCallback>();
 

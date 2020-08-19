@@ -1,1 +1,6 @@
 G:\UnityWorkspace\Nullspace\Tools\OcclusionCulling\obj\Release\OcclusionCulling.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\bin\OcclusionCulling.dll
+F:\Unity\Nullspace\Tools\bin\OcclusionCulling.pdb
+F:\Unity\Nullspace\Tools\OcclusionCulling\obj\Release\OcclusionCulling.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\OcclusionCulling\obj\Release\OcclusionCulling.dll
+F:\Unity\Nullspace\Tools\OcclusionCulling\obj\Release\OcclusionCulling.pdb

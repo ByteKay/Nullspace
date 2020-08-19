@@ -79,12 +79,13 @@ namespace Nullspace
 
     public partial class SequenceLinkedList : ISequnceUpdate
     {
-        private LinkedList<BehaviourCallback> mBehaviours;
-        private Callback mOnCompleted;
+        protected LinkedList<BehaviourCallback> mBehaviours;
+        protected Callback mOnCompleted;
+        protected float mMaxDuration;
+        protected float mTimeLine;
+        protected ISequnceUpdate mSibling;
+
         internal BehaviourCallback Current;
-        private float mMaxDuration;
-        private float mTimeLine;
-        private ISequnceUpdate mSibling;
         internal SequenceLinkedList()
         {
             mBehaviours = new LinkedList<BehaviourCallback>();

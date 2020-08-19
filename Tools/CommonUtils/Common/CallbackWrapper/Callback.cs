@@ -52,18 +52,18 @@ namespace Nullspace
         }
     }
 
-    public abstract class Callback : ObjectKey
+    public abstract class Callback : ObjectBase
     {
         public abstract Delegate Handler
         {
             get;
             set;
         }
-        public override void Initialize()
+        protected override void Acquire()
         {
 
         }
-        public override void Clear()
+        protected override void Release()
         {
 
         }

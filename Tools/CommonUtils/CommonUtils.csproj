@@ -43,10 +43,10 @@
   <ItemGroup>
     <Compile Include="Common\CallbackWrapper\Callback.cs" />
     <Compile Include="Common\CallbackWrapper\Callback0.cs" />
-    <Compile Include="Common\CallbackWrapper\CallbackT.cs" />
-    <Compile Include="Common\CallbackWrapper\CallbackTU.cs" />
-    <Compile Include="Common\CallbackWrapper\CallbackTUV.cs" />
-    <Compile Include="Common\CallbackWrapper\CallbackTUVW.cs" />
+    <Compile Include="Common\CallbackWrapper\Callback1.cs" />
+    <Compile Include="Common\CallbackWrapper\Callback2.cs" />
+    <Compile Include="Common\CallbackWrapper\Callback3.cs" />
+    <Compile Include="Common\CallbackWrapper\Callback4.cs" />
     <Compile Include="Common\DataStruct\DoubleCircleLinkedList.cs" />
     <Compile Include="Common\DataStruct\PriorityQueue.cs" />
     <Compile Include="Common\EventDispatcher\EnumEventDispatcher.cs" />
@@ -58,7 +58,7 @@
     <Compile Include="Common\EventDispatcher\IntEventDispatcher.cs" />
     <Compile Include="Common\EventDispatcher\StringEventDefines.cs" />
     <Compile Include="Common\EventDispatcher\StringEventDispatcher.cs" />
-    <Compile Include="Common\ObjectPool\ObjectKey.cs" />
+    <Compile Include="Common\ObjectPool\ObjectBase.cs" />
     <Compile Include="Common\ObjectPool\ObjectPool.cs" />
     <Compile Include="Common\ObjectPool\ObjectPools.cs" />
     <Compile Include="Common\Singleton.cs" />

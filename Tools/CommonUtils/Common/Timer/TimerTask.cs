@@ -4,7 +4,7 @@ using System;
 
 namespace Nullspace
 {
-    public class TimerTask : ObjectKey
+    public class TimerTask : ObjectBase
     {
         internal int TimerId { get; set; }
 
@@ -22,23 +22,23 @@ namespace Nullspace
             }
         }
 
-        public override void Initialize()
+        protected override void Acquire()
         {
-            Clear();
+            Release();
         }
 
-        public override void Clear()
+        protected override void Release()
+        {
+            Release();
+        }
+
+        public override void Destroy()
         {
             if (Callback != null)
             {
                 ObjectPools.Instance.Release(Callback);
                 Callback = null;
             }
-        }
-
-        public override void Destroy()
-        {
-            Clear();
         }
     }
 }

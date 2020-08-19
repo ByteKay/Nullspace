@@ -29,7 +29,7 @@ namespace Nullspace
             mCheckTimerId = TimerTaskQueue.Instance.AddTimer(2000, 1000 * 60 * 3, CheckLifeExpired);
         }
 
-        public T Acquire<T>() where T : ObjectKey
+        public T Acquire<T>() where T : ObjectBase
         {
             Type type = typeof(T);
             DebugUtils.Assert(type.GetConstructor(Type.EmptyTypes) != null, "no default constructor");
@@ -40,21 +40,22 @@ namespace Nullspace
             return mPools[type].Acquire() as T;
         }
 
-        public void Release(ObjectKey obj)
+        public void Release(ObjectBase obj)
         {
             if (obj == null)
             {
                 return;
             }
             Type type = obj.GetType();
-            DebugUtils.Assert(type.IsSubclassOf(typeof(ObjectKey)), "wrong type");
+            DebugUtils.Assert(type.IsSubclassOf(typeof(ObjectBase)), "wrong type");
             if (mPools.ContainsKey(type))
             {
                 mPools[type].Release(obj);
             }
             else
             {
-                obj.Released();
+                // 释放调用 Destroy，比Release要强
+                obj.Destroy();
             }
         }
 
@@ -62,7 +63,7 @@ namespace Nullspace
         {
             foreach (ObjectPool pool in mPools.Values)
             {
-                pool.Clear();
+                pool.Destroy();
             }
             TimerTaskQueue.Instance.DelTimer(mCheckTimerId);
         }

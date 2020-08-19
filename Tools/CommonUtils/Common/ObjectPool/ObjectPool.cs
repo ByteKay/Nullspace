@@ -6,10 +6,8 @@ namespace Nullspace
 
     public class ObjectPool
     {
-        private static List<uint> mExpiredKeys = new List<uint>();
-
-        protected int mDefaultSize = 2;
-        protected Dictionary<uint, ObjectKey> mCircleCaches;
+        protected static int mDefaultSize = 2;
+        protected LinkedList<ObjectBase> mCircleCaches;
         protected int mLifeTimeSecond;
 
         public Type Type { get; set; }
@@ -18,7 +16,7 @@ namespace Nullspace
         {
             Type = type;
             mLifeTimeSecond = lifeTimeSecond;
-            mCircleCaches = new Dictionary<uint, ObjectKey>(mDefaultSize);
+            mCircleCaches = new LinkedList<ObjectBase>();
             Generator(mDefaultSize);
         }
 
@@ -26,93 +24,84 @@ namespace Nullspace
         {
             while (size-- > 0)
             {
-                ObjectKey circle = (ObjectKey)Activator.CreateInstance(Type);
+                ObjectBase circle = (ObjectBase)Activator.CreateInstance(Type);
                 if (circle != null)
                 {
-                    mCircleCaches.Add(circle.Key, circle);
+                    mCircleCaches.AddLast(circle);
                 }
             }
         }
 
-        public virtual void Release(ObjectKey t)
+        public virtual void Release(ObjectBase t)
         {
             t.Released();
-            if (!mCircleCaches.ContainsKey(t.Key))
-            {
-                mCircleCaches.Add(t.Key, t);
-            }
+            mCircleCaches.AddLast(t);
         }
 
-        public virtual void Acquire(int num, List<ObjectKey> result)
+        public virtual void Acquire(int num, List<ObjectBase> result)
         {
             if (mCircleCaches.Count < num)
             {
                 Generator(num - mCircleCaches.Count);
             }
-            var itr = mCircleCaches.Values.GetEnumerator();
-            while (itr.MoveNext() && result.Count < num)
+
+            while (result.Count < num)
             {
-                ObjectKey circle = itr.Current;
+                ObjectBase circle = mCircleCaches.First.Value;
+                mCircleCaches.RemoveFirst();
                 circle.Acquired();
                 result.Add(circle);
             }
-
-            for (int i = 0; i < num; ++i)
-            {
-                mCircleCaches.Remove(result[i].Key);
-            }
         }
 
-        public virtual List<ObjectKey> Acquire(int num)
+        public virtual List<ObjectBase> Acquire(int num)
         {
-            List<ObjectKey> result = new List<ObjectKey>();
+            List<ObjectBase> result = new List<ObjectBase>();
             Acquire(num, result);
             return result;
         }
 
-        public virtual ObjectKey Acquire()
+        public virtual ObjectBase Acquire()
         {
             if (mCircleCaches.Count == 0)
             {
                 // 生产太多，会多创建空壳。后面从缓存中选取，可能是空壳，进一步需要初始化
                 Generator(1);
             }
-            var itr = mCircleCaches.Values.GetEnumerator();
-            itr.MoveNext();
-            ObjectKey circle = itr.Current;
+            ObjectBase circle = mCircleCaches.First.Value;
+            mCircleCaches.RemoveFirst();
             circle.Acquired();
-            mCircleCaches.Remove(circle.Key);
             return circle;
         }
 
-        public virtual void Clear()
+        public virtual void Destroy()
         {
-            // 实际上 缓存中的物体 不用调用 Released
-            var itr = mCircleCaches.Values.GetEnumerator();
-            while (itr.MoveNext())
+            while (mCircleCaches.Count > 0)
             {
-                ObjectKey item = itr.Current;
-                item.Destroy();
+                ObjectBase circle = mCircleCaches.First.Value;
+                mCircleCaches.RemoveFirst();
+                circle.Destroy();
             }
             mCircleCaches.Clear();
         }
 
         public void RemoveExpired(int lifeSeconds)
         {
-            var itr = mCircleCaches.Values.GetEnumerator();
             float timeStamp = DateTimeUtils.GetTimeStampSeconds();
-            mExpiredKeys.Clear();
-            while (itr.MoveNext())
+            int cnt = mCircleCaches.Count;
+            int i = 0;
+            while (i < cnt)
             {
-                ObjectKey item = itr.Current;
-                if (item.IsExpired(mLifeTimeSecond))
+                ObjectBase circle = mCircleCaches.First.Value;
+                mCircleCaches.RemoveFirst();
+                if (!circle.IsExpired(mLifeTimeSecond))
                 {
-                    mExpiredKeys.Add(item.Key);
+                    mCircleCaches.AddLast(circle);
                 }
-            }
-            foreach (uint key in mExpiredKeys)
-            {
-                mCircleCaches.Remove(key);
+                else
+                {
+                    circle.Destroy();
+                }
             }
         }
 

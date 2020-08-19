@@ -16,9 +16,9 @@ namespace Nullspace
             return seqTree;
         }
 
-        public static SequenceParallel CreateParallel()
+        public static SequenceParallelFull CreateParallel()
         {
-            SequenceParallel sb = new SequenceParallel();
+            SequenceParallelFull sb = new SequenceParallelFull();
             Instance.AddSequence(sb);
             return sb;
         }

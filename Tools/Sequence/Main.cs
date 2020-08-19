@@ -21,7 +21,7 @@ namespace Nullspace
 
         private static void TestParallelSequence()
         {
-            SequenceParallel sequence = SequenceManager.CreateParallel();
+            SequenceParallelFull sequence = SequenceManager.CreateParallel();
             sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
             // 整体延迟 2 秒
             sequence.PrependInterval(2);
