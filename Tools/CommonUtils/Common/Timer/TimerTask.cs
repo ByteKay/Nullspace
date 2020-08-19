@@ -29,7 +29,7 @@ namespace Nullspace
 
         protected override void Release()
         {
-            Release();
+            Destroy();
         }
 
         public override void Destroy()

@@ -6,7 +6,7 @@ namespace Nullspace
     {
         private ISequnceUpdate mRoot;
         private ISequnceUpdate mCurrent;
-        private ISequnceUpdate mSibling;
+
         internal SequenceTree()
         {
             mRoot = null;
@@ -15,22 +15,37 @@ namespace Nullspace
 
         public bool IsPlaying { get { return mCurrent != null; } }
 
-        public ISequnceUpdate Sibling
+        // foreast,not supported now
+        ISequnceUpdate ISequnceUpdate.Sibling
         {
             get
             {
-                return mSibling;
+                // todo
+                throw new NotImplementedException();
             }
 
             set
             {
-                mSibling = value;
+                // todo
+                throw new NotImplementedException();
             }
+        }
+
+        void ISequnceUpdate.NextBehaviour()
+        {
+            // todo
         }
 
         public void Kill()
         {
+            ISequnceUpdate parent = mRoot;
+            while (parent != null)
+            {
+                parent.Kill();
+                parent = parent.Sibling;
+            }
             mCurrent = null;
+            mRoot = null;
         }
 
         void ISequnceUpdate.Update(float deltaTime)
@@ -56,10 +71,15 @@ namespace Nullspace
             mCurrent = root;
         }
 
-        void ISequnceUpdate.Next()
+        public void Replay()
         {
-             // todo
+            mCurrent = mRoot;
+            ISequnceUpdate parent = mCurrent;
+            while (parent != null)
+            {
+                parent.Replay();
+                parent = parent.Sibling;
+            }
         }
-
     }
 }

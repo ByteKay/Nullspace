@@ -1,0 +1,5 @@
+F:\Unity\Nullspace\Tools\bin\BuffManager.dll
+F:\Unity\Nullspace\Tools\bin\BuffManager.pdb
+F:\Unity\Nullspace\Tools\BuffManager\obj\Debug\BuffManager.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\BuffManager\obj\Debug\BuffManager.dll
+F:\Unity\Nullspace\Tools\BuffManager\obj\Debug\BuffManager.pdb

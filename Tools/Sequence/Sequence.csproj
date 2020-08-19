@@ -84,17 +84,19 @@
     <Compile Include="Nav\NavTarget\NavTargetCondition.cs" />
     <Compile Include="Nav\NavTarget\NavTargetType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sequence\SequenceParallelDynamic.cs" />
+    <Compile Include="Sequence\BehaviourCollection.cs" />
+    <Compile Include="Sequence\ConnectionLock.cs" />
+    <Compile Include="Sequence\SequenceController.cs" />
+    <Compile Include="Sequence\SequenceMultipleDynamic.cs" />
+    <Compile Include="Sequence\SequenceMultiple.cs" />
+    <Compile Include="Sequence\SequenceOne.cs" />
     <Compile Include="Sequence\Behaviour\BehaviourCallback.cs" />
     <Compile Include="Sequence\Behaviour\BehaviourCallbackUtils.cs" />
     <Compile Include="Sequence\Behaviour\TimeCallback.cs" />
     <Compile Include="Sequence\Behaviour\FrameCountCallback.cs" />
     <Compile Include="Sequence\ISequnceUpdate.cs" />
-    <Compile Include="Sequence\SequenceController.cs" />
-    <Compile Include="Sequence\SequenceParallelFull.cs" />
     <Compile Include="Sequence\SequenceManager.cs" />
     <Compile Include="Sequence\SequenceUtils.cs" />
-    <Compile Include="Sequence\SequenceLinkedList.cs" />
     <Compile Include="Sequence\SequenceTree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

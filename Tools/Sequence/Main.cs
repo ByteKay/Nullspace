@@ -21,7 +21,7 @@ namespace Nullspace
 
         private static void TestParallelSequence()
         {
-            SequenceParallelFull sequence = SequenceManager.CreateParallel();
+            SequenceMultiple sequence = SequenceManager.CreateMultiple();
             sequence.OnCompletion(CallbackUtils.Acquire(OnCompletion));
             // 整体延迟 2 秒
             sequence.PrependInterval(2);
@@ -41,9 +41,9 @@ namespace Nullspace
 
         private static void TestSingleSequence()
         {
-            SequenceLinkedList sequence = SequenceManager.CreateSingle();
+            SequenceOne sequence = SequenceManager.CreateOne();
             // 整体延迟 4 秒
-            sequence.Pause(4);
+            sequence.PrependInterval(4);
             // 只有开始和结束，持续1秒
             sequence.Append(CallbackUtils.Acquire(TestBegin), CallbackUtils.Acquire(TestEnd), 0);
             // 每帧调用且持续一秒

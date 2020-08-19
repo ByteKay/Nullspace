@@ -1,5 +1,5 @@
 F:\Unity\Nullspace\Tools\bin\Sequence.pdb
 F:\Unity\Nullspace\Tools\Sequence\obj\Release\Sequence.csprojResolveAssemblyReference.cache
 F:\Unity\Nullspace\Tools\Sequence\obj\Release\Sequence.pdb
-F:\Unity\Nullspace\Tools\bin\Sequence.dll
-F:\Unity\Nullspace\Tools\Sequence\obj\Release\Sequence.dll
+F:\Unity\Nullspace\Tools\bin\Sequence.exe
+F:\Unity\Nullspace\Tools\Sequence\obj\Release\Sequence.exe

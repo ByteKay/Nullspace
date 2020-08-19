@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Nullspace
 {
 
-    public partial class SequenceManager
+    public partial class SequenceManager : CollectionLock
     {
         public static SequenceManager Instance = new SequenceManager();
 
@@ -16,27 +16,44 @@ namespace Nullspace
             return seqTree;
         }
 
-        public static SequenceParallelFull CreateParallel()
+        public static SequenceMultiple CreateMultiple()
         {
-            SequenceParallelFull sb = new SequenceParallelFull();
+            SequenceMultiple sb = new SequenceMultiple();
             Instance.AddSequence(sb);
             return sb;
         }
 
-        public static SequenceLinkedList CreateSingle()
+        public static SequenceOne CreateOne()
         {
-            SequenceLinkedList sb = new SequenceLinkedList();
+            SequenceOne sb = new SequenceOne();
+            Instance.AddSequence(sb);
+            return sb;
+        }
+
+        public static SequenceMultipleDynamic CreateMultipleDynamic()
+        {
+            SequenceMultipleDynamic sb = new SequenceMultipleDynamic();
+            Instance.AddSequence(sb);
+            return sb;
+        }
+
+        public static SequenceController<T> CreateController<T>(T t) where T : BehaviourCollection
+        {
+            SequenceController<T> sb = new SequenceController<T>(t);
             Instance.AddSequence(sb);
             return sb;
         }
 
         private List<ISequnceUpdate> mBehaviours;
+        private List<ISequnceUpdate> mInactiveBehaviours;
+
         private List<int> mFinishedList = new List<int>();
         private Stopwatch mStopWatch;
 
         private SequenceManager()
         {
             mBehaviours = new List<ISequnceUpdate>();
+            mInactiveBehaviours = new List<ISequnceUpdate>();
             mStopWatch = new Stopwatch();
             mStopWatch.Start();
         }
@@ -53,6 +70,7 @@ namespace Nullspace
         {
             int count = mBehaviours.Count;
             mFinishedList.Clear();
+            LockUpdate();
             for (int i = 0; i < count; ++i)
             {
                 ISequnceUpdate sb = mBehaviours[i];
@@ -62,19 +80,50 @@ namespace Nullspace
                     mFinishedList.Add(i);
                 }
             }
+            UnLockUpdate();
             count = mFinishedList.Count;
             if (count > 0)
             {
                 for (int i = count - 1; i >= 0; --i)
                 {
+                    mInactiveBehaviours.Add(mBehaviours[i]);
                     mBehaviours.RemoveAt(i);
                 }
             }
         }
 
+        internal void Replay(ISequnceUpdate su)
+        {
+            DebugUtils.Assert(!IsLockUpdate(), "Kill");
+            bool contains = mInactiveBehaviours.Remove(su);
+            if (contains)
+            {
+                AddSequence(su);
+            }
+            su.Replay();
+        }
+
+        internal void Kill(ISequnceUpdate su)
+        {
+            DebugUtils.Assert(!IsLockUpdate(), "Kill");
+            su.Kill();
+            mBehaviours.Remove(su);
+            mInactiveBehaviours.Remove(su);
+        }
+
         public void Clear()
         {
+            DebugUtils.Assert(!IsLockUpdate(), "Clear");
+            foreach (ISequnceUpdate su in  mBehaviours)
+            {
+                su.Kill();
+            }
             mBehaviours.Clear();
+            foreach (ISequnceUpdate su in mInactiveBehaviours)
+            {
+                su.Kill();
+            }
+            mInactiveBehaviours.Clear();
         }
 
         private void AddSequence(ISequnceUpdate seq)
