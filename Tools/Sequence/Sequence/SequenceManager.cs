@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Nullspace
 {
 
-    public partial class SequenceManager : CollectionLock
+    public partial class SequenceManager : CollectionUpdateLock
     {
         public static SequenceManager Instance = new SequenceManager();
 

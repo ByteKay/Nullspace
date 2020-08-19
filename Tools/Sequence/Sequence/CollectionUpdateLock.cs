@@ -1,7 +1,7 @@
 ﻿
 namespace Nullspace
 {
-    public class CollectionLock
+    public class CollectionUpdateLock
     {
         protected bool mUpdateLocker = false;
 

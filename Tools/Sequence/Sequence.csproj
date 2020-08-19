@@ -85,7 +85,7 @@
     <Compile Include="Nav\NavTarget\NavTargetType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sequence\BehaviourCollection.cs" />
-    <Compile Include="Sequence\ConnectionLock.cs" />
+    <Compile Include="Sequence\CollectionUpdateLock.cs" />
     <Compile Include="Sequence\SequenceController.cs" />
     <Compile Include="Sequence\SequenceMultipleDynamic.cs" />
     <Compile Include="Sequence\SequenceMultiple.cs" />

@@ -47,7 +47,7 @@ namespace Nullspace
         internal abstract void NextBehaviour();
     }
 
-    public partial class BehaviourCollection : CollectionLock
+    public partial class BehaviourCollection : CollectionUpdateLock
     {
         protected LinkedList<BehaviourCallback> mAddBehaviourCaches;
         protected LinkedList<BehaviourCallback> mRemoveBehaviourCaches;
