@@ -1,0 +1,6 @@
+F:\Unity\Nullspace\Tools\bin\TestProj.exe.config
+F:\Unity\Nullspace\Tools\bin\TestProj.exe
+F:\Unity\Nullspace\Tools\bin\TestProj.pdb
+F:\Unity\Nullspace\Tools\TestProj\obj\Debug\TestProj.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\TestProj\obj\Debug\TestProj.exe
+F:\Unity\Nullspace\Tools\TestProj\obj\Debug\TestProj.pdb

@@ -1,6 +1,4 @@
-﻿using Nullspace;
-using System;
-using System.Threading;
+﻿using System;
 
 namespace Nullspace
 {
@@ -9,23 +7,11 @@ namespace Nullspace
         public static void Main(string[] argvs)
         {
             DebugUtils.SetLogAction(LogAction);
-
-            Properties cfg = Properties.Create("config.txt");
-            string logConfig = cfg.GetString("server_config_file", "null");
-            if (logConfig != null)
-            {    
-                Properties config = Properties.Create(logConfig);
-                NetworkClient client = new NetworkClient(config);
-                NetworkEventHandler.Initialize();
-
-                while (true)
-                {
-                    TimerTaskQueue.Instance.Tick();
-                    NetworkEventHandler.Update();
-                    Thread.Sleep(100);
-                }
-            }
+            TestSequence.Test();
+            //TestLogger.Test();
+            //TestClient.Test();
         }
+
 
         private static void LogAction(InfoType infoType, string info)
         {
@@ -41,9 +27,7 @@ namespace Nullspace
                     Console.ForegroundColor = ConsoleColor.Green;
                     break;
             }
-            Console.WriteLine(info);
+            Console.WriteLine(DateTimeUtils.GetDateTimeStringHMS() + info);
         }
     }
-
-
 }

@@ -549,8 +549,8 @@ namespace Nullspace
                 tex.SetPixels(0, i, mBlockCountX * 32, 1, row.ToArray());
             }
             tex.Apply();
-            //byte[] img = tex.EncodeToPNG();
-            //File.WriteAllBytes("./img_shot.png", img);
+            byte[] img = tex.EncodeToPNG();
+            File.WriteAllBytes("./img_shot.png", img);
         }
 
         /// <summary>

@@ -4,11 +4,10 @@ using System.Threading;
 
 namespace Nullspace
 {
-    public class MainEntry
+    public class TestSequence
     {
-        public static void Main(string[] argvs)
+        public static void Test()
         {
-            DebugUtils.SetLogAction(LogAction);
             TestSingleSequence();
             TestParallelSequence();
             while (true)
@@ -17,7 +16,6 @@ namespace Nullspace
                 Thread.Sleep(16);
             }
         }
-
 
         private static void TestParallelSequence()
         {
@@ -126,21 +124,5 @@ namespace Nullspace
             DebugUtils.Log(InfoType.Info, string.Format("OnCompletion"));
         }
 
-        private static void LogAction(InfoType infoType, string info)
-        {
-            switch (infoType)
-            {
-                case InfoType.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                case InfoType.Info:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-                case InfoType.Warning:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-            }
-            Console.WriteLine(DateTimeUtils.GetDateTimeStringHMS() +  info);
-        }
     }
 }

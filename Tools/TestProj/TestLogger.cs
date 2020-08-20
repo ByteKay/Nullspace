@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
 using System.Threading;
 
 namespace Nullspace
 {
-    public class TestMain
+    public class TestLogger
     {
         static Logger logger = new Logger();
 
-        public static void Main(string[] argvs)
+        public static void Test()
         {
             Properties cfg = Properties.Create("config.txt");
             string logConfig = cfg.GetString("log_config_file", "null");

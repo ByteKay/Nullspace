@@ -61,7 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Main.cs" />
     <Compile Include="Nav\NavPath\NavPathController.cs" />
     <Compile Include="Nav\NavTarget\NavObjectConstraint.cs" />
     <Compile Include="Nav\NavTarget\NavTargetController.cs" />
