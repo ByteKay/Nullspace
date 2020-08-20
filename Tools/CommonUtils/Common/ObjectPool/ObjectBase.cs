@@ -1,4 +1,5 @@
-﻿
+﻿using UnityEngine;
+
 namespace Nullspace
 {
     public abstract class ObjectBase
@@ -11,7 +12,7 @@ namespace Nullspace
         {
             // 构造的时候，会放进缓存先。所以，构造的时刻就是 释放的时刻
             mIsReleased = true;
-            mReleasedTimePoint = DateTimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
+            mReleasedTimePoint = Time.realtimeSinceStartup;
         }
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace Nullspace
             if (!mIsReleased)
             {
                 Release();
-                mReleasedTimePoint = DateTimeUtils.GetTimeStampSeconds();// Time.realtimeSinceStartup;
+                mReleasedTimePoint = Time.realtimeSinceStartup;
                 mIsReleased = true;
             }
         }
