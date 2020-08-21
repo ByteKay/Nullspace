@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Nav\NavPath\NavPathController.cs" />
+    <Compile Include="Nav\NavPath\PathDefine\NavPointFixed.cs" />
     <Compile Include="Nav\NavTarget\NavObjectConstraint.cs" />
     <Compile Include="Nav\NavTarget\NavTargetController.cs" />
     <Compile Include="Nav\NavPath\PathDefine\AbstractNavPath.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="Nav\NavPath\PathDefine\NavLinePosLineDir.cs" />
     <Compile Include="Nav\NavPath\PathDefine\NavPathData.cs" />
     <Compile Include="Nav\NavPath\PathDefine\NavPathPoint.cs" />
-    <Compile Include="Nav\NavPath\PathDefine\NavPathType.cs" />
+    <Compile Include="Nav\NavPath\PathDefine\NavPathMoveType.cs" />
     <Compile Include="Nav\NavPath\NavPathUtils.cs" />
     <Compile Include="Nav\NavPath\PathTrigger\IPathTrigger.cs" />
     <Compile Include="Nav\NavPath\PathTrigger\PathTrigger.cs" />

@@ -10,7 +10,7 @@ namespace Nullspace
         public Action OnRemove;
         public Action OnTick;
 
-        public IntegerStack StackSize = new IntegerStack();
+        public ValueStack StackSize = new ValueStack();
 
         public abstract float DisplayPercent
         {

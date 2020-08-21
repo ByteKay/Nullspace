@@ -5,44 +5,12 @@ using System.Text;
 
 namespace Nullspace
 {
-    public class IntegerStack
+    public class ValueStack
     {
-        public class Modifier
-        {
-            public IntegerStack Parent;
-            public int currentValue;
-
-            public int Value
-            {
-                get
-                {
-                    return currentValue;
-                }
-                set
-                {
-                    currentValue = value;
-                    Parent.isDirty = true;
-                    Parent.InvokeChanged();
-                }
-            }
-
-            public Modifier(IntegerStack parent)
-            {
-                Parent = parent;
-                Value = 0;
-            }
-
-            public Modifier(IntegerStack parent, int value)
-            {
-                Parent = parent;
-                Value = value;
-            }
-        }
-
         public Action<int> OnValueChanged;
         private int baseValue;
         private int lastValue;
-        private bool isDirty = true;
+        internal bool isDirty = true;
         private int delta;
         public List<Modifier> FlatModifiers = new List<Modifier>();
 

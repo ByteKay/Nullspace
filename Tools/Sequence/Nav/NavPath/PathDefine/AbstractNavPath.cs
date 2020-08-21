@@ -350,12 +350,17 @@ namespace Nullspace
         protected abstract void UpdatePosAndTangent();
 
         /// <summary>
+        /// 一个点为定点
         /// 首尾两点的控制点计算
         /// </summary>
         protected void InitializeAppendWaypoint()
         {
-            Debug.Assert(mPathData.WayPoints.Count > 1, "wrong");
-            if (mPathData.WayPoints.Count == 2)
+            Debug.Assert(mPathData.WayPoints.Count > 0, "wrong");
+            if (mPathData.WayPoints.Count == 1)
+            {
+                // nothing todo
+            }
+            else if(mPathData.WayPoints.Count == 2)
             {
                 Vector3 diff1 = mPathData.WayPoints[0] - mPathData.WayPoints[1];
                 Vector3 diff2 = mPathData.WayPoints[mPathData.WayPoints.Count - 1] - mPathData.WayPoints[mPathData.WayPoints.Count - 2];
@@ -390,7 +395,7 @@ namespace Nullspace
         /// 更新路点索引
         /// </summary>
         /// <returns></returns>
-        protected int UpdateWaypointIndex()
+        protected virtual int UpdateWaypointIndex()
         {
             int lastWayIndex = mCurrentWaypointIndex;
             int nextWayIndex = mCurrentWaypointIndex + 1;

@@ -17,14 +17,16 @@ namespace Nullspace
             }
         }
 
+        // 循环的最大次数
         internal uint LoopMaxCount;
+        // 循环累计次数
         protected internal uint mLoopAgainCount;
         // 开始执行时间点
+        protected float mOriginStartTime;
+        // 开始执行时间点,每次循环的起始点
         internal float StartTime;
         // 持续时长
         protected float mDuration;
-        // EndTime = StartTime + Duration。结束时间点
-        internal float EndTime;
         // 开始回调
         protected Callback mBeginCallback;
         // 处理回调，可持续
@@ -67,9 +69,11 @@ namespace Nullspace
 
         protected internal virtual void SetStartDurationTime(float startTime, float duration)
         {
+            DebugUtils.Assert(mState == ThreeState.Ready, "");
+            mOriginStartTime = startTime;
             StartTime = startTime;
             mDuration = duration;
-            EndTime = StartTime + mDuration;
+            // EndTime = StartTime + mDuration;
         }
 
         protected internal bool IsLoop()
@@ -100,7 +104,6 @@ namespace Nullspace
                 if (mState == ThreeState.Ready)
                 {
                     Begin();
-
                 }
                 if (IsEnd())
                 {
@@ -120,17 +123,17 @@ namespace Nullspace
 
         protected virtual bool IsEnd()
         {
-            bool isEnd = mTimeElappsed >= EndTime;
+            bool isEnd = mTimeElappsed >= StartTime + mDuration;
             if (isEnd)
             {
-                // confirm mDuration > 0
+                // Constraint mDuration > 0
                 if (mDuration > 0 && CanLoop())
                 {
                     mLoopAgainCount++;
                     // 调整流失的时长
-                    mTimeElappsed -= mDuration;
+                    StartTime += mDuration;
                     LoopBegin();
-                    return IsEnd(); // 可能还是超过 EndTime，递归调用。 mDuration > 0 必定会退出
+                    return IsEnd(); // 可能还是超过 StartTime + mDuration，递归调用。 mDuration > 0 必定会退出
                 }
             }
             return isEnd;
@@ -139,19 +142,6 @@ namespace Nullspace
         protected virtual void LoopBegin()
         {
             // todo
-        }
-
-        protected virtual bool LoopProcess()
-        {
-            if (mDuration <= 0)
-            {
-                return false;
-            }
-            if (CanLoop())
-            {
-                mLoopAgainCount++;
-            }
-            return true; // Loop;
         }
 
         internal bool IsPlaying { get { return mState == ThreeState.Playing; } }
@@ -200,6 +190,7 @@ namespace Nullspace
         internal virtual void Reset()
         {
             mTimeElappsed = 0;
+            StartTime = mOriginStartTime;
             mLoopAgainCount = 0;
             mState = ThreeState.Ready;
         }

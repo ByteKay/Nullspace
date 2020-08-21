@@ -69,8 +69,9 @@
     <Compile Include="BuffType.cs" />
     <Compile Include="Event\EventField.cs" />
     <Compile Include="Event\EventFieldClass.cs" />
+    <Compile Include="Event\FieldModifier.cs" />
     <Compile Include="IBehaviourContext.cs" />
-    <Compile Include="IntegerStack.cs" />
+    <Compile Include="Event\ValueStack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

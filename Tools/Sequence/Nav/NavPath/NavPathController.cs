@@ -6,7 +6,7 @@ namespace Nullspace
     public class NavPathController
     {
         // 在路径上移动：位置改变和事件触发
-        public NavPathType mPathType;
+        public NavPathMoveType mPathType;
         private AbstractNavPath mNavPath;
         // 改变位置的gameObject
         public Transform mCtlPosition;
@@ -14,31 +14,23 @@ namespace Nullspace
         public Transform mCtlRotate;
         // 响应触发器的实例
         public IPathTrigger mTriggerHandler;
-        // 控制速度
-        public float mLineSpeed;
-        // 控制速度加成，默认值为1
+        // 控制速度:基础速度
+        public float mBaseSpeed;
+        // 控制速度加成累加倍数值 百分比，默认值为0
         public float mLineSpeedTimes;
-        // 控制游动
-        public bool canMove;
-        // 正在执行中处理
-        private bool bLocked;
-
+        // 控制速度加成累加数值，默认值为0
+        public float mLineSpeedPlus;
         public NavPathController()
         {
             mNavPath = null;
-            bLocked = false;
-            canMove = false;
-            mLineSpeed = 0;
+            mBaseSpeed = 0;
             mLineSpeedTimes = 1;
+            mLineSpeedPlus = 0;
         }
 
         // Update is called once per frame
         public void Update(float time)
         {
-            if (!canMove)
-            {
-                return;
-            }
             MoveTo(time);
         }
 
@@ -46,9 +38,7 @@ namespace Nullspace
         /// 开始移动
         /// </summary>
         /// <param name="lineSpeed">线速度设置</param>
-        /// <param name="offset">路径偏移设置。编辑器定义</param>
-        /// <param name="pathFlip">路径是否做 中心对称旋转(x, y, z) -> (-x, y, -z)</param>
-        public void StartMove(AbstractNavPath navPath, float lineSpeed, Vector3 offset, bool pathFlip)
+        public void StartMove(AbstractNavPath navPath, float lineSpeed)
         {
             mNavPath = navPath;
             if (mNavPath != null)
@@ -56,25 +46,14 @@ namespace Nullspace
                 mCtlPosition.position = mNavPath.CurInfo.curvePos;
                 RotateTo(mNavPath.CurInfo.curveDir);
                 SetLineSpeed(lineSpeed);
-                EnableMove(true);
             }
         }
-        /// <summary>
-        /// 控制是否移动
-        /// </summary>
-        /// <param name="enableMove">是否移动</param>
-        public void EnableMove(bool enableMove)
-        {
-            if (bLocked)
-            {
-                Debug.Log("DragTo 正在执行中");
-            }
-            canMove = enableMove;
-        }
+
+        protected float Speed { get { return (mBaseSpeed + mLineSpeedPlus) * (1 + mLineSpeedTimes); } }
 
         public virtual void MoveTo(float time)
         {
-            float moved = mLineSpeed * mLineSpeedTimes * time;
+            float moved = Speed * time;
             if (moved > 0)
             {
                 DragTo(moved);
@@ -87,7 +66,6 @@ namespace Nullspace
         /// <param name="moved">移动的位置长度</param>
         public void DragTo(float moved)
         {
-            bLocked = true;
             float start = Time.realtimeSinceStartup;
             NavPathPoint track = mNavPath.UpdatePath(moved);
             float end = Time.realtimeSinceStartup;
@@ -96,7 +74,6 @@ namespace Nullspace
                 mCtlPosition.position = track.curvePos;
                 RotateTo(track.curveDir);
             }
-            bLocked = false;
         }
 
         /// <summary>
@@ -114,7 +91,7 @@ namespace Nullspace
         /// <param name="speed">线速度</param>
         public void SetLineSpeed(float speed)
         {
-            mLineSpeed = speed;
+            mBaseSpeed = speed;
         }
 
         public void OnDrawGizmosSelected()
@@ -128,7 +105,7 @@ namespace Nullspace
         // 指定时间插入
         public void RegisterTrigger(float time, Callback callback)
         {
-            float length = mLineSpeed * time;
+            float length = mBaseSpeed * time;
             mNavPath.InsertTriggerByLength(false, length, callback);
         }
     }

@@ -7,25 +7,25 @@ namespace Nullspace
 {
     public abstract class EventField
     {
-        public event Action onChanged;
+        public event Action OnChanged;
 
         public void ResetEvents()
         {
-            onChanged = null;
+            OnChanged = null;
         }
 
         public void InvokeChanged()
         {
-            if (onChanged != null)
+            if (OnChanged != null)
             {
-                onChanged();
+                OnChanged();
             }
         }
     }
 
     public class EventField<T> : EventField
     {
-        private T internalValue;
+        private T mInternalValue;
 
         public EventField()
         {
@@ -33,20 +33,20 @@ namespace Nullspace
 
         public EventField(T defaultValue)
         {
-            internalValue = defaultValue;
+            mInternalValue = defaultValue;
         }
 
         public T Value
         {
             get
             {
-                return internalValue;
+                return mInternalValue;
             }
             set
             {
-                if (!EqualityComparer<T>.Default.Equals(internalValue, value))
+                if (!EqualityComparer<T>.Default.Equals(mInternalValue, value))
                 {
-                    internalValue = value;
+                    mInternalValue = value;
                     InvokeChanged();
                 }
             }

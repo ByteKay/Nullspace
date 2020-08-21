@@ -143,22 +143,22 @@ namespace Nullspace
             callback.Arg4 = beh;
             return beh;
         }
-        
-        //public static BehaviourCallback PathTo(this Transform trans, float duration, List<Vector3> waypoints, NavPathType pathType = NavPathType.LinePosLineDir, int subdivisions = 5)
-        //{
-        //    FixedPathController pathCtrl = new FixedPathController();
-        //    AbstractNavPath navPath = NavPathUtils.Create(pathType, Vector3.zero, NavPathFlipType.None, null, waypoints, subdivisions);
-        //    pathCtrl.StartMove(navPath, navPath.PathLength / duration, Vector3.zero, false);
-        //    pathCtrl.mCtlPosition = trans;
-        //    pathCtrl.mCtlRotate = trans;
 
-        //    Callback<FixedPathController, BehaviourCallback> callback = new Callback<FixedPathController, BehaviourCallback>();
-        //    callback.Arg1 = pathCtrl;
-        //    callback.Handler = (Action<FixedPathController, BehaviourCallback>)PathTo;
-        //    BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
-        //    callback.Arg2 = beh;
-        //    return beh;
-        //}
+        public static BehaviourCallback NavPathTo(this Transform trans, float duration, List<Vector3> waypoints, Vector3 offset, IPathTrigger triggerHandler = null, NavPathFlipType flipType = NavPathFlipType.None, NavPathMoveType pathType = NavPathMoveType.LinePosLineDir, int subdivisions = 5, float pathLength = 0.0f)
+        {
+            NavPathController pathCtrl = new NavPathController();
+            AbstractNavPath navPath = NavPathUtils.Create(pathType, offset, flipType, triggerHandler, waypoints, subdivisions, pathLength);
+            pathCtrl.StartMove(navPath, navPath.PathLength / duration);
+            pathCtrl.mCtlPosition = trans;
+            pathCtrl.mCtlRotate = trans;
+
+            Callback2<NavPathController, BehaviourCallback> callback = new Callback2<NavPathController, BehaviourCallback>();
+            callback.Arg1 = pathCtrl;
+            callback.Handler = (Action<NavPathController, BehaviourCallback>)PathTo;
+            BehaviourCallback beh = new BehaviourCallback(callback, callback, callback);
+            callback.Arg2 = beh;
+            return beh;
+        }
 
         public static BehaviourCallback MoveXTo(this Transform trans, float x)
         {
