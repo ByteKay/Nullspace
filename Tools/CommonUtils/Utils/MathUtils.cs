@@ -136,6 +136,15 @@ namespace Nullspace
         {
             return v < min ? min : (v > max ? max : v);
         }
+
+        public static float Modf(float v, float div)
+        {
+            DebugUtils.Assert(v >= 0, "");
+            DebugUtils.Assert(div > 0, "");
+            int times = (int)(v / div);
+            return v - times * div;
+        }
+
         public static Color Interpolation(Color left, Color right, float t)
         {
             if (t < 0) t = 0;

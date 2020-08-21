@@ -24,7 +24,7 @@ namespace Nullspace
 
         internal FrameCountCallback(Callback begin = null, Callback process = null, Callback end = null) : base(begin, process, end)
         {
-
+            mForceProcess = true;
         }
 
         internal void SetFrameCount(int targetFrameCount)
@@ -95,6 +95,13 @@ namespace Nullspace
                 }
             }
         }
+
+        protected override void LoopBegin()
+        {
+            base.LoopBegin();
+            mElappsedFrameCount = 0; // 重置一下执行帧数为 0
+        }
+
         // 按帧数计算百分比
         public override float Percent
         {
@@ -104,7 +111,7 @@ namespace Nullspace
                 {
                     return 1;
                 }
-                if (!IsPlaying)
+                if (!IsPlaying || mTargetFrameCount <= 0)
                 {
                     return 0;
                 }

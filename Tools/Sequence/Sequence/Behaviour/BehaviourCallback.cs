@@ -17,7 +17,8 @@ namespace Nullspace
             }
         }
 
-        internal bool Loop;
+        internal uint LoopMaxCount;
+        protected internal uint mLoopAgainCount;
         // 开始执行时间点
         internal float StartTime;
         // 持续时长
@@ -44,7 +45,8 @@ namespace Nullspace
             mProcessCallback = process;
             mEndCallback = end;
             mSequence = null;
-            Loop = false;
+            LoopMaxCount = 0;
+            mLoopAgainCount = 0;
             SetStartDurationTime(0, 0);
         }
         internal BehaviourCallback Begin(Callback begin)
@@ -70,6 +72,16 @@ namespace Nullspace
             EndTime = StartTime + mDuration;
         }
 
+        protected internal bool IsLoop()
+        {
+            return LoopMaxCount > 0;
+        }
+
+        protected internal bool CanLoop()
+        {
+            return LoopMaxCount > mLoopAgainCount;
+        }
+
         /// <summary>
         /// 每帧都会执行
         /// </summary>
@@ -90,14 +102,11 @@ namespace Nullspace
                     Begin();
 
                 }
-                if (mTimeElappsed >= EndTime)
+                if (IsEnd())
                 {
                     if (mState == ThreeState.Playing)
                     {
-                        if (!LoopProcess()) 
-                        {
-                            End();
-                        }
+                        End();
                     }
                 }
                 else
@@ -109,12 +118,40 @@ namespace Nullspace
             return mState != ThreeState.Finished;
         }
 
+        protected virtual bool IsEnd()
+        {
+            bool isEnd = mTimeElappsed >= EndTime;
+            if (isEnd)
+            {
+                // confirm mDuration > 0
+                if (mDuration > 0 && CanLoop())
+                {
+                    mLoopAgainCount++;
+                    // 调整流失的时长
+                    mTimeElappsed -= mDuration;
+                    LoopBegin();
+                    return IsEnd(); // 可能还是超过 EndTime，递归调用。 mDuration > 0 必定会退出
+                }
+            }
+            return isEnd;
+        }
+
+        protected virtual void LoopBegin()
+        {
+            // todo
+        }
+
         protected virtual bool LoopProcess()
         {
-            // todo 目前为 false
-            //EndTime = EndTime + mDuration;
-            //Process();
-            return false; // Loop;
+            if (mDuration <= 0)
+            {
+                return false;
+            }
+            if (CanLoop())
+            {
+                mLoopAgainCount++;
+            }
+            return true; // Loop;
         }
 
         internal bool IsPlaying { get { return mState == ThreeState.Playing; } }
@@ -130,6 +167,10 @@ namespace Nullspace
                     return 1;
                 }
                 if (!IsPlaying)
+                {
+                    return 0;
+                }
+                if (mDuration <= 0)
                 {
                     return 0;
                 }
@@ -151,12 +192,15 @@ namespace Nullspace
             mBeginCallback = null;
             mProcessCallback = null;
             mEndCallback = null;
+            LoopMaxCount = 0;
+            mLoopAgainCount = 0;
             SetStartDurationTime(0, 0);
         }
 
         internal virtual void Reset()
         {
             mTimeElappsed = 0;
+            mLoopAgainCount = 0;
             mState = ThreeState.Ready;
         }
 
