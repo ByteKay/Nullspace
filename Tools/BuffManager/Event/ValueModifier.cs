@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nullspace
 {
-    public class FieldModifier<T>
+    public class ValueModifier<T>
     {
         public ValueStackGeneric<T> Parent;
         public T CurrentValue;
@@ -25,13 +25,13 @@ namespace Nullspace
             }
         }
 
-        public FieldModifier(ValueStackGeneric<T> parent)
+        public ValueModifier(ValueStackGeneric<T> parent)
         {
             Parent = parent;
             Value = default(T);
         }
 
-        public FieldModifier(ValueStackGeneric<T> parent, T value)
+        public ValueModifier(ValueStackGeneric<T> parent, T value)
         {
             Parent = parent;
             Value = value;

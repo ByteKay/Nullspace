@@ -7,13 +7,12 @@ namespace Nullspace
     {
         protected T mBaseValue;
         protected T mLastValue;
-        protected List<FieldModifier<T>> mModifiers;
+        protected List<ValueModifier<T>> mModifiers;
         internal bool IsDirty = true;
-
         public Action<T> OnValueChanged;
         public ValueStackGeneric()
         {
-            mModifiers = new List<FieldModifier<T>>();
+            mModifiers = new List<ValueModifier<T>>();
         }
 
         public T Delta { get; set; }
@@ -47,7 +46,7 @@ namespace Nullspace
             }
         }
 
-        protected T Sum(List<FieldModifier<T>> modifiers)
+        protected T Sum(List<ValueModifier<T>> modifiers)
         {
             T total = default(T);
             for (int i = 0; i < modifiers.Count; i++)
@@ -73,16 +72,16 @@ namespace Nullspace
             }
         }
 
-        public FieldModifier<T> AddFlatModifier(T startingValue)
+        public ValueModifier<T> AddModifier(T startingValue)
         {
-            FieldModifier<T> mod = new FieldModifier<T>(this, startingValue);
+            ValueModifier<T> mod = new ValueModifier<T>(this, startingValue);
             mModifiers.Add(mod);
             IsDirty = true;
             InvokeChanged();
             return mod;
         }
 
-        public void RemoveFlatModifier(FieldModifier<T> modifier)
+        public void RemoveModifier(ValueModifier<T> modifier)
         {
             mModifiers.Remove(modifier);
             IsDirty = true;

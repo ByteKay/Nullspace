@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Nullspace
 {
-    public enum BuffType
+    public enum BuffType : uint
     {
-        None,
-        Buff,
-        Debuff
+        None = 0,
+        Speed = 1 << 0,
+        Freeze = 1 << 1,
     }
+
 }

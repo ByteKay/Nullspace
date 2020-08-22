@@ -41,6 +41,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\CommonUtils.dll</HintPath>
     </Reference>
+    <Reference Include="GameDataRuntime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\GameDataRuntime.dll</HintPath>
+    </Reference>
     <Reference Include="Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Sequence.dll</HintPath>
@@ -62,11 +66,14 @@
   <ItemGroup>
     <Compile Include="Buff.cs" />
     <Compile Include="BuffManager.cs" />
-    <Compile Include="BuffTemplate.cs" />
+    <Compile Include="BuffData.cs" />
     <Compile Include="BuffType.cs" />
+    <Compile Include="Event\ColorValueStack.cs" />
+    <Compile Include="Event\QuaternionValueStack.cs" />
     <Compile Include="Event\EventField.cs" />
     <Compile Include="Event\EventFieldClass.cs" />
-    <Compile Include="Event\FieldModifier.cs" />
+    <Compile Include="Event\PositionValueStack.cs" />
+    <Compile Include="Event\ValueModifier.cs" />
     <Compile Include="Event\FloatValueStack.cs" />
     <Compile Include="Event\IntValueStack.cs" />
     <Compile Include="Event\ValueStackGeneric.cs" />

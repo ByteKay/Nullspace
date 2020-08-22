@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Nullspace
 {
@@ -16,10 +14,7 @@ namespace Nullspace
 
         public void InvokeChanged()
         {
-            if (OnChanged != null)
-            {
-                OnChanged();
-            }
+            OnChanged?.Invoke();
         }
     }
 
