@@ -21,7 +21,7 @@ namespace Nullspace
             return mState == ThreeState.Playing || (Target != null && Target.IsPlaying());
         }
 
-        internal override void Update(float deltaTime)
+        public override void Update(float deltaTime)
         {
             // 执行基类
             base.Update(deltaTime);
@@ -31,7 +31,7 @@ namespace Nullspace
             }
         }
 
-        protected override void Clear()
+        public override void Clear()
         {
             base.Clear();
         }

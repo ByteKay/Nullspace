@@ -20,7 +20,7 @@ namespace Nullspace
             return Current != null;
         }
 
-        protected override void Clear()
+        public override void Clear()
         {
             Current = null;
             base.Clear();
@@ -37,7 +37,7 @@ namespace Nullspace
             ConsumeChild();
         }
 
-        internal override void Update(float deltaTime)
+        public override void Update(float deltaTime)
         {
             ConsumeChild();
             if (Current != null)

@@ -61,17 +61,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buff.cs" />
-    <Compile Include="BuffClock.cs" />
-    <Compile Include="BuffClockDecaying.cs" />
-    <Compile Include="BuffClockFixed.cs" />
-    <Compile Include="BuffCollection.cs" />
+    <Compile Include="BuffManager.cs" />
     <Compile Include="BuffTemplate.cs" />
     <Compile Include="BuffType.cs" />
     <Compile Include="Event\EventField.cs" />
     <Compile Include="Event\EventFieldClass.cs" />
     <Compile Include="Event\FieldModifier.cs" />
-    <Compile Include="IBehaviourContext.cs" />
-    <Compile Include="Event\ValueStack.cs" />
+    <Compile Include="Event\FloatValueStack.cs" />
+    <Compile Include="Event\IntValueStack.cs" />
+    <Compile Include="Event\ValueStackGeneric.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

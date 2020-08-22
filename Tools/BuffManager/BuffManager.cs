@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Nullspace
 {
-    public class BuffCollection : IEnumerable<Buff>
+    public class BuffManager : IEnumerable<Buff>
     {
         public event Action<Buff> OnAddBuff;
         public event Action<Buff> OnRemoveBuff;
-
         private List<Buff> buffs = new List<Buff>();
-
-        //private RPGCharacter character;
-
         public int Count
         {
             get
@@ -44,31 +38,20 @@ namespace Nullspace
         public void Add(Buff buff)
         {
             buffs.Add(buff);
-
             Action removeCallback = null;
-
             removeCallback = () =>
             {
                 buffs.Remove(buff);
                 buff.OnRemove -= removeCallback;
             };
-
             buff.OnRemove += removeCallback;
-
-            if (OnAddBuff != null)
-            {
-                OnAddBuff(buff);
-            }
+            OnAddBuff?.Invoke(buff);
         }
 
         public void Remove(Buff buff)
         {
-            buff.RemoveBuff();
-
-            if (OnRemoveBuff != null)
-            {
-                OnRemoveBuff(buff);
-            }
+            buff.Remove();
+            OnRemoveBuff?.Invoke(buff);
         }
 
         public Buff Find(BuffTemplate template)
@@ -76,13 +59,11 @@ namespace Nullspace
             for (int i = buffs.Count - 1; i >= 0; i--)
             {
                 var buff = buffs[i];
-
                 if (buff.buffTemplate == template)
                 {
                     return buff;
                 }
             }
-
             return null;
         }
 
@@ -91,7 +72,6 @@ namespace Nullspace
             for (int i = buffs.Count - 1; i >= 0; i--)
             {
                 var buff = buffs[i];
-
                 buff.Update(deltaTime);
             }
         }

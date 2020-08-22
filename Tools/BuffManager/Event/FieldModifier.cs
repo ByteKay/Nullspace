@@ -1,36 +1,37 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Nullspace
 {
-    public class Modifier
+    public class FieldModifier<T>
     {
-        public ValueStack Parent;
-        public int currentValue;
+        public ValueStackGeneric<T> Parent;
+        public T CurrentValue;
 
-        public int Value
+        public T Value
         {
             get
             {
-                return currentValue;
+                return CurrentValue;
             }
             set
             {
-                currentValue = value;
-                Parent.isDirty = true;
-                Parent.InvokeChanged();
+                if (!EqualityComparer<T>.Default.Equals(CurrentValue, value))
+                {
+                    CurrentValue = value;
+                    Parent.IsDirty = true;
+                    Parent.InvokeChanged();
+                }
             }
         }
 
-        public Modifier(ValueStack parent)
+        public FieldModifier(ValueStackGeneric<T> parent)
         {
             Parent = parent;
-            Value = 0;
+            Value = default(T);
         }
 
-        public Modifier(ValueStack parent, int value)
+        public FieldModifier(ValueStackGeneric<T> parent, T value)
         {
             Parent = parent;
             Value = value;

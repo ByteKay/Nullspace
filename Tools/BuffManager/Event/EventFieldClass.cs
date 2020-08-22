@@ -19,6 +19,7 @@ namespace Nullspace
     {
         public UIntEventField() : base()
         {
+
         }
         public UIntEventField(uint defaultValue) : base(defaultValue)
         {

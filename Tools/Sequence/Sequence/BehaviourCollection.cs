@@ -43,7 +43,7 @@ namespace Nullspace
 
         protected ISequnceUpdate mSibling;
         internal abstract bool IsPlaying();
-        internal abstract void Update(float deltaTime);
+        public abstract void Update(float deltaTime);
         internal abstract void NextBehaviour();
     }
 
@@ -77,7 +77,7 @@ namespace Nullspace
             mPrependTime = interval;
         }
 
-        protected void Add(BehaviourCallback callback)
+        public void Add(BehaviourCallback callback)
         {
             callback.mSequence = this;
             if (IsLockUpdate())
@@ -115,7 +115,7 @@ namespace Nullspace
             }
         }
 
-        protected virtual void Clear()
+        public virtual void Clear()
         {
             DebugUtils.Assert(!IsLockUpdate(), "");
             ClearBehaviours();

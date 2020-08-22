@@ -10,5 +10,28 @@ namespace Nullspace
         {
 
         }
+
+        public float MaxPercent
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        public float MinPercent
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        public bool IsFinished
+        {
+            get
+            { return mBehaviours.Count > 0 || mAddBehaviourCaches.Count > 0;
+            }
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace Nullspace
             // todo
         }
 
-        protected override void Clear()
+        public override void Clear()
         {
             mState = ThreeState.Ready;
             base.Clear();
@@ -35,7 +35,7 @@ namespace Nullspace
             base.Reset();
         }
 
-        internal override void Update(float deltaTime)
+        public override void Update(float deltaTime)
         {
             if (mState == ThreeState.Ready)
             {

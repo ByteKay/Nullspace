@@ -1,108 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace Nullspace
 {
     public class Buff
     {
         public event Action OnRemove;
-        public Action OnTick;
-
-        // SequenceParallelRemove Clocks;
-
-       public List<BuffClock> Clocks = new List<BuffClock>();
-
         public BuffTemplate buffTemplate;
-
-        public IntEventField BaseStackSize = new IntEventField();
-        public IntEventField StackSize = new IntEventField();
+        public SequenceMultipleDynamic mBehaviours;
 
         public float DisplayPercent
         {
             get
             {
-                float max = 0.0f;
-                for (int i = 0; i < Clocks.Count; i++)
-                {
-                    max = Mathf.Max(max, Clocks[i].DisplayPercent);
-                }
-                return max;
+                return mBehaviours.MaxPercent;
             }
         }
 
-        public BuffClock GetBaseClock()
+        public void AddBehaviour(BehaviourCallback behaviour)
         {
-            return Clocks[0];
+            mBehaviours.Add(behaviour);
         }
 
-        public void AddClock(BuffClock clock)
+        public void RemoveBehaviour(BehaviourCallback behaviour)
         {
-            Clocks.Add(clock);
-
-            Action removeCallback = null;
-            removeCallback = () =>
-            {
-                Clocks.Remove(clock);
-
-                clock.StackSize.OnValueChanged -= RecalculateStackSizeCallback;
-                clock.OnRemove -= removeCallback;
-                clock.OnTick -= OnTick;
-
-                if (Clocks.Count == 0)
-                {
-                    RemoveBuff();
-                }
-                else
-                {
-                    RecalculateStackSize();
-                }
-            };
-
-            clock.StackSize.OnValueChanged += RecalculateStackSizeCallback;
-            clock.OnRemove += removeCallback;
-            clock.OnTick += OnTick;
-
-            RecalculateStackSizeCallback(0);
-        }
-        public void RemoveClock(BuffClock clock)
-        {
-            clock.OnTick -= OnTick;
-            clock.RemoveClock();
+            mBehaviours.Remove(behaviour);
         }
 
         public void Update(float deltaTime)
         {
-            for (int i = Clocks.Count - 1; i >= 0; i--)
-            {
-                var clock = Clocks[i];
-
-                clock.Update(deltaTime);
-            }
+            mBehaviours.Update(deltaTime);
         }
 
-        public void RemoveBuff()
+        public void Remove()
         {
-            if (OnRemove != null)
-            {
-                OnRemove();
-            }
-        }
-
-        private void RecalculateStackSizeCallback(int _)
-        {
-            RecalculateStackSize();
-        }
-
-        private void RecalculateStackSize()
-        {
-            int counter = BaseStackSize.Value;
-
-            foreach (var addClock in Clocks)
-            {
-                counter += addClock.StackSize.Value;
-            }
-            StackSize.Value = counter;
+            mBehaviours.Clear();
+            OnRemove.Invoke();
         }
     }
 }
