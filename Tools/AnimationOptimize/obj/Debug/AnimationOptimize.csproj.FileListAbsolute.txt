@@ -1,0 +1,4 @@
+G:\UnityWorkspace\Nullspace\Tools\bin\AnimationOptimize.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\AnimationOptimize.pdb
+G:\UnityWorkspace\Nullspace\Tools\AnimationOptimize\obj\Debug\AnimationOptimize.dll
+G:\UnityWorkspace\Nullspace\Tools\AnimationOptimize\obj\Debug\AnimationOptimize.pdb

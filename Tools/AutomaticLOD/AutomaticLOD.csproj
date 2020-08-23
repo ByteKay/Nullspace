@@ -4,18 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BB681929-D84B-416B-9D89-FC1FFD3A2F2C}</ProjectGuid>
+    <ProjectGuid>{91FAA1C7-FD72-4785-A172-B2F3D5B116AB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nullspace</RootNamespace>
-    <AssemblyName>BuffManager</AssemblyName>
+    <RootNamespace>AutomaticLOD</RootNamespace>
+    <AssemblyName>AutomaticLOD</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\</OutputPath>
@@ -33,21 +30,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\CommonUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="GameDataRuntime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\GameDataRuntime.dll</HintPath>
-    </Reference>
-    <Reference Include="Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Sequence.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -58,27 +44,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\UnityEngine.UI.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Buff.cs" />
-    <Compile Include="BuffManager.cs" />
-    <Compile Include="BuffData.cs" />
-    <Compile Include="BuffType.cs" />
-    <Compile Include="Event\BoolAndValueStack.cs" />
-    <Compile Include="Event\BoolOrValueStack.cs" />
-    <Compile Include="Event\ColorValueStack.cs" />
-    <Compile Include="Event\QuaternionValueStack.cs" />
-    <Compile Include="Event\EventField.cs" />
-    <Compile Include="Event\EventFieldClass.cs" />
-    <Compile Include="Event\PositionValueStack.cs" />
-    <Compile Include="Event\ValueModifier.cs" />
-    <Compile Include="Event\FloatValueStack.cs" />
-    <Compile Include="Event\IntValueStack.cs" />
-    <Compile Include="Event\ValueStackGeneric.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

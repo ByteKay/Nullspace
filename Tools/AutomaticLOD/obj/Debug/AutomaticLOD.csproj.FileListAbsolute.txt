@@ -1,0 +1,4 @@
+G:\UnityWorkspace\Nullspace\Tools\bin\AutomaticLOD.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\AutomaticLOD.pdb
+G:\UnityWorkspace\Nullspace\Tools\AutomaticLOD\obj\Debug\AutomaticLOD.dll
+G:\UnityWorkspace\Nullspace\Tools\AutomaticLOD\obj\Debug\AutomaticLOD.pdb
