@@ -5,6 +5,6 @@ G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.dll
 G:\UnityWorkspace\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.pdb
 F:\Unity\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.csprojResolveAssemblyReference.cache
 F:\Unity\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.pdb
-F:\Unity\Nullspace\Tools\bin\ClientNetwork.exe
 F:\Unity\Nullspace\Tools\bin\ClientNetwork.pdb
-F:\Unity\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.exe
+F:\Unity\Nullspace\Tools\bin\ClientNetwork.dll
+F:\Unity\Nullspace\Tools\ClientNetwork\obj\Release\ClientNetwork.dll

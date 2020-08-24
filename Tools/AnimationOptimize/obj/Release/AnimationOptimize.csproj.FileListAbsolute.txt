@@ -1,0 +1,5 @@
+F:\Unity\Nullspace\Tools\bin\AnimationOptimize.dll
+F:\Unity\Nullspace\Tools\bin\AnimationOptimize.pdb
+F:\Unity\Nullspace\Tools\AnimationOptimize\obj\Release\AnimationOptimize.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\AnimationOptimize\obj\Release\AnimationOptimize.dll
+F:\Unity\Nullspace\Tools\AnimationOptimize\obj\Release\AnimationOptimize.pdb

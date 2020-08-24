@@ -68,6 +68,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimationOptimize", "Animat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assetbundle", "Assetbundle\Assetbundle.csproj", "{8D733477-89C9-4726-B18A-B26DDC04DDE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomGameData", "CustomGameData\CustomGameData.csproj", "{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +144,10 @@ Global
 		{8D733477-89C9-4726-B18A-B26DDC04DDE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D733477-89C9-4726-B18A-B26DDC04DDE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D733477-89C9-4726-B18A-B26DDC04DDE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

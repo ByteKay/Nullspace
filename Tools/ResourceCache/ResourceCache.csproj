@@ -34,6 +34,10 @@
     <Reference Include="CommonUtils">
       <HintPath>..\bin\CommonUtils.dll</HintPath>
     </Reference>
+    <Reference Include="CustomGameData, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\CustomGameData.dll</HintPath>
+    </Reference>
     <Reference Include="GameDataRuntime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\GameDataRuntime.dll</HintPath>
@@ -49,9 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceCache\IResourceConfig.cs" />
     <Compile Include="ResourceCache\ResourceCacheBehaviour.cs" />
     <Compile Include="ResourceCache\ResourceCacheBindParent.cs" />
-    <Compile Include="ResourceCache\ResourceCacheConfig.cs" />
     <Compile Include="ResourceCache\ResourceCacheEntity.cs" />
     <Compile Include="ResourceCache\ResourceCachePool.cs" />
     <Compile Include="ResourceCache\ResourceCachePools.cs" />
@@ -60,6 +64,7 @@
     <Compile Include="ResourceCache\Strategy\StrategyFixedForce.cs" />
     <Compile Include="ResourceCache\Strategy\StrategyFixedIgnore.cs" />
     <Compile Include="ResourceCache\Strategy\StrategyInfinteCached.cs" />
+    <Compile Include="ResourceCache\Strategy\StrategyType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

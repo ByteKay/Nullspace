@@ -1,7 +1,6 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Nullspace
 {
@@ -15,7 +14,6 @@ namespace Nullspace
             MaxSize = param.Max;
             OwnPools = param.OwnedPools;
             Cached = new LinkedList<int>();
-
         }
 
         public override bool CanAcquire()

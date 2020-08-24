@@ -1,0 +1,5 @@
+F:\Unity\Nullspace\Tools\bin\Assetbundle.dll
+F:\Unity\Nullspace\Tools\bin\Assetbundle.pdb
+F:\Unity\Nullspace\Tools\Assetbundle\obj\Release\Assetbundle.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\Assetbundle\obj\Release\Assetbundle.dll
+F:\Unity\Nullspace\Tools\Assetbundle\obj\Release\Assetbundle.pdb

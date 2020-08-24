@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Nullspace
 {
-    public enum StrategyType
-    {
-        Infinte = 0,
-        FixedForce = 1,
-        FixedIgnore = 2,
-    }
 
     public class StrategyFactory
     {

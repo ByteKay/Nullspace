@@ -39,9 +39,10 @@ namespace Nullspace
         /// <returns></returns>
         public static string ToXml<T>(List<T> target)
         {
+            DebugUtils.Assert(!typeof(T).IsGenericType, "");
             string name = typeof(T).Name;
             SecurityElement root = new SecurityElement(name + "s");
-            PropertyInfo[] infos = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo[] infos = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (T t in target)
             {
                 SecurityElement child = new SecurityElement(name);

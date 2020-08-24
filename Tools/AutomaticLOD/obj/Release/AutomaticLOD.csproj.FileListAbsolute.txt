@@ -1,0 +1,5 @@
+F:\Unity\Nullspace\Tools\bin\AutomaticLOD.dll
+F:\Unity\Nullspace\Tools\bin\AutomaticLOD.pdb
+F:\Unity\Nullspace\Tools\AutomaticLOD\obj\Release\AutomaticLOD.csprojResolveAssemblyReference.cache
+F:\Unity\Nullspace\Tools\AutomaticLOD\obj\Release\AutomaticLOD.dll
+F:\Unity\Nullspace\Tools\AutomaticLOD\obj\Release\AutomaticLOD.pdb
