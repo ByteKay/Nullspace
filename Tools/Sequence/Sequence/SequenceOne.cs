@@ -15,7 +15,7 @@ namespace Nullspace
             Current = null;
         }
 
-        internal override bool IsPlaying()
+        public override bool IsPlaying()
         {
             return Current != null;
         }

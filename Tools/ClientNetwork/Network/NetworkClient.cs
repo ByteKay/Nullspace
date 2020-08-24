@@ -431,7 +431,7 @@ namespace Nullspace
         protected void InitState()
         {
             StateCtl = new StateController<NetworkConnectState>();
-            StateCtl.AddParameter(StateParamName, StateParameterDataType.INT, StateParameterValue.None);
+            StateCtl.AddParameter(StateParamName, StateParameterValue.None);
 
             StateCtl.AddState(NetworkConnectState.None).AsCurrent().AddTransfer(NetworkConnectState.Initialized).With(StateParamName, ConditionOperationType.EQUAL, StateParameterValue.None2Initialized);
             StateCtl.AddState(NetworkConnectState.Initialized).AddTransfer(NetworkConnectState.Connectting).With(StateParamName, ConditionOperationType.EQUAL, StateParameterValue.Initialized2Connectting);

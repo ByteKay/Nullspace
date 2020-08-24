@@ -1,15 +1,8 @@
 ﻿
-using System;
-
 namespace Nullspace
 {
-    public class BTActionNode<T> : BehaviourTreeNode<T>
+    public abstract class BTActionNode<Target> : BehaviourTreeNode<Target>
     {
-        public override BTNodeState Process(T obj)
-        {
-            return BTNodeState.Ready;
-        }
+        
     }
-
-
 }

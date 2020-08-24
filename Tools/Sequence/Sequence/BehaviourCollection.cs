@@ -42,7 +42,7 @@ namespace Nullspace
         }
 
         protected ISequnceUpdate mSibling;
-        internal abstract bool IsPlaying();
+        public abstract bool IsPlaying();
         public abstract void Update(float deltaTime);
         internal abstract void NextBehaviour();
     }

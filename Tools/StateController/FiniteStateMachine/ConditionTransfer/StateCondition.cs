@@ -5,11 +5,11 @@ namespace Nullspace
 {
     public class StateConditions
     {
-        private List<StateCondition> mConditions;
+        private List<GenericValue> mConditions;
 
         public StateConditions()
         {
-            mConditions = new List<StateCondition>();
+            mConditions = new List<GenericValue>();
         }
 
         /// <summary>
@@ -19,21 +19,18 @@ namespace Nullspace
         /// <param name="comType">比较类别</param>
         /// <param name="value">目标值</param>
         /// <returns></returns>
-        public StateConditions With(string parameterName, ConditionOperationType comType, object value)
+        public StateConditions With<T>(string parameterName, ConditionOperationType cot, T value)
         {
             // 这里不去重复
             // 比如 条件是一个区间
-            StateCondition condition = new StateCondition();
-            condition.Name = parameterName;
-            condition.Value = value;
-            condition.CompareType = comType;
+            GenericValue condition = GenericValue.CreateConditionValue(parameterName, value, cot);
             mConditions.Add(condition);
             return this;
         }
 
         public bool IsSuccess<T>(StateController<T> controller)
         {
-            foreach (StateCondition condition in mConditions)
+            foreach (GenericValue condition in mConditions)
             {
                 if (!controller.CheckCondition(condition))
                 {

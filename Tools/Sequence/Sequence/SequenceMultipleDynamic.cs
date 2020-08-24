@@ -26,12 +26,5 @@ namespace Nullspace
                 return 1;
             }
         }
-
-        public bool IsFinished
-        {
-            get
-            { return mBehaviours.Count > 0 || mAddBehaviourCaches.Count > 0;
-            }
-        }
     }
 }

@@ -5,7 +5,7 @@ namespace Nullspace
 {
     public class StateController<T>
     {
-        private Dictionary<string, StateControllerParameter> mParameters;
+        private Dictionary<string, GenericValue> mParameters;
         //private StateEntity<T> mEntryState;
         //private StateEntity<T> mExitState;
         //private StateEntity<T> mAnyStates;
@@ -13,7 +13,7 @@ namespace Nullspace
 
         public StateController()
         {
-            mParameters = new Dictionary<string, StateControllerParameter>();
+            mParameters = new Dictionary<string, GenericValue>();
             mStateSet = new List<StateEntity<T>>();
         }
 
@@ -52,28 +52,11 @@ namespace Nullspace
         {
             if (mParameters.ContainsKey(paraName))
             {
-                StateParameterDataType type = StateParameterDataType.TRIGGER;
-                Type vType = value.GetType();
-                if (vType == typeof(int))
+                StateGenericValue<U> param = mParameters[paraName] as StateGenericValue<U>;
+                DebugUtils.Assert(param != null, "");
+                if (!param.Value.Equals(value))
                 {
-                    type = StateParameterDataType.INT;
-                }
-                else if (vType == typeof(float))
-                {
-                    type = StateParameterDataType.FLOAT;
-                }
-                else if (vType == typeof(bool))
-                {
-                    type = StateParameterDataType.BOOLEAN;
-                }
-                else
-                {
-
-                }
-                Assert(type == mParameters[paraName].DataType, "wrong value type");
-                if (!mParameters[paraName].Value.Equals(value))
-                {
-                    mParameters[paraName].Value = value;
+                    param.Value = value;
                     Update(paraName);
                 }
             }
@@ -87,7 +70,7 @@ namespace Nullspace
                 bool isDirty = Current.CheckTransfer(out nextTransfer);
                 if (isDirty)
                 {
-                    Assert(!nextTransfer.Equals(Current.StateType), "wrong changed state");
+                    DebugUtils.Assert(!nextTransfer.Equals(Current.StateType), "wrong changed state");
                     ChangeStatus(nextTransfer);
                 }
             }
@@ -108,15 +91,12 @@ namespace Nullspace
         /// <param name="dataType">参数类型</param>
         /// <param name="ctlValue">参数控制值</param>
         /// <returns></returns>
-        public StateController<T> AddParameter(string paraName, StateParameterDataType dataType, object ctlValue)
+        public StateController<T> AddParameter<P>(string paraName, P ctlValue)
         {
             if (!mParameters.ContainsKey(paraName))
             {
-                StateControllerParameter param = new StateControllerParameter();
-                param.Name = paraName;
-                param.DataType = dataType;
-                param.Value = ctlValue;
-                mParameters.Add(paraName, param);
+                GenericValue value = GenericValue.CreateGenericValue(paraName, ctlValue);
+                mParameters.Add(paraName, value);
             }
             else
             {
@@ -126,70 +106,12 @@ namespace Nullspace
         }
 
 
-        public bool CheckCondition(StateCondition condition)
+        public bool CheckCondition(GenericValue condition)
         {
-            Assert(condition != null, "wrong condition");
-            StateControllerParameter param = mParameters[condition.Name];
-            Assert(param != null, "wrong parameter");
-            switch (param.DataType)
-            {
-                case StateParameterDataType.TRIGGER:
-                    return true;
-                case StateParameterDataType.BOOLEAN:
-                    return param.Value.Equals(condition.Value);
-                case StateParameterDataType.FLOAT:
-                    return CheckFloat((float)param.Value, (float)condition.Value, condition.CompareType);
-                case StateParameterDataType.INT:
-                    return CheckInt((int)param.Value, (int)condition.Value, condition.CompareType);
-            }
-            return true;
-        }
-        public static bool CheckInt(int a, int b, ConditionOperationType type)
-        {
-            switch (type)
-            {
-                case ConditionOperationType.EQUAL:
-                    return a == b;
-                case ConditionOperationType.GREATER:
-                    return a > b;
-                case ConditionOperationType.GREATER_EQUAL:
-                    return a >= b;
-                case ConditionOperationType.LESS:
-                    return a < b;
-                case ConditionOperationType.LESS_EQUAL:
-                    return a <= b;
-                case ConditionOperationType.NOT_EQUAL:
-                    return a != b;
-            }
-            return false;
-        }
-
-        public static bool CheckFloat(float a, float b, ConditionOperationType type)
-        {
-            switch (type)
-            {
-                case ConditionOperationType.EQUAL:
-                    return a == b;
-                case ConditionOperationType.GREATER:
-                    return a > b;
-                case ConditionOperationType.GREATER_EQUAL:
-                    return a >= b;
-                case ConditionOperationType.LESS:
-                    return a < b;
-                case ConditionOperationType.LESS_EQUAL:
-                    return a <= b;
-                case ConditionOperationType.NOT_EQUAL:
-                    return a != b;
-            }
-            return false;
-        }
-
-        public static void Assert(bool cond, string message)
-        {
-            if (!cond)
-            {
-                throw new Exception(message);
-            }
+            DebugUtils.Assert(condition != null, "wrong condition");
+            GenericValue param = mParameters[condition.Name];
+            DebugUtils.Assert(param != null, "wrong parameter");
+            return condition.CompareTo(param);
         }
     }
 }

@@ -13,9 +13,17 @@ namespace Nullspace
             mIsRemove = remove;
         }
 
-        internal override bool IsPlaying()
+        public override bool IsPlaying()
         {
             return mState == ThreeState.Playing;
+        }
+
+        public bool IsFinished
+        {
+            get
+            {
+                return mState == ThreeState.Finished;
+            }
         }
 
         internal override void NextBehaviour()

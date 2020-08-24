@@ -16,7 +16,7 @@ namespace Nullspace
             Target = target;
         }
 
-        internal override bool IsPlaying()
+        public override bool IsPlaying()
         {
             return mState == ThreeState.Playing || (Target != null && Target.IsPlaying());
         }

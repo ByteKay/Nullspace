@@ -34,9 +34,12 @@
     <Reference Include="CommonUtils">
       <HintPath>..\bin\CommonUtils.dll</HintPath>
     </Reference>
+    <Reference Include="Sequence, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Sequence.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="UnityEngine.CoreModule">
@@ -44,18 +47,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BehaviourTree\BehaviorTreeRoot.cs" />
     <Compile Include="BehaviourTree\BehaviourTree.cs" />
     <Compile Include="BehaviourTree\BTActionNode.cs" />
-    <Compile Include="BehaviourTree\BTCompositeNode.cs" />
-    <Compile Include="BehaviourTree\BTConditionNode.cs" />
-    <Compile Include="BehaviourTree\BTDecoratorNode.cs" />
-    <Compile Include="BehaviourTree\BTTimerTask.cs" />
-    <Compile Include="ConditionOperationType.cs" />
+    <Compile Include="BehaviourTree\Condition\BTConditionNode.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTCounterLimitNode.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTDecoratorNode.cs" />
+    <Compile Include="BehaviourTree\BTNodeState.cs" />
+    <Compile Include="BehaviourTree\Composite\BTCompositeNode.cs" />
+    <Compile Include="BehaviourTree\Composite\BTRandomSelectorNode.cs" />
+    <Compile Include="BehaviourTree\Composite\BTSelectorNode.cs" />
+    <Compile Include="BehaviourTree\Composite\BTSequenceNode.cs" />
+    <Compile Include="BehaviourTree\Condition\BTConditionRangeOperation.cs" />
+    <Compile Include="BehaviourTree\Condition\BTConditionSingleOperation.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTInvertNode.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTTimerLimitNode.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTTimerNode.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTUntilSuccessNode.cs" />
+    <Compile Include="BehaviourTree\Decorator\BTUtilFailureNode.cs" />
+    <Compile Include="GenericValue\ConditionOperationType.cs" />
     <Compile Include="FiniteStateMachine\ConditionTransfer\StateCondition.cs" />
     <Compile Include="FiniteStateMachine\ConditionTransfer\StateController.cs" />
     <Compile Include="FiniteStateMachine\ConditionTransfer\StateEntity.cs" />
-    <Compile Include="FiniteStateMachine\ConditionTransfer\StateParameterDataType.cs" />
-    <Compile Include="FiniteStateMachine\ConditionTransfer\StateParameterValue.cs" />
+    <Compile Include="GenericValue\ConditionValue.cs" />
+    <Compile Include="GenericValue\GenericValue.cs" />
     <Compile Include="FiniteStateMachine\IAgent.cs" />
     <Compile Include="FiniteStateMachine\IState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

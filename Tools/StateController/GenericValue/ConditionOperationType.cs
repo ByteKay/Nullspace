@@ -1,7 +1,6 @@
 ﻿
 namespace Nullspace
 {
-
     public enum ConditionOperationType
     {
         EQUAL,
