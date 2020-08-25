@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GameData;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nullspace

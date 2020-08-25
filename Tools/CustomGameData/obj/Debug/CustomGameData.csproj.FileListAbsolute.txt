@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\bin\CustomGameData.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\CustomGameData.pdb
+G:\UnityWorkspace\Nullspace\Tools\CustomGameData\obj\Debug\CustomGameData.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\CustomGameData\obj\Debug\CustomGameData.dll
+G:\UnityWorkspace\Nullspace\Tools\CustomGameData\obj\Debug\CustomGameData.pdb

@@ -38,6 +38,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\CommonUtils.dll</HintPath>
     </Reference>
+    <Reference Include="CustomGameData, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\CustomGameData.dll</HintPath>
+    </Reference>
     <Reference Include="GameDataRuntime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\GameDataRuntime.dll</HintPath>
@@ -71,7 +75,6 @@
     <Compile Include="Nav\NavPath\PathDefine\NavLinePosCurveDir.cs" />
     <Compile Include="Nav\NavPath\PathDefine\NavLinePosLineAngle.cs" />
     <Compile Include="Nav\NavPath\PathDefine\NavLinePosLineDir.cs" />
-    <Compile Include="Nav\NavPath\PathDefine\NavPathData.cs" />
     <Compile Include="Nav\NavPath\PathDefine\NavPathPoint.cs" />
     <Compile Include="Nav\NavPath\PathDefine\NavPathMoveType.cs" />
     <Compile Include="Nav\NavPath\NavPathUtils.cs" />

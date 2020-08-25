@@ -14,6 +14,10 @@ namespace Nullspace
         public static LoggerConfig Create(string logConfig)
         {
             Properties logProperties = Properties.Create(logConfig);
+            return Create(logProperties);
+        }
+        public static LoggerConfig Create(Properties logProperties)
+        {
             LoggerConfig config = new LoggerConfig();
             config.Directory = logProperties.GetString("Directory", "./Log");
             config.FileName = logProperties.GetString("FileName", "Nullspace");
@@ -22,7 +26,6 @@ namespace Nullspace
             config.LogLevel = ParseLevel(logProperties.GetString("LogLevel", "DEFAULT"));
             return config;
         }
-
         private static LogLevel ParseLevel(string levelString)
         {
             string level = StringUtils.StrTok(levelString, "|");

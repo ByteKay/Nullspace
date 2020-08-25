@@ -70,6 +70,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assetbundle", "Assetbundle\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomGameData", "CustomGameData\CustomGameData.csproj", "{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceCacheBehaviours", "ResourceCacheBehaviour\ResourceCacheBehaviours.csproj", "{974FEDE4-C739-4F05-9C9A-9487243B34A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathFinder", "PathFinder\PathFinder.csproj", "{BD4CC2B2-859B-4BF0-8344-05EC3D4A31CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BVHStatic", "StaticBVH\BVHStatic.csproj", "{7E9E9CA1-1D3F-4FDD-8A2F-1C392824696D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BVHDynamic", "DynamicBVH\BVHDynamic.csproj", "{325C300D-6946-45B3-96CD-67D4B4B76BD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDataRuntime", "GameDataRuntime\GameDataRuntime.csproj", "{50521232-F963-4A72-93F5-0B7FCDEF473B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameDataTool", "GameDataTool", "{60F76627-EDBA-41BE-A381-CD758C84FA9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,8 +160,33 @@ Global
 		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5237B3E0-15E9-415D-A346-4E45EAFEBEBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{974FEDE4-C739-4F05-9C9A-9487243B34A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{974FEDE4-C739-4F05-9C9A-9487243B34A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{974FEDE4-C739-4F05-9C9A-9487243B34A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{974FEDE4-C739-4F05-9C9A-9487243B34A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD4CC2B2-859B-4BF0-8344-05EC3D4A31CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD4CC2B2-859B-4BF0-8344-05EC3D4A31CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD4CC2B2-859B-4BF0-8344-05EC3D4A31CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD4CC2B2-859B-4BF0-8344-05EC3D4A31CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E9E9CA1-1D3F-4FDD-8A2F-1C392824696D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E9E9CA1-1D3F-4FDD-8A2F-1C392824696D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E9E9CA1-1D3F-4FDD-8A2F-1C392824696D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E9E9CA1-1D3F-4FDD-8A2F-1C392824696D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{325C300D-6946-45B3-96CD-67D4B4B76BD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{325C300D-6946-45B3-96CD-67D4B4B76BD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{325C300D-6946-45B3-96CD-67D4B4B76BD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{325C300D-6946-45B3-96CD-67D4B4B76BD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50521232-F963-4A72-93F5-0B7FCDEF473B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50521232-F963-4A72-93F5-0B7FCDEF473B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50521232-F963-4A72-93F5-0B7FCDEF473B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50521232-F963-4A72-93F5-0B7FCDEF473B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E46C291A-1B25-4127-946A-4E0425E0B320} = {60F76627-EDBA-41BE-A381-CD758C84FA9D}
+		{7BA96655-468A-45F5-AE46-7F62E706BBF3} = {60F76627-EDBA-41BE-A381-CD758C84FA9D}
+		{F0AEECD9-ED0F-4A08-AB3F-CB24BFA3739C} = {60F76627-EDBA-41BE-A381-CD758C84FA9D}
 	EndGlobalSection
 EndGlobal

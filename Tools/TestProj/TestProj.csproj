@@ -85,8 +85,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestClient.cs" />
-    <Compile Include="TestLogger.cs" />
     <Compile Include="TestMain.cs" />
     <Compile Include="TestSequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

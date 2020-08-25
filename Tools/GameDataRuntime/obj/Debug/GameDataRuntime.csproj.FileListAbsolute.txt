@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\GameDataRuntime\obj\Debug\GameDataRuntime.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataRuntime.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\GameDataRuntime.pdb
+G:\UnityWorkspace\Nullspace\Tools\GameDataRuntime\obj\Debug\GameDataRuntime.dll
+G:\UnityWorkspace\Nullspace\Tools\GameDataRuntime\obj\Debug\GameDataRuntime.pdb

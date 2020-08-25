@@ -5,3 +5,5 @@ F:\Unity\Nullspace\Tools\bin\TestProj.pdb
 F:\Unity\Nullspace\Tools\TestProj\obj\Release\TestProj.csprojResolveAssemblyReference.cache
 F:\Unity\Nullspace\Tools\TestProj\obj\Release\TestProj.exe
 F:\Unity\Nullspace\Tools\TestProj\obj\Release\TestProj.pdb
+G:\UnityWorkspace\Nullspace\Tools\TestProj\obj\Release\TestProj.exe
+G:\UnityWorkspace\Nullspace\Tools\TestProj\obj\Release\TestProj.pdb

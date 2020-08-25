@@ -3,3 +3,8 @@ F:\Unity\Nullspace\Tools\bin\PhysXSample.dll
 F:\Unity\Nullspace\Tools\bin\PhysXSample.pdb
 F:\Unity\Nullspace\Tools\PhysXSample\obj\Debug\PhysXSample.dll
 F:\Unity\Nullspace\Tools\PhysXSample\obj\Debug\PhysXSample.pdb
+G:\UnityWorkspace\Nullspace\Tools\bin\PhysXSample.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\PhysXSample.pdb
+G:\UnityWorkspace\Nullspace\Tools\PhysXSample\obj\Debug\PhysXSample.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\PhysXSample\obj\Debug\PhysXSample.dll
+G:\UnityWorkspace\Nullspace\Tools\PhysXSample\obj\Debug\PhysXSample.pdb

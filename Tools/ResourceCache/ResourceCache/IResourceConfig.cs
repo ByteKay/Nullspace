@@ -4,19 +4,19 @@ namespace Nullspace
 {
     public interface IResourceConfig
     {
-        int ID { get; set; }
-        string Directory { get; set; }
-        List<string> Names { get; set; }
-        bool Delay { get; set; }
-        StrategyType StrategyType { get; set; }
-        int MaxSize { get; set; }
-        int MinSize { get; set; }
-        int LifeTime { get; set; }
-        string GoName { get; set; }
-        bool Reset { get; set; }
-        string BehaviourName { get; set; }
-        int Mask { get; set; }
-        int Level { get; set; }
-        bool IsTimerOn { get; set; }
+        int ID { get; }
+        string Directory { get; }
+        List<string> Names { get; }
+        bool Delay { get; }
+        StrategyType StrategyType { get; }
+        int MaxSize { get; }
+        int MinSize { get; }
+        int LifeTime { get; }
+        string GoName { get; }
+        bool Reset { get; }
+        string BehaviourName { get; }
+        int Mask { get; }
+        int Level { get; }
+        bool IsTimerOn { get; }
     }
 }

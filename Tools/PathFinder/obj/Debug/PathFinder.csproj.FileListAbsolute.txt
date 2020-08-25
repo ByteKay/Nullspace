@@ -1,0 +1,5 @@
+G:\UnityWorkspace\Nullspace\Tools\bin\PathFinder.dll
+G:\UnityWorkspace\Nullspace\Tools\bin\PathFinder.pdb
+G:\UnityWorkspace\Nullspace\Tools\PathFinder\obj\Debug\PathFinder.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\PathFinder\obj\Debug\PathFinder.dll
+G:\UnityWorkspace\Nullspace\Tools\PathFinder\obj\Debug\PathFinder.pdb

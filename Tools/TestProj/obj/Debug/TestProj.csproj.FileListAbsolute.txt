@@ -7,3 +7,6 @@ F:\Unity\Nullspace\Tools\TestProj\obj\Debug\TestProj.pdb
 G:\UnityWorkspace\Nullspace\Tools\bin\TestProj.exe.config
 G:\UnityWorkspace\Nullspace\Tools\TestProj\obj\Debug\TestProj.exe
 G:\UnityWorkspace\Nullspace\Tools\TestProj\obj\Debug\TestProj.pdb
+G:\UnityWorkspace\Nullspace\Tools\TestProj\obj\Debug\TestProj.csprojResolveAssemblyReference.cache
+G:\UnityWorkspace\Nullspace\Tools\bin\TestProj.exe
+G:\UnityWorkspace\Nullspace\Tools\bin\TestProj.pdb

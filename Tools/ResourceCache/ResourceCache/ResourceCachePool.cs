@@ -6,10 +6,6 @@ using GameData;
 
 namespace Nullspace
 {
-    public enum ResourceCacheMask
-    {
-        Testing = 1,
-    }
 
 
     public static class  DeviceLevel

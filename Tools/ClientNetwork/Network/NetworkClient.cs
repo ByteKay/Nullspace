@@ -191,6 +191,8 @@ namespace Nullspace
 
     public partial class NetworkClient
     {
+        public static NetworkClient Instance = new NetworkClient();
+
         protected string mIP;
         protected int mPort;
         protected int mReconnectMaxCount = 5;
@@ -202,10 +204,15 @@ namespace Nullspace
         private IPAddress mAddress;
         private Socket mClientSocket;
 
-        public NetworkClient(Properties prop)
+        private NetworkClient()
         {
-            InitData(prop);
             InitState();
+        }
+
+        public void Initialize(Properties prop)
+        {
+            Stop();
+            InitData(prop);
             // 开始
             StateCtl.Set(StateParamName, StateParameterValue.None2Initialized);
         }
@@ -221,7 +228,6 @@ namespace Nullspace
             mNeedSendMessages = new Queue<byte[]>();
             mSendPack = new List<byte>();
         }
-
     }
 
     public partial class NetworkClient
@@ -258,8 +264,6 @@ namespace Nullspace
         {
             return State == NetworkConnectState.Connectted;
         }
-
-
 
         protected bool Connect()
         {
@@ -397,7 +401,7 @@ namespace Nullspace
             DebugUtils.Log(InfoType.Info, "EnterDisconnected");
         }
 
-        protected virtual void Stop()
+        public virtual void Stop()
         {
             mIsStop = true;
             mReceiveThread.Interrupt();
@@ -405,6 +409,10 @@ namespace Nullspace
             mSendWait.Reset();
             mReceiveWait.Reset();
             Close();
+            DelReconnectTimer();
+            DelHeartTimer();
+            StateCtl.AddState(NetworkConnectState.None).AsCurrent();
+            StateCtl.Set(StateParamName, StateParameterValue.None);
         }
 
         protected void Close()
@@ -468,7 +476,7 @@ namespace Nullspace
 
         protected void ExitConnectted()
         {
-            ClearHeart();
+            DelHeartTimer();
         }
 
         protected void InitHeart()
@@ -481,7 +489,7 @@ namespace Nullspace
             Send(NetworkPacket.HeartPacketBytes);
         }
 
-        protected void ClearHeart()
+        protected void DelHeartTimer()
         {
             TimerTaskQueue.Instance.DelTimer(mHeartTimerId);
         }

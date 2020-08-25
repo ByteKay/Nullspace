@@ -2,3 +2,4 @@ G:\UnityWorkspace\Nullspace\Tools\bin\Assetbundle.dll
 G:\UnityWorkspace\Nullspace\Tools\bin\Assetbundle.pdb
 G:\UnityWorkspace\Nullspace\Tools\Assetbundle\obj\Debug\Assetbundle.dll
 G:\UnityWorkspace\Nullspace\Tools\Assetbundle\obj\Debug\Assetbundle.pdb
+G:\UnityWorkspace\Nullspace\Tools\Assetbundle\obj\Debug\Assetbundle.csprojResolveAssemblyReference.cache

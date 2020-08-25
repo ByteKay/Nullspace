@@ -6,9 +6,11 @@ namespace Nullspace
 {
     public class Logger
     {
+        public static Logger Instance = new Logger();
+
         private LogFileWriter mFileWriter;
         private LoggerConfig Config;
-        private Action<string> mLog;
+        private event Action<string> mLog;
         private bool isInitialize = false;
 
         public void Stop()
@@ -16,6 +18,22 @@ namespace Nullspace
             if (mFileWriter != null)
             {
                 mFileWriter.Stop();
+            }
+        }
+
+        public void Initialize(string logCfgFile)
+        {
+            if (!isInitialize)
+            {
+                Initialize(LoggerConfig.Create(logCfgFile));
+            }
+        }
+
+        public void Initialize(Properties config)
+        {
+            if (!isInitialize)
+            {
+                Initialize(LoggerConfig.Create(config));
             }
         }
 
@@ -29,7 +47,7 @@ namespace Nullspace
                     Directory.CreateDirectory(Config.Directory);
                 }
                 mFileWriter = new LogFileWriter(Config);
-                mLog = mFileWriter.Log;
+                AddLogOut(mFileWriter.Log);
                 isInitialize = true;
             }
         }
